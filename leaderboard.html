@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rat Republic — Leaderboard</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #1a1f0f;
+            background-image: url('images/Background.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: #fff;
+            font-family: monospace, 'Courier New', sans-serif;
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+        }
+
+        .container { max-width: 860px; margin: 0 auto; }
+
+        @font-face {
+            font-family: 'NftOpensea';
+            src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
+        }
+
+        /* Header image */
+        .page-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .page-header img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .page-header-text {
+            text-align: center;
+            font-family: 'NftOpensea', monospace;
+            color: #ffffff;
+            font-size: 2.2rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 16px rgba(255,255,255,0.2);
+            margin-bottom: 6px;
+        }
+
+        /* Week + countdown */
+        .week-bar {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .week-label {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.45);
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+        .countdown {
+            font-size: 1rem;
+            color: rgba(200,224,48,0.6);
+            letter-spacing: 1.5px;
+        }
+
+        /* Podium */
+        .podium {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        /* shared card base */
+        .podium-card {
+            background: rgba(20,28,12,0.92);
+            border: 2px solid #5A7A18;
+            border-radius: 14px;
+            transition: all 0.2s;
+            position: relative;
+            width: 100%;
+        }
+        .podium-card:hover { border-color: #C8E030; box-shadow: 0 0 20px rgba(200,224,48,0.15); }
+        .podium-card.rank-2 { border-color: #7a9a30; }
+        .podium-card.rank-3 { border-color: #5A7A18; }
+
+        /* ── RANK 1 — horizontal flex ── */
+        .podium-card.rank-1 {
+            border-color: #C8E030;
+            box-shadow: 0 0 28px rgba(200,224,48,0.28);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 14px 20px 14px 16px;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+        .rank-1 .podium-avatar {
+            width: 150px; height: 150px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: #2a3510;
+            border: 3px solid #C8E030;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.2rem;
+            overflow: hidden;
+        }
+        .rank-1 .podium-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .rank-1 .podium-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .rank-1 .podium-rank-title {
+            font-family: 'NftOpensea', monospace;
+            font-size: 2rem;
+            color: #C8E030;
+            letter-spacing: 3px;
+            text-shadow: 0 0 14px rgba(200,224,48,0.5);
+            margin-bottom: 4px;
+        }
+        .rank-1 .podium-username {
+            font-family: 'NftOpensea', monospace;
+            font-size: 1.4rem;
+            color: #C8E030;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+        .rank-1 hr.podium-divider {
+            border: none; border-top: 1px solid rgba(200,224,48,0.25);
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .rank-1 .podium-sol {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #C8E030;
+            text-shadow: 0 0 10px rgba(200,224,48,0.5);
+        }
+        .rank-1 .podium-sol-label {
+            font-size: 0.62rem;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 2.5px;
+            margin-top: 2px;
+        }
+        .rank-1 .podium-meta {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.35);
+            margin-top: 6px;
+        }
+
+        /* ── RANK 2 & 3 — same horizontal flex as rank-1 ── */
+        .podium-card.rank-2 {
+            border-color: #b8c860;
+            box-shadow: 0 0 20px rgba(184,200,96,0.2);
+            display: flex; align-items: center;
+            gap: 20px; padding: 14px 20px 14px 16px;
+            max-width: 520px; margin: 0 auto;
+        }
+        .podium-card.rank-3 {
+            border-color: #8aa030;
+            box-shadow: 0 0 16px rgba(138,160,48,0.15);
+            display: flex; align-items: center;
+            gap: 20px; padding: 14px 20px 14px 16px;
+            max-width: 520px; margin: 0 auto;
+        }
+        .podium-card.rank-2 .podium-avatar,
+        .podium-card.rank-3 .podium-avatar {
+            width: 150px; height: 150px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: #2a3510;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.2rem;
+            overflow: hidden;
+        }
+        .podium-card.rank-2 .podium-avatar { border: 3px solid #b8c860; }
+        .podium-card.rank-3 .podium-avatar { border: 3px solid #8aa030; }
+        .podium-card.rank-2 .podium-avatar img,
+        .podium-card.rank-3 .podium-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .podium-card.rank-2 .podium-info,
+        .podium-card.rank-3 .podium-info {
+            flex: 1;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+        }
+        .podium-card.rank-2 .podium-rank-title,
+        .podium-card.rank-3 .podium-rank-title {
+            font-family: 'NftOpensea', monospace;
+            font-size: 2rem; letter-spacing: 3px; margin-bottom: 4px;
+        }
+        .rank-2 .podium-rank-title { color: #b8c860; text-shadow: 0 0 14px rgba(184,200,96,0.4); }
+        .rank-3 .podium-rank-title { color: #8aa030; text-shadow: 0 0 14px rgba(138,160,48,0.4); }
+        .podium-card.rank-2 .podium-username,
+        .podium-card.rank-3 .podium-username {
+            font-family: 'NftOpensea', monospace;
+            font-size: 1.4rem; color: #C8E030;
+            letter-spacing: 2px; margin-bottom: 12px;
+        }
+        .podium-card.rank-2 hr.podium-divider,
+        .podium-card.rank-3 hr.podium-divider {
+            border: none; border-top: 1px solid rgba(200,224,48,0.2);
+            width: 100%; margin-bottom: 10px;
+        }
+        .podium-card.rank-2 .podium-sol,
+        .podium-card.rank-3 .podium-sol {
+            font-size: 1.8rem; font-weight: 800;
+            color: #C8E030; text-shadow: 0 0 10px rgba(200,224,48,0.4);
+        }
+        .podium-card.rank-2 .podium-sol-label,
+        .podium-card.rank-3 .podium-sol-label {
+            font-size: 0.62rem; color: rgba(255,255,255,0.3);
+            letter-spacing: 2.5px; margin-top: 2px;
+        }
+        .podium-card.rank-2 .podium-meta,
+        .podium-card.rank-3 .podium-meta {
+            font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-top: 6px;
+        }
+
+        @media (max-width: 560px) {
+            .podium-card.rank-1,
+            .podium-card.rank-2,
+            .podium-card.rank-3 { flex-direction: column; padding: 18px 16px; }
+        }
+
+        /* Rank table */
+        .rank-card {
+            background: rgba(20,28,12,0.92);
+            border: 2px solid #5A7A18;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+        .rank-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .rank-table th {
+            font-size: 0.62rem;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 2px;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(90,122,24,0.4);
+            white-space: nowrap;
+        }
+        .rank-table td {
+            padding: 11px 16px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.75);
+            border-bottom: 1px solid rgba(90,122,24,0.18);
+            vertical-align: middle;
+        }
+        .rank-table tr:last-child td { border-bottom: none; }
+        .rank-table tr:hover td { background: rgba(200,224,48,0.04); }
+        .rank-table tr.is-me td { background: rgba(200,224,48,0.07); color: #C8E030; }
+
+        .rank-num {
+            font-weight: bold;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.78rem;
+            width: 40px;
+        }
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .table-avatar {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: #2a3510;
+            border: 1.5px solid #5A7A18;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .table-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .sol-val { color: #C8E030; font-weight: bold; }
+
+        /* Empty state */
+        .empty-state {
+            background: rgba(20,28,12,0.92);
+            border: 2px solid #5A7A18;
+            border-radius: 12px;
+            padding: 48px 24px;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .empty-state p {
+            color: rgba(255,255,255,0.35);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            line-height: 1.8;
+        }
+        .empty-state a {
+            color: #C8E030;
+            text-decoration: none;
+        }
+
+        /* Past Winners */
+        .crowned-heading {
+            font-family: 'NftOpensea', monospace;
+            font-size: 2.6rem;
+            color: #ffffff;
+            letter-spacing: 4px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(255,255,255,0.15);
+            margin: 0 0 6px;
+        }
+        .past-winners-title {
+            font-family: 'NftOpensea', monospace;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.75);
+            letter-spacing: 4px;
+            text-align: center;
+            margin: 36px 0 20px;
+        }
+        .past-week-block {
+            max-width: 520px;
+            margin: 0 auto 32px;
+        }
+        .past-week-label {
+            text-align: center;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        /* Loading */
+        .loading-state {
+            text-align: center;
+            padding: 60px 0;
+            color: rgba(255,255,255,0.25);
+            font-size: 0.78rem;
+            letter-spacing: 2px;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="page-header" id="header-img-wrap">
+            <img src="images/leaderboard-header.png" alt="Leaderboard"
+                 onerror="this.style.display='none'; document.getElementById('header-fallback').style.display='block';">
+            <div id="header-fallback" class="page-header-text hidden">LEADERBOARD</div>
+        </div>
+
+        <div class="crowned-heading">CROWNED VERMINS</div>
+
+        <div class="week-bar">
+            <div class="week-label" id="week-label">Loading…</div>
+            <div class="countdown" id="countdown"></div>
+        </div>
+
+        <div class="loading-state" id="loading">LOADING…</div>
+
+        <!-- Podium (top 3) -->
+        <div class="podium hidden" id="podium"></div>
+
+        <!-- Rank table (4th+) -->
+        <div class="rank-card hidden" id="rank-card">
+            <table class="rank-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>USER</th>
+                        <th>SOL RECLAIMED</th>
+                        <th>ACCOUNTS</th>
+                        <th>TXS</th>
+                    </tr>
+                </thead>
+                <tbody id="rank-body"></tbody>
+            </table>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state hidden" id="empty-state">
+            <p>No reclaims recorded this week yet.<br>
+            Be the first! <a href="cleanup.html">Launch Scavenger →</a></p>
+        </div>
+
+        <!-- Past Winners -->
+        <div id="past-winners-section" class="hidden">
+            <div class="past-winners-title">LAST WEEK WINNERS</div>
+            <div id="past-winners-list"></div>
+        </div>
+
+    </div>
+
+    <script>
+        var myUserId = null;
+        var countdownInterval = null;
+        var resetInSeconds = 0;
+
+        function formatCountdown(secs) {
+            var d = Math.floor(secs / 86400);
+            var h = Math.floor((secs % 86400) / 3600);
+            var m = Math.floor((secs % 3600) / 60);
+            var s = secs % 60;
+            var parts = [];
+            if (d > 0) parts.push(d + 'd');
+            if (h > 0 || d > 0) parts.push(h + 'h');
+            parts.push(m + 'm');
+            if (d === 0) parts.push(s + 's');
+            return 'Resets in ' + parts.join(' ');
+        }
+
+        function formatWeek(start, end) {
+            var s = new Date(start + 'T00:00:00Z');
+            var e = new Date(end   + 'T00:00:00Z');
+            var opts = { month: 'short', day: 'numeric', timeZone: 'UTC' };
+            return 'Week of ' + s.toLocaleDateString('en-US', opts)
+                + ' – ' + e.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+        }
+
+        function avatarEl(avatarUrl, size) {
+            var wrap = document.createElement('div');
+            wrap.className = size === 'podium' ? 'podium-avatar' : 'table-avatar';
+            var img = document.createElement('img');
+            img.src = avatarUrl || 'images/Default-Avatar.png';
+            img.onerror = function() { this.src = 'images/Default-Avatar.png'; };
+            wrap.appendChild(img);
+            return wrap;
+        }
+
+        function buildPodium(entries) {
+            var titles = ['🥇 ALPHA RAT', '🥈 BETA RAT', '🥉 GAMMA RAT'];
+            var podium = document.getElementById('podium');
+            podium.innerHTML = '';
+
+            function makeCard(e, i) {
+                var card = document.createElement('div');
+                card.className = 'podium-card rank-' + (i + 1);
+                if (myUserId && String(e.id) === String(myUserId)) card.classList.add('is-me');
+
+                var av = avatarEl(e.avatar_url, 'podium');
+
+                var rankTitle = document.createElement('div');
+                rankTitle.className = 'podium-rank-title';
+                rankTitle.textContent = titles[i];
+
+                var uname = document.createElement('div');
+                uname.className = 'podium-username';
+                uname.textContent = e.username;
+
+                var sol = document.createElement('div');
+                sol.className = 'podium-sol';
+                sol.textContent = parseFloat(e.weekly_sol).toFixed(4) + ' SOL';
+
+                var solLabel = document.createElement('div');
+                solLabel.className = 'podium-sol-label';
+                solLabel.textContent = 'RECLAIMED THIS WEEK';
+
+                var meta = document.createElement('div');
+                meta.className = 'podium-meta';
+                meta.textContent = e.weekly_accounts + ' accounts · ' + e.weekly_txs + ' txs';
+
+                // All ranks — horizontal: big avatar left, info right
+                var info = document.createElement('div');
+                info.className = 'podium-info';
+                var hr = document.createElement('hr');
+                hr.className = 'podium-divider';
+                info.appendChild(rankTitle);
+                info.appendChild(uname);
+                info.appendChild(hr);
+                info.appendChild(sol);
+                info.appendChild(solLabel);
+                info.appendChild(meta);
+                card.appendChild(av);
+                card.appendChild(info);
+                return card;
+            }
+
+            var top3 = entries.slice(0, 3);
+            top3.forEach(function(e, i) { podium.appendChild(makeCard(e, i)); });
+
+            podium.classList.remove('hidden');
+        }
+
+        function buildTable(entries) {
+            var tbody = document.getElementById('rank-body');
+            tbody.innerHTML = '';
+            var rest = entries.slice(3);
+            if (rest.length === 0) return;
+
+            rest.forEach(function(e, i) {
+                var rank = i + 4;
+                var tr = document.createElement('tr');
+                if (myUserId && String(e.id) === String(myUserId)) tr.classList.add('is-me');
+
+                var tdRank = document.createElement('td');
+                tdRank.className = 'rank-num';
+                tdRank.textContent = '#' + rank;
+
+                var tdUser = document.createElement('td');
+                var cell = document.createElement('div');
+                cell.className = 'user-cell';
+                cell.appendChild(avatarEl(e.avatar_url, 'table'));
+                var span = document.createElement('span');
+                span.textContent = e.username;
+                cell.appendChild(span);
+                tdUser.appendChild(cell);
+
+                var tdSol = document.createElement('td');
+                tdSol.className = 'sol-val';
+                tdSol.textContent = parseFloat(e.weekly_sol).toFixed(4);
+
+                var tdAcc = document.createElement('td');
+                tdAcc.textContent = e.weekly_accounts;
+
+                var tdTxs = document.createElement('td');
+                tdTxs.textContent = e.weekly_txs;
+
+                tr.appendChild(tdRank);
+                tr.appendChild(tdUser);
+                tr.appendChild(tdSol);
+                tr.appendChild(tdAcc);
+                tr.appendChild(tdTxs);
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('rank-card').classList.remove('hidden');
+        }
+
+        function load() {
+            // Try to get logged-in user id for row highlight
+            var token = localStorage.getItem('rr_token');
+
+            fetch('api/leaderboard.php')
+                .then(function(r) { return r.text(); })
+                .then(function(text) {
+                    var data;
+                    try { data = JSON.parse(text); }
+                    catch(e) {
+                        document.getElementById('loading').textContent = 'API error: ' + text.slice(0, 200);
+                        return;
+                    }
+                    if (data.error) {
+                        document.getElementById('loading').textContent = 'Error: ' + data.error;
+                        return;
+                    }
+                    document.getElementById('loading').classList.add('hidden');
+
+                    document.getElementById('week-label').textContent = formatWeek(data.week_start, data.week_end);
+
+                    resetInSeconds = data.reset_in;
+                    document.getElementById('countdown').textContent = formatCountdown(resetInSeconds);
+                    countdownInterval = setInterval(function() {
+                        resetInSeconds = Math.max(0, resetInSeconds - 1);
+                        document.getElementById('countdown').textContent = formatCountdown(resetInSeconds);
+                    }, 1000);
+
+                    if (!data.entries || data.entries.length === 0) {
+                        document.getElementById('empty-state').classList.remove('hidden');
+                        loadWinners();
+                        return;
+                    }
+
+                    // Get logged-in user id before rendering
+                    if (token) {
+                        fetch('api/me.php', { headers: { 'Authorization': 'Bearer ' + token } })
+                            .then(function(r) { return r.ok ? r.json() : null; })
+                            .then(function(me) {
+                                if (me) myUserId = me.id;
+                                render(data.entries);
+                                loadWinners();
+                            })
+                            .catch(function() { render(data.entries); loadWinners(); });
+                    } else {
+                        render(data.entries);
+                        loadWinners();
+                    }
+                })
+                .catch(function() {
+                    document.getElementById('loading').textContent = 'Failed to load leaderboard.';
+                });
+        }
+
+        function render(entries) {
+            buildPodium(entries);
+            buildTable(entries);
+        }
+
+        function loadWinners() {
+            fetch('api/winners.php')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data.weeks || data.weeks.length === 0) return;
+                    var titles = ['🥇 ALPHA RAT', '🥈 BETA RAT', '🥉 GAMMA RAT'];
+                    var list = document.getElementById('past-winners-list');
+                    list.innerHTML = '';
+
+                    data.weeks.forEach(function(week) {
+                        var block = document.createElement('div');
+                        block.className = 'past-week-block';
+
+                        var label = document.createElement('div');
+                        label.className = 'past-week-label';
+                        label.textContent = week.label;
+                        block.appendChild(label);
+
+                        week.entries.forEach(function(e) {
+                            var i = e.rank - 1;
+                            var card = document.createElement('div');
+                            card.className = 'podium-card rank-' + e.rank;
+
+                            var av = avatarEl(e.avatar_url, 'podium');
+
+                            var info = document.createElement('div');
+                            info.className = 'podium-info';
+
+                            var rankTitle = document.createElement('div');
+                            rankTitle.className = 'podium-rank-title';
+                            rankTitle.textContent = titles[i] || ('#' + e.rank);
+
+                            var uname = document.createElement('div');
+                            uname.className = 'podium-username';
+                            uname.textContent = e.username;
+
+                            var hr = document.createElement('hr');
+                            hr.className = 'podium-divider';
+
+                            var sol = document.createElement('div');
+                            sol.className = 'podium-sol';
+                            sol.textContent = parseFloat(e.sol_amount).toFixed(4) + ' SOL';
+
+                            var solLabel = document.createElement('div');
+                            solLabel.className = 'podium-sol-label';
+                            solLabel.textContent = 'RECLAIMED THAT WEEK';
+
+                            var meta = document.createElement('div');
+                            meta.className = 'podium-meta';
+                            meta.textContent = e.accounts_closed + ' accounts · ' + e.tx_count + ' txs';
+
+                            info.appendChild(rankTitle);
+                            info.appendChild(uname);
+                            info.appendChild(hr);
+                            info.appendChild(sol);
+                            info.appendChild(solLabel);
+                            info.appendChild(meta);
+                            card.appendChild(av);
+                            card.appendChild(info);
+                            block.appendChild(card);
+                        });
+
+                        list.appendChild(block);
+                    });
+
+                    document.getElementById('past-winners-section').classList.remove('hidden');
+                })
+                .catch(function() {});
+        }
+
+        load();
+    </script>
+
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+</body>
+</html>

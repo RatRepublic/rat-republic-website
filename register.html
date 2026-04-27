@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rat Republic — Register</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #1a1f0f;
+            background-image: url('images/Background.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: #fff;
+            font-family: monospace, 'Courier New', sans-serif;
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .container { width: 100%; max-width: 420px; }
+        @font-face {
+            font-family: 'NftOpensea';
+            src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 24px;
+            background-color: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            color: #C8E030;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+        .back-btn:hover { border-color: #C8E030; box-shadow: 0 0 10px rgba(200,224,48,0.3); }
+        .main-card {
+            background: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            border-radius: 16px;
+            padding: 32px 28px;
+        }
+        .page-title {
+            text-align: center;
+            font-family: 'NftOpensea', monospace;
+            color: #fff;
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            margin-bottom: 6px;
+        }
+        .page-sub {
+            text-align: center;
+            color: rgba(255,255,255,0.35);
+            font-size: 0.68rem;
+            letter-spacing: 2px;
+            margin-bottom: 28px;
+        }
+        .field { margin-bottom: 18px; }
+        .field label {
+            display: block;
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+        .field input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid #5A7A18;
+            border-radius: 8px;
+            color: #fff;
+            font-family: monospace;
+            font-size: 0.9rem;
+            padding: 11px 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .field input:focus { border-color: #C8E030; }
+        .field input::placeholder { color: rgba(255,255,255,0.2); }
+        .btn-submit {
+            width: 100%;
+            background-color: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            color: #C8E030;
+            font-weight: bold;
+            font-family: 'NftOpensea', monospace;
+            font-size: 0.95rem;
+            padding: 13px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+        .btn-submit:hover {
+            border-color: #C8E030;
+            box-shadow: 0 0 14px rgba(200,224,48,0.35);
+            background-color: rgba(40,60,15,0.98);
+        }
+        .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+        .msg {
+            margin-top: 14px;
+            font-size: 0.78rem;
+            text-align: center;
+            min-height: 1.2em;
+        }
+        .msg.error { color: #ff8080; }
+        .msg.success { color: #C8E030; }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.74rem;
+            color: rgba(255,255,255,0.35);
+        }
+        .login-link a { color: #C8E030; text-decoration: none; }
+        .login-link a:hover { text-decoration: underline; }
+        .check-inbox {
+            text-align: center;
+            padding: 10px 0 6px;
+        }
+        .inbox-icon {
+            font-size: 2.8rem;
+            margin-bottom: 14px;
+        }
+        .inbox-title {
+            font-family: 'NftOpensea', monospace;
+            font-size: 1.3rem;
+            color: #C8E030;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+        .inbox-body {
+            color: rgba(255,255,255,0.55);
+            font-size: 0.8rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+        .inbox-email {
+            color: #C8E030;
+        }
+        .btn-resend {
+            background: transparent;
+            border: 1.5px solid #5A7A18;
+            color: rgba(255,255,255,0.4);
+            font-family: monospace;
+            font-size: 0.75rem;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+        .btn-resend:hover { border-color: #C8E030; color: #C8E030; }
+        .btn-resend:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="tools.html" class="back-btn">← Back to Utilities</a>
+        <div class="main-card">
+            <div class="page-title">REGISTER</div>
+            <div class="page-sub">CREATE YOUR RAT REPUBLIC ACCOUNT</div>
+
+            <div class="field">
+                <label>USERNAME</label>
+                <input type="text" id="username" placeholder="RatKing" maxlength="20" autocomplete="username">
+            </div>
+            <div class="field">
+                <label>EMAIL</label>
+                <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="field">
+                <label>PASSWORD</label>
+                <input type="password" id="password" placeholder="Min 8 characters" autocomplete="new-password">
+            </div>
+            <div class="field">
+                <label>CONFIRM PASSWORD</label>
+                <input type="password" id="confirm" placeholder="Repeat password" autocomplete="new-password">
+            </div>
+
+            <button class="btn-submit" id="register-btn">Create Account</button>
+            <div class="msg" id="msg"></div>
+
+            <div class="login-link">Already have an account? <a href="login.html">Log in</a></div>
+
+            <!-- Shown after successful registration -->
+            <div class="check-inbox" id="inbox-screen" style="display:none;">
+                <div class="inbox-icon">📬</div>
+                <div class="inbox-title">CHECK YOUR INBOX</div>
+                <div class="inbox-body">
+                    We sent a verification link to<br>
+                    <span class="inbox-email" id="inbox-email-display"></span><br><br>
+                    Click the link in the email to activate your account.<br>
+                    The link expires in <strong style="color:#C8E030;">24 hours</strong>.
+                </div>
+                <button class="btn-resend" id="resend-btn">Resend Email</button>
+                <div class="msg" id="resend-msg" style="margin-top:10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var btn        = document.getElementById('register-btn');
+        var msg        = document.getElementById('msg');
+        var registeredEmail = '';
+        var refCode    = new URLSearchParams(window.location.search).get('ref') || '';
+
+        btn.addEventListener('click', async function () {
+            var username = document.getElementById('username').value.trim();
+            var email    = document.getElementById('email').value.trim();
+            var password = document.getElementById('password').value;
+            var confirm  = document.getElementById('confirm').value;
+
+            msg.className = 'msg';
+            msg.textContent = '';
+
+            if (!email || !password) {
+                msg.className = 'msg error';
+                msg.textContent = 'Email and password are required.';
+                return;
+            }
+            if (password.length < 8) {
+                msg.className = 'msg error';
+                msg.textContent = 'Password must be at least 8 characters.';
+                return;
+            }
+            if (password !== confirm) {
+                msg.className = 'msg error';
+                msg.textContent = 'Passwords do not match.';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+
+            try {
+                var resp = await fetch('api/auth.php?action=register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username, email: email, password: password, ref: refCode })
+                });
+                var data = await resp.json();
+
+                if (!resp.ok) {
+                    msg.className = 'msg error';
+                    msg.textContent = data.error || 'Registration failed.';
+                    btn.disabled = false;
+                    btn.textContent = 'Create Account';
+                    return;
+                }
+
+                // Show the "check your inbox" screen
+                registeredEmail = email;
+                document.getElementById('inbox-email-display').textContent = email;
+                document.querySelector('.main-card').querySelectorAll('.field, .btn-submit, .msg, .login-link').forEach(function (el) {
+                    el.style.display = 'none';
+                });
+                document.getElementById('inbox-screen').style.display = 'block';
+                document.querySelector('.page-title').textContent = 'ALMOST THERE';
+                document.querySelector('.page-sub').textContent   = 'ONE LAST STEP';
+
+            } catch (e) {
+                msg.className = 'msg error';
+                msg.textContent = 'Network error. Please try again.';
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+            }
+        });
+
+        // Resend button
+        var resendBtn = document.getElementById('resend-btn');
+        var resendMsg = document.getElementById('resend-msg');
+        var resendCooldown = false;
+
+        resendBtn.addEventListener('click', async function () {
+            if (resendCooldown || !registeredEmail) return;
+            resendBtn.disabled = true;
+            resendMsg.className = 'msg';
+            resendMsg.textContent = 'Sending...';
+            resendCooldown = true;
+
+            try {
+                await fetch('api/auth.php?action=resend-verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: registeredEmail })
+                });
+                resendMsg.className = 'msg success';
+                resendMsg.textContent = 'Email resent! Check your inbox.';
+            } catch (e) {
+                resendMsg.className = 'msg error';
+                resendMsg.textContent = 'Network error. Try again.';
+            }
+
+            // 60-second cooldown to prevent spam
+            setTimeout(function () {
+                resendBtn.disabled = false;
+                resendCooldown = false;
+                if (resendMsg.textContent === 'Email resent! Check your inbox.') {
+                    resendMsg.textContent = '';
+                }
+            }, 60000);
+        });
+    </script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+</body>
+</html>

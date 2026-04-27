@@ -1,0 +1,705 @@
+﻿/*==========================================================*/
+/* Global Scrolling & Reset */
+/*==========================================================*/
+* {
+    box-sizing: border-box;
+}
+
+html {
+    /* Ensures smooth animation when clicking navigation links */
+    scroll-behavior: smooth;
+}
+
+/*==========================================================*/
+/* Base & Background Styling (ADOPTED from Source File) */
+/*==========================================================*/
+body {
+    /* ADOPTED: Fixed background image and light blue fallback */
+    background-color: #90E0EF; 
+    background-image: url('../images/Background.png'); 
+    background-size: cover;
+    background-repeat: no-repeat; 
+    background-attachment: fixed; 
+    background-position: center center; 
+    
+    /* RETAINED: Structural and font setup from the Target File */
+    width: 100vw !important;
+    font-family: monospace, 'Courier New', sans-serif; 
+    color: #333333; 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/*==========================================================*/
+/* Typography & Headings */
+/*==========================================================*/
+h2 a {
+    color: #333333; 
+    text-decoration: none;
+}
+
+h2 {
+    font-size: 27px;
+    background-color: transparent; 
+    border-radius: 0;
+    line-height: 1.2;
+    margin: 28px 0;
+    font-weight: 800;
+    padding: 0; 
+    color: #333333; 
+    text-transform: uppercase;
+    box-shadow: none; 
+    margin-top: 0px;
+    text-decoration: none !important;
+}
+
+/* Specific text container styling for readability over the background image */
+.hero-content {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    max-width: 450px;
+    margin: 0 auto; 
+}
+
+/* New class to set sections to semi-transparent white (Artworks/Content) */
+.artwork-transparent {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* P-tags inside the generator section (e.g., <p>Background</p>) */
+.outfit-section p {
+    font-family: monospace, 'Courier New', sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    color: #C8E030;
+    background-color: rgba(20, 28, 12, 0.92);
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    text-align: center;
+    width: 100%;
+    border: 1px solid #5A7A18;
+    text-shadow: 0 0 8px rgba(200, 224, 48, 0.6);
+    letter-spacing: 1px;
+}
+
+/* Fix for the intro text color */
+.intro-text h2 {
+    color: #C8E030 !important; 
+}
+
+
+/*==========================================================*/
+/* Custom Button Styles (ADOPTED & ROUNDED FIX) */
+/*==========================================================*/
+/* New classes for general usage across the site */
+.btn-green-custom {
+    background-color: rgba(20, 28, 12, 0.92);
+    border: 2px solid #5A7A18;
+    color: #C8E030;
+    font-weight: bold;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    text-shadow: 0 0 6px rgba(200, 224, 48, 0.4);
+}
+
+.btn-green-custom:hover {
+    background-color: rgba(40, 60, 15, 0.98);
+    border-color: #C8E030;
+    color: #C8E030;
+    box-shadow: 0 0 10px rgba(200, 224, 48, 0.35);
+}
+
+.btn-yellow-custom {
+    background-color: rgba(20, 28, 12, 0.92);
+    border: 2px solid #5A7A18;
+    color: #C8E030;
+    font-weight: bold;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    text-shadow: 0 0 6px rgba(200, 224, 48, 0.4);
+}
+
+.btn-yellow-custom:hover {
+    background-color: rgba(40, 60, 15, 0.98);
+    border-color: #C8E030;
+    color: #C8E030;
+    box-shadow: 0 0 10px rgba(200, 224, 48, 0.35);
+}
+
+/* Generator buttons */
+#reset-button, #download-button, #randomize-button, #daily-button, #share-button {
+    padding: 10px 20px;
+    font-family: monospace, 'Courier New', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    cursor: pointer;
+    border: 2px solid #5A7A18;
+    border-radius: 10px;
+    background-color: rgba(20, 28, 12, 0.92);
+    color: #C8E030;
+    transition: all 0.2s;
+    width: 150px;
+    text-align: center;
+    text-shadow: 0 0 6px rgba(200, 224, 48, 0.5);
+    letter-spacing: 1px;
+}
+
+#reset-button:hover, #download-button:hover, #randomize-button:hover, #daily-button:hover, #share-button:hover {
+    background-color: rgba(40, 60, 15, 0.98);
+    border-color: #C8E030;
+    box-shadow: 0 0 10px rgba(200, 224, 48, 0.4);
+}
+
+/*==========================================================*/
+/* Meme Text Controls */
+/*==========================================================*/
+.meme-controls {
+    margin-top: 14px;
+    background-color: rgba(20, 28, 12, 0.88);
+    border: 1px solid #5A7A18;
+    border-radius: 8px;
+    padding: 10px 14px;
+    width: 100%;
+    max-width: 350px;
+}
+
+.meme-title {
+    color: #C8E030;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 13px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    text-shadow: 0 0 6px rgba(200,224,48,0.4);
+}
+
+#meme-text {
+    width: 100%;
+    background-color: rgba(255,255,255,0.07);
+    border: 1px solid #5A7A18;
+    border-radius: 5px;
+    color: #fff;
+    font-family: monospace;
+    font-size: 13px;
+    padding: 5px 8px;
+    margin-bottom: 8px;
+    outline: none;
+}
+
+#meme-text:focus { border-color: #C8E030; }
+
+.meme-options {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.meme-options label {
+    color: rgba(255,255,255,0.65);
+    font-family: monospace;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.meme-options select {
+    background-color: rgba(20,28,12,0.95);
+    border: 1px solid #5A7A18;
+    color: #C8E030;
+    font-family: monospace;
+    font-size: 12px;
+    border-radius: 4px;
+    padding: 2px 4px;
+    outline: none;
+}
+
+.meme-options input[type="color"] {
+    width: 36px;
+    height: 24px;
+    border: 1px solid #5A7A18;
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+/*==========================================================*/
+/* Image Generator Component Styles (FIXES APPLIED) */
+/*==========================================================*/
+.game-container {
+    flex-direction: row;
+    align-items: center;
+    padding: 15px;
+    border-radius: 0;
+    margin-bottom: 40px;
+    width: 1100px;
+    max-width: 1200px;
+}
+
+.base-and-options {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 70px;
+}
+
+/*==========================================================*/
+/* Image Generator Component Styles (IMAGE SIZE FIX) */
+/*==========================================================*/
+
+/* --- FIX: Constrain the parent image container height and remove aspect ratio hack --- */
+.base-image {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    background-color: white;
+    border-radius: 0;
+    
+    /* ADDED: Set maximum height equal to maximum width to maintain square shape */
+    max-height: 350px; 
+    height: 100%; 
+    
+    /* RETAINED: Border styling */
+    border: 8px solid #ffff;
+    
+    /* REMOVED: padding-bottom: 100%; height: 0; */
+    
+    align-self: center;
+    width: 45%; 
+    max-width: 350px;
+    
+    /* ADDED: Padding at the bottom to ensure space for the buttons */
+    padding-bottom: 70px; 
+}
+
+/* --- FIX: Adjust positioning of base image and layers inside the constrained container --- */
+#base {
+    max-width: 350px;
+    height: 100%; /* Should fit the new max-height of the parent */
+    border-radius: 0;
+    position: relative; /* Changed back to relative to simplify, or keep absolute if layers need it */
+    z-index: 2;
+    display: block; /* Ensures it respects size constraints */
+    margin: 0 auto; /* Center the image */
+}
+
+/* Select all layer IDs */
+#background-overlay, #outfit-overlay, #hand-overlay, #mouth-overlay, #eyes-overlay, #head-overlay {
+    position: absolute;
+    top: 0;
+    left: 50%; /* Center layers horizontally */
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 350px;
+    /* ADDED: Constrain height to maintain square ratio */
+    height: 100%; 
+    border-radius: 0;
+}
+
+/* FIX: Positioning the buttons absolutely below the image canvas */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    
+    position: absolute;
+    bottom: 5px; /* Moved up slightly */
+    left: 0;
+    width: 100%;
+    z-index: 10; /* Ensure buttons are always on top */
+}
+
+/*==========================================================*/
+/* Rest of the CSS remains the same... */
+/*==========================================================*/
+
+/* Z-INDEX ORDER (RETAINED) */
+#background-overlay { z-index: 1; } 
+#outfit-overlay { z-index: 2; } 
+#hand-overlay { z-index: 3; }
+#mouth-overlay { z-index: 4; }
+#eyes-overlay { z-index: 5; }
+#head-overlay { z-index: 6; } 
+
+.hidden {
+    display: none;
+}
+
+.outfit-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 540px !important;
+    margin-bottom: 6px;
+    width: 45%; 
+    max-width: 540px !important;
+}
+
+.outfit-options {
+    margin: 5px auto;
+    padding: 0 5%;
+    width: 80%;
+    position: relative;
+    text-align: center;
+}
+
+.outfit {
+    /* 1. Set the background to low-opacity dark gray */
+    background-color: rgba(255, 255, 255, 0.75);
+    
+    /* 2. Inherit/Keep existing styles */
+    margin: 5px;
+    cursor: pointer;
+    border: 3px solid #fff;
+    border-radius: 5px; /* Added slight radius for a softer look */
+    transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    
+    /* Ensure the image container respects the box dimensions */
+    display: block; 
+    
+    /* Make the entire box clickable and visually responsive */
+    width: 70px !important;
+    height: 70px !important;
+    
+    /* Center the image within its fixed 70x70 box */
+    object-fit: contain;
+}
+
+.outfit:hover {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-color: #C8E030;
+}
+
+#item-preview {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+    background-color: rgba(255, 255, 255, 0.97);
+    border: 3px solid #C8E030;
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    transform: translate(-50%, -110%);
+}
+
+#item-preview img {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    display: block;
+}
+
+.owl-item img {
+    width: 70px !important;
+    height: 70px !important;
+}
+
+/* Owl Carousel Styling - ADOPTED GREEN COLOR */
+.owl-carousel .owl-nav button.owl-next, .owl-carousel .owl-nav button.owl-prev {
+    background-color: rgba(20, 28, 12, 0.92) !important; border: 2px solid #5A7A18 !important; 
+    font-size: 24px !important;
+    color: #ffffff !important;
+    border-radius: 50%; 
+    border: none;
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.owl-nav .owl-prev {
+    left: -20px;
+    top: 20%;
+}
+
+.owl-nav .owl-next {
+    right: -20px !important;
+    top: 20%;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    
+    /* FIX: Positioning the buttons absolutely below the image canvas */
+    position: absolute;
+    bottom: -65px; /* Adjust this value to set the distance from the bottom edge of the square */
+    left: 0;
+    width: 100%;
+}
+
+/*==========================================================*/
+/* Header & Misc Cleanup (REPLACING ACCENTS) */
+/*==========================================================*/
+
+/* --- HEADER STYLING --- */
+.header-wofl-container {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    margin-bottom: 20px;
+}
+
+.logo-title-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.header-logo-wofl {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+
+.site-title-wofl {
+    font-family: monospace, 'Courier New', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    color: #333333; 
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.nav-links-wofl a {
+    font-family: monospace, 'Courier New', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #007bff; 
+    text-decoration: underline;
+    margin: 0 10px;
+}
+
+.nav-links-wofl a:hover {
+    color: #0056b3;
+}
+
+/* --- WINDOW STYLING (ADOPTED GREEN ACCENT) --- */
+.chan-window-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 20px 0;
+    border: 1px solid #000000;
+    border-radius: 0;
+    box-shadow: none;
+    background-color: rgba(255, 255, 255, 0.9); 
+}
+
+.window-header {
+    background-color: rgba(20, 28, 12, 0.95); color: white;
+    padding: 3px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: monospace, 'Courier New', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: 1px solid #000000;
+}
+
+.window-close-btn {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0 5px;
+    border: 1px solid white;
+    line-height: 1;
+}
+
+.window-close-btn:hover {
+    background-color: rgba(40, 60, 15, 0.98); 
+}
+
+.window-content {
+    background-color: #FFFFFF;
+    padding: 15px;
+    border-radius: 0;
+    text-align: center;
+}
+
+/* ... (All other minor utility and link styles are retained) ... */
+#back-button a {
+    text-decoration: none;
+}
+
+a.h2 {
+    text-decoration: none !important;
+}
+
+a.back-button {
+    color: white;
+}
+
+.intro-text {
+    width: 100%;
+    max-width: 1000px;
+    text-align: center;
+    padding: 10px 0;
+    margin-top: 20px;
+    margin-bottom: 5px;
+    color: #000000;
+    text-transform: none;
+}
+
+.intro-text h2 {
+    font-family: monospace, 'Courier New', sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.2;
+    margin: 0 auto;
+    padding: 0;
+    color: #333333; 
+    background-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    text-transform: uppercase;
+}
+
+.back-button {
+    margin-top: 0px;
+}
+
+/*==========================================================*/
+/* New Back to Home Button Styling (ADJUSTED POSITION) */
+/*==========================================================*/
+.back-to-home-button {
+    background-color: rgba(20, 28, 12, 0.92);
+    border: 2px solid #5A7A18;
+    color: #C8E030;
+    text-decoration: none;
+    font-family: monospace, 'Courier New', sans-serif;
+    font-weight: 800;
+    font-size: 24px;
+    padding: 15px 40px;
+    border-radius: 15px;
+    transition: all 0.2s;
+    width: 350px;
+    text-align: center;
+    text-shadow: 0 0 6px rgba(200, 224, 48, 0.5);
+    letter-spacing: 1px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.back-to-home-button:hover {
+    background-color: rgba(40, 60, 15, 0.98);
+    border-color: #C8E030;
+    box-shadow: 0 0 10px rgba(200, 224, 48, 0.4);
+}
+
+/* Also ensure the game-container alignment is correct */
+.game-container {
+    /* ... existing styles ... */
+    margin-top: 0; /* Remove top margin if the button is now the primary element above it */
+}
+
+/*==========================================================*/
+/* PFP Download / Share Modal */
+/*==========================================================*/
+.pfp-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.pfp-modal-overlay.hidden {
+    display: none;
+}
+
+.pfp-modal-card {
+    background: rgba(10, 15, 5, 0.97);
+    border: 2px solid #5A7A18;
+    border-radius: 16px;
+    padding: 28px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+    box-shadow: 0 0 40px rgba(200, 224, 48, 0.12), 0 8px 32px rgba(0,0,0,0.6);
+    max-width: 90vw;
+}
+
+.pfp-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: 1px solid transparent;
+    color: rgba(255,255,255,0.45);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 2px 7px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    line-height: 1.4;
+}
+
+.pfp-modal-close:hover {
+    color: #C8E030;
+    border-color: #5A7A18;
+}
+
+.pfp-share-preview {
+    display: block;
+    border-radius: 10px;
+    border: 1px solid #5A7A18;
+    box-shadow: 0 0 16px rgba(200, 224, 48, 0.15);
+    max-width: min(560px, 80vw);
+    max-height: min(560px, 80vw);
+    width: auto;
+    height: auto;
+}
+
+.pfp-modal-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.pfp-modal-actions button {
+    background-color: rgba(20, 28, 12, 0.92);
+    border: 2px solid #5A7A18;
+    color: #C8E030;
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 0.88rem;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-shadow: 0 0 6px rgba(200, 224, 48, 0.4);
+}
+
+.pfp-modal-actions button:hover {
+    border-color: #C8E030;
+    box-shadow: 0 0 10px rgba(200, 224, 48, 0.35);
+    background-color: rgba(40, 60, 15, 0.98);
+}
+

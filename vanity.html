@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rat Republic — Vanity Wallet</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #1a1f0f;
+            background-image: url('images/Background.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: #fff;
+            font-family: monospace, 'Courier New', sans-serif;
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+        }
+
+        .container { max-width: 580px; margin: 0 auto; }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 24px;
+            background-color: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            color: #C8E030;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+        .back-btn:hover { border-color: #C8E030; box-shadow: 0 0 10px rgba(200,224,48,0.3); }
+
+        @font-face {
+            font-family: 'NftOpensea';
+            src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
+        }
+
+        .main-card {
+            background: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            border-radius: 16px;
+            padding: 28px 24px 32px;
+        }
+
+        .page-title {
+            text-align: center;
+            font-family: 'NftOpensea', monospace;
+            color: #ffffff;
+            font-size: 2rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 16px rgba(255,255,255,0.2);
+            margin-bottom: 6px;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.35);
+            font-size: 0.68rem;
+            letter-spacing: 2px;
+            margin-bottom: 28px;
+        }
+
+        /* Inputs */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.66rem;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+        .input-group input[type="text"] {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid #5A7A18;
+            border-radius: 8px;
+            color: #C8E030;
+            font-family: monospace;
+            font-size: 1rem;
+            padding: 10px 12px;
+            outline: none;
+            letter-spacing: 2px;
+            transition: border-color 0.2s;
+        }
+        .input-group input[type="text"]::placeholder { color: rgba(255,255,255,0.18); letter-spacing: 1px; }
+        .input-group input[type="text"]:focus { border-color: #C8E030; }
+
+        .case-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 0.74rem;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+        }
+        .case-row input { accent-color: #C8E030; width: 14px; height: 14px; cursor: pointer; }
+
+        .difficulty-hint {
+            font-size: 0.72rem;
+            color: rgba(200,224,48,0.55);
+            margin-bottom: 14px;
+            min-height: 1.2em;
+        }
+
+        .error-msg {
+            color: #ff8080;
+            font-size: 0.74rem;
+            margin-bottom: 10px;
+            min-height: 1.2em;
+        }
+
+        /* Start button */
+        .btn-start {
+            width: 100%;
+            background-color: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            color: #C8E030;
+            font-weight: bold;
+            font-family: 'NftOpensea', monospace;
+            font-size: 0.95rem;
+            padding: 13px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+        .btn-start:hover {
+            border-color: #C8E030;
+            box-shadow: 0 0 14px rgba(200,224,48,0.35);
+            background-color: rgba(40,60,15,0.98);
+        }
+        .btn-start.running { border-color: rgba(255,80,80,0.5); color: rgba(255,120,120,0.85); }
+        .btn-start.running:hover { border-color: #ff8080; box-shadow: 0 0 14px rgba(255,80,80,0.3); background-color: rgba(40,10,10,0.98); }
+
+        /* Progress */
+        .progress-area {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(90,122,24,0.4);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 24px;
+        }
+        .progress-stat { flex: 1; text-align: center; }
+        .stat-label { font-size: 0.63rem; color: rgba(255,255,255,0.32); letter-spacing: 2px; margin-bottom: 5px; }
+        .stat-value { font-size: 1.15rem; font-weight: 800; color: #C8E030; }
+
+        /* Divider */
+        .divider { border: none; border-top: 1px solid rgba(90,122,24,0.3); margin: 20px 0; }
+
+        /* Result */
+        .result-label {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+        .result-address {
+            font-size: 0.82rem;
+            color: #C8E030;
+            word-break: break-all;
+            font-weight: bold;
+            margin-bottom: 16px;
+            padding: 10px 14px;
+            background: rgba(200,224,48,0.06);
+            border: 1px solid rgba(90,122,24,0.45);
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .warning-box {
+            background: rgba(255,80,80,0.07);
+            border: 1px solid rgba(255,80,80,0.35);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.74rem;
+            color: #ff8080;
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        .secret-key {
+            font-size: 0.63rem;
+            color: rgba(255,255,255,0.45);
+            word-break: break-all;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(90,122,24,0.28);
+            border-radius: 6px;
+            line-height: 1.6;
+            transition: filter 0.2s;
+            margin-bottom: 10px;
+        }
+        .secret-key.blurred { filter: blur(5px); user-select: none; }
+
+        .key-actions { display: flex; gap: 10px; }
+        .btn-key-action {
+            flex: 1;
+            background: rgba(20,28,12,0.92);
+            border: 1.5px solid #5A7A18;
+            color: rgba(255,255,255,0.65);
+            font-family: monospace;
+            font-size: 0.73rem;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-key-action:hover { border-color: #C8E030; color: #C8E030; }
+        .btn-download { color: #C8E030; border-color: #5A7A18; }
+
+        .security-note {
+            margin-top: 22px;
+            font-size: 0.69rem;
+            color: rgba(255,255,255,0.22);
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #5A7A18;
+            margin-bottom: 28px;
+            gap: 0;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            color: rgba(255,255,255,0.38);
+            font-family: monospace;
+            font-size: 0.72rem;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { color: rgba(255,255,255,0.7); }
+        .tab-btn.active { color: #C8E030; border-bottom-color: #C8E030; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Info tabs shared styles */
+        .faq-list { display: flex; flex-direction: column; gap: 20px; }
+        .section-heading {
+            color: #C8E030;
+            font-size: 0.72rem;
+            font-weight: bold;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            opacity: 0.75;
+        }
+        .faq-q {
+            color: #C8E030;
+            font-size: 0.83rem;
+            font-weight: bold;
+            margin-bottom: 7px;
+            letter-spacing: 0.5px;
+        }
+        .faq-a {
+            color: rgba(255,255,255,0.58);
+            font-size: 0.82rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+        .faq-divider {
+            border: none;
+            border-top: 1px solid rgba(90,122,24,0.3);
+            margin: 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="tools.html" class="back-btn">← Back to Utilities</a>
+
+        <div class="main-card">
+            <div class="page-title">VANITY ADDY</div>
+            <div class="page-subtitle">GENERATE A CUSTOM SOLANA ADDRESS</div>
+
+            <div class="tabs">
+                <button class="tab-btn active" id="tab-create-btn" onclick="switchVanityTab('create')">CREATE</button>
+                <button class="tab-btn" id="tab-howto-btn" onclick="switchVanityTab('howto')">HOW IT WORKS</button>
+                <button class="tab-btn" id="tab-disclaimer-btn" onclick="switchVanityTab('disclaimer')">DISCLAIMER</button>
+            </div>
+
+            <!-- CREATE TAB -->
+            <div class="tab-content active" id="tab-create">
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>PREFIX</label>
+                        <input type="text" id="prefix-input" placeholder="RAT" maxlength="5" autocomplete="off" spellcheck="false">
+                    </div>
+                    <div class="input-group">
+                        <label>SUFFIX (OPTIONAL)</label>
+                        <input type="text" id="suffix-input" placeholder="..." maxlength="5" autocomplete="off" spellcheck="false">
+                    </div>
+                </div>
+
+                <label class="case-row">
+                    <input type="checkbox" id="case-sensitive" checked>
+                    Case sensitive
+                </label>
+
+                <div class="difficulty-hint" id="difficulty-hint"></div>
+                <div class="error-msg" id="error-msg"></div>
+
+                <button class="btn-start" id="start-btn">Start</button>
+
+                <div class="progress-area hidden" id="progress-area">
+                    <div class="progress-stat">
+                        <div class="stat-label">ATTEMPTS</div>
+                        <div class="stat-value" id="attempts-count">0</div>
+                    </div>
+                    <div class="progress-stat">
+                        <div class="stat-label">KEYS / SEC</div>
+                        <div class="stat-value" id="speed-count">0</div>
+                    </div>
+                </div>
+
+                <!-- Result -->
+                <div class="hidden" id="result-section">
+                    <hr class="divider">
+                    <div class="result-label">ADDRESS FOUND</div>
+                    <div class="result-address" id="result-address"></div>
+
+                    <div class="warning-box">
+                        ⚠ Save your private key immediately. Once you leave this page it is gone forever. Never share it with anyone.
+                    </div>
+
+                    <div class="result-label">PRIVATE KEY</div>
+                    <div class="secret-key blurred" id="secret-key"></div>
+
+                    <div class="key-actions">
+                        <button class="btn-key-action" id="reveal-btn">Reveal</button>
+                        <button class="btn-key-action btn-download" id="download-btn">↓ Download keypair.json</button>
+                    </div>
+                </div>
+
+                <div class="security-note">
+                    This tool runs 100% in your browser.<br>
+                    No keys or data are ever sent to any server.
+                </div>
+            </div>
+
+            <!-- HOW IT WORKS TAB -->
+            <div class="tab-content" id="tab-howto">
+                <div class="faq-list">
+
+                    <div class="faq-item">
+                        <div class="section-heading">The Process</div>
+                        <p class="faq-a">This tool utilizes your browser's local processing power to "grind" through millions of randomly generated Solana keypairs until it finds one that matches your desired prefix or suffix.</p>
+                    </div>
+
+                    <hr class="faq-divider">
+
+                    <div class="faq-item">
+                        <div class="faq-q">Local Computation</div>
+                        <p class="faq-a">All cryptographic calculations are performed locally on your device using JavaScript.</p>
+                    </div>
+
+                    <hr class="faq-divider">
+
+                    <div class="faq-item">
+                        <div class="faq-q">Zero Data Transmission</div>
+                        <p class="faq-a">Your CPU does the heavy lifting, but your sensitive data never leaves your window. No private keys, seeds, or generation patterns are ever sent to a server or stored in a database.</p>
+                    </div>
+
+                    <hr class="faq-divider">
+
+                    <div class="faq-item">
+                        <div class="faq-q">Deterministic Security</div>
+                        <p class="faq-a">The randomness is generated using secure, browser-native cryptographic APIs to ensure your vanity address is as secure as one generated by a standard wallet.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- DISCLAIMER TAB -->
+            <div class="tab-content" id="tab-disclaimer">
+                <div class="faq-list">
+
+                    <div class="faq-item">
+                        <div class="section-heading">Before You Generate</div>
+                        <p class="faq-a">Please review these points before generating your address.</p>
+                    </div>
+
+                    <hr class="faq-divider">
+
+                    <div class="faq-item">
+                        <div class="faq-q">Finality of Keys</div>
+                        <p class="faq-a">Once a vanity address is generated, you are responsible for safely backing up the private key or seed phrase. If you lose it, the address and any funds sent to it are permanently unrecoverable.</p>
+                    </div>
+
+                    <hr class="faq-divider">
+
+                    <div class="faq-item">
+                        <div class="faq-q">Resource Intensity</div>
+                        <p class="faq-a">Generating long or complex vanity patterns requires significant CPU power. This may cause your browser to slow down or your device to heat up during the process.</p>
+                    </div>
+
+                    <hr class="faq-divider">
+
+                    <div class="faq-item">
+                        <div class="faq-q">Self-Custody Responsibility</div>
+                        <p class="faq-a">This tool provides the keypair, but it does not store it. We cannot recover your keys if you close the tab before saving them.</p>
+                    </div>
+
+                    <hr class="faq-divider">
+
+                    <div class="faq-item">
+                        <div class="faq-q">Verify Environment</div>
+                        <p class="faq-a">To ensure maximum security, we recommend running this tool in an Incognito/Private window and ensuring no malicious browser extensions are active while generating keys.</p>
+                    </div>
+
+                    <hr class="faq-divider">
+
+                    <div class="faq-item">
+                        <p class="faq-a" style="color: rgba(200,224,48,0.6); font-style: italic;">By using this tool, you acknowledge that you are solely responsible for the security of your generated keys and that the developers hold no liability for lost funds or compromised accounts.</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function switchVanityTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+            document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
+            document.getElementById('tab-' + tab + '-btn').classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+        }
+    </script>
+    <script src="js/vanity.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+</body>
+</html>

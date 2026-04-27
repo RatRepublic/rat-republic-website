@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rat Republic — Dust to SOL</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #1a1f0f;
+            background-image: url('images/Background.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: #fff;
+            font-family: monospace, 'Courier New', sans-serif;
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+        }
+
+        .container { max-width: 580px; margin: 0 auto; }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 24px;
+            background-color: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            color: #C8E030;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+        .back-btn:hover { border-color: #C8E030; box-shadow: 0 0 10px rgba(200,224,48,0.3); }
+
+        @font-face {
+            font-family: 'NftOpensea';
+            src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
+        }
+
+        .page-title {
+            text-align: center;
+            font-family: 'NftOpensea', monospace;
+            color: #ffffff;
+            font-size: 2rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 16px rgba(255,255,255,0.2);
+            margin-bottom: 28px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #5A7A18;
+            margin-bottom: 36px;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.4);
+            font-family: monospace;
+            font-size: 0.78rem;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { color: rgba(255,255,255,0.7); }
+        .tab-btn.active {
+            color: #C8E030;
+            border-bottom-color: #C8E030;
+        }
+
+        /* Tab content */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* SOL display */
+        .sol-display {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .sol-label {
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 2.5px;
+            margin-bottom: 8px;
+        }
+        .sol-amount {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #C8E030;
+            text-shadow: 0 0 24px rgba(200,224,48,0.5);
+            letter-spacing: 1px;
+        }
+
+        /* Image placeholder */
+        .tool-image-wrap {
+            text-align: center;
+            margin: 0 auto 28px;
+        }
+        .tool-image-wrap img {
+            width: 160px;
+            height: auto;
+            filter: drop-shadow(0 0 14px rgba(200,224,48,0.3));
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Connect area */
+        .connect-area { text-align: center; }
+        .btn-connect {
+            background-color: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            color: #C8E030;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 0.95rem;
+            padding: 13px 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-shadow: 0 0 8px rgba(200,224,48,0.4);
+            letter-spacing: 1px;
+        }
+        .btn-connect:hover {
+            border-color: #C8E030;
+            box-shadow: 0 0 16px rgba(200,224,48,0.35);
+            background-color: rgba(40,60,15,0.98);
+        }
+        .connect-note {
+            color: rgba(255,255,255,0.25);
+            font-size: 0.7rem;
+            margin-top: 10px;
+        }
+
+        /* Wallet picker modal */
+        .wallet-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.72);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .wallet-modal-card {
+            background: #1a1f0f;
+            border: 2px solid #5A7A18;
+            border-radius: 16px;
+            padding: 24px 20px 20px;
+            width: 320px;
+            max-width: 92vw;
+        }
+        .wallet-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 18px;
+        }
+        .wallet-modal-title {
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+        }
+        .wallet-modal-close {
+            position: absolute;
+            right: 0;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.45);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 2px 6px;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        .wallet-modal-close:hover { color: #fff; }
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: 1px solid transparent;
+            margin-bottom: 4px;
+        }
+        .wallet-option:hover:not(.wallet-disabled) {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(90,122,24,0.5);
+        }
+        .wallet-option.wallet-disabled { opacity: 0.28; cursor: not-allowed; }
+        .wallet-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        .wallet-name {
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: bold;
+            flex: 1;
+        }
+        .wallet-installed {
+            font-size: 0.62rem;
+            color: #C8E030;
+            border: 1px solid #5A7A18;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(200,224,48,0.08);
+            letter-spacing: 1px;
+        }
+
+        /* Wallet row */
+        .wallet-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .wallet-addr-text { color: rgba(255,255,255,0.5); font-size: 0.76rem; }
+        .wallet-addr-text strong { color: #C8E030; }
+        .btn-sm {
+            background: rgba(20,28,12,0.9);
+            border: 1.5px solid #5A7A18;
+            color: rgba(255,255,255,0.65);
+            font-family: monospace;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-sm:hover { border-color: #C8E030; color: #C8E030; }
+        .btn-sm.btn-disconnect { border-color: rgba(255,80,80,0.4); color: rgba(255,120,120,0.65); }
+        .btn-sm.btn-disconnect:hover { border-color: rgba(255,80,80,0.8); color: #ff8080; }
+
+        /* Status */
+        .status-area {
+            margin: 16px 0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            display: none;
+            text-align: center;
+        }
+        .status-area.loading {
+            display: block;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(90,122,24,0.5);
+            color: rgba(255,255,255,0.65);
+        }
+        .status-area.success {
+            display: block;
+            background: rgba(200,224,48,0.07);
+            border: 1px solid #5A7A18;
+            color: #C8E030;
+        }
+        .status-area.error {
+            display: block;
+            background: rgba(255,80,80,0.07);
+            border: 1px solid rgba(255,80,80,0.4);
+            color: #ff8080;
+        }
+        .status-area.info {
+            display: block;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(90,122,24,0.5);
+            color: rgba(255,255,255,0.65);
+        }
+        .status-area a { color: #C8E030; }
+
+        /* Results */
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .select-all-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.76rem;
+            cursor: pointer;
+        }
+        .select-all-label input { accent-color: #C8E030; width: 14px; height: 14px; cursor: pointer; }
+        .summary-text { color: #C8E030; font-size: 0.76rem; font-weight: bold; }
+
+        .token-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 14px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+        .token-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(90,122,24,0.35);
+            border-radius: 6px;
+            padding: 7px 12px;
+        }
+        .token-row input[type="checkbox"] { accent-color: #C8E030; width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
+        .token-mint { color: rgba(255,255,255,0.55); font-size: 0.74rem; flex: 1; }
+        .token-sol { color: #C8E030; font-size: 0.74rem; font-weight: bold; white-space: nowrap; }
+
+        .btn-reclaim {
+            width: 100%;
+            background-color: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            color: #C8E030;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 0.95rem;
+            padding: 13px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-shadow: 0 0 6px rgba(200,224,48,0.4);
+            letter-spacing: 1px;
+        }
+        .btn-reclaim:hover:not(:disabled) {
+            border-color: #C8E030;
+            box-shadow: 0 0 14px rgba(200,224,48,0.35);
+            background-color: rgba(40,60,15,0.98);
+        }
+        .btn-reclaim:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        /* HOW DOES IT WORK */
+        .faq-list { display: flex; flex-direction: column; gap: 20px; }
+        .section-heading {
+            color: #C8E030;
+            font-size: 0.72rem;
+            font-weight: bold;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            opacity: 0.75;
+        }
+        .faq-q {
+            color: #C8E030;
+            font-size: 0.83rem;
+            font-weight: bold;
+            margin-bottom: 7px;
+            letter-spacing: 0.5px;
+        }
+        .faq-a {
+            color: rgba(255,255,255,0.58);
+            font-size: 0.79rem;
+            line-height: 1.7;
+        }
+        .faq-a strong { color: #C8E030; }
+        .faq-bullets {
+            margin: 8px 0 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-left: 4px;
+        }
+        .faq-divider {
+            border: none;
+            border-top: 1px solid rgba(90,122,24,0.25);
+        }
+
+        /* Success screen */
+        .success-label {
+            text-align: center;
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 2.5px;
+            margin-bottom: 8px;
+            margin-top: 8px;
+        }
+        .success-amount {
+            text-align: center;
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #C8E030;
+            text-shadow: 0 0 24px rgba(200,224,48,0.5);
+            margin-bottom: 24px;
+            letter-spacing: 1px;
+        }
+        .success-image-wrap {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .success-image-wrap img {
+            width: 200px;
+            height: auto;
+            filter: drop-shadow(0 0 14px rgba(200,224,48,0.3));
+            animation: float 3s ease-in-out infinite;
+        }
+        .success-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .btn-success-action {
+            flex: 1;
+            background: rgba(20,28,12,0.92);
+            border: 2px solid #5A7A18;
+            color: #C8E030;
+            font-family: 'NftOpensea', monospace;
+            font-size: 0.95rem;
+            padding: 13px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+        .btn-success-action:hover {
+            border-color: #C8E030;
+            box-shadow: 0 0 14px rgba(200,224,48,0.35);
+            background: rgba(40,60,15,0.98);
+        }
+
+        .main-card {
+            background: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            border-radius: 16px;
+            padding: 28px 24px 32px;
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .stat-box {
+            background: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            border-radius: 12px;
+            padding: 16px 10px 14px;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .stat-box:hover { border-color: #C8E030; }
+        .stat-icon { margin-bottom: 8px; opacity: 0.55; line-height: 1; }
+        .stat-num {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #C8E030;
+            text-shadow: 0 0 12px rgba(200,224,48,0.4);
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        .stat-label {
+            font-size: 0.58rem;
+            color: rgba(255,255,255,0.38);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            line-height: 1.4;
+        }
+        @media (max-width: 500px) {
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="tools.html" class="back-btn">← Back to Utilities</a>
+
+        <div class="main-card">
+
+        <div class="page-title">SCAVENGER</div>
+
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-claim-btn" onclick="switchTab('claim')">CLAIM</button>
+            <button class="tab-btn" id="tab-howto-btn" onclick="switchTab('howto')">HOW IT WORKS</button>
+            <button class="tab-btn" id="tab-disclaimer-btn" onclick="switchTab('disclaimer')">DISCLAIMER</button>
+        </div>
+
+        <!-- CLAIM TAB -->
+        <div class="tab-content active" id="tab-claim">
+
+            <div class="sol-display" id="sol-display">
+                <div class="sol-label">UNCLAIMED SOL</div>
+                <div class="sol-amount" id="unclaimed-sol-display">??? SOL</div>
+            </div>
+
+            <!-- Replace src with your PNG path once you have it -->
+            <div class="tool-image-wrap" id="tool-image-wrap">
+                <img src="images/dust-to-sol.png" alt="" id="tool-image">
+            </div>
+
+            <!-- Auth indicator (shown when logged in) -->
+            <div id="auth-indicator" style="display:none;text-align:center;margin-bottom:10px;font-size:0.72rem;color:rgba(255,255,255,0.45);letter-spacing:1px;">
+                Logged in as <strong id="auth-username" style="color:#C8E030;"></strong>
+                &nbsp;·&nbsp;<a href="profile.html" style="color:#C8E030;text-decoration:none;">Profile</a>
+                &nbsp;·&nbsp;<a href="login.html" id="auth-logout-link" style="color:rgba(255,255,255,0.35);text-decoration:none;">Log out</a>
+            </div>
+
+            <!-- Connect section -->
+            <div class="connect-area" id="connect-section">
+                <button class="btn-connect" id="connect-btn">Connect Wallet</button>
+                <div class="connect-note">Make sure to register first to enjoy additional perks</div>
+            </div>
+
+            <!-- Scan section (shown after connect) -->
+            <div class="hidden" id="scan-section">
+                <div class="wallet-row">
+                    <span class="wallet-addr-text">Connected: <strong id="wallet-display"></strong></span>
+                    <button class="btn-sm" id="scan-btn">↻ Rescan</button>
+                    <button class="btn-sm btn-disconnect" id="disconnect-btn">Disconnect</button>
+                </div>
+            </div>
+
+            <div class="status-area" id="status-area"></div>
+
+            <!-- Results (shown after scan finds accounts) -->
+            <div class="hidden" id="results-section">
+                <div class="results-header">
+                    <label class="select-all-label">
+                        <input type="checkbox" id="select-all" checked> Select All
+                    </label>
+                    <span class="summary-text" id="summary-text"></span>
+                </div>
+                <div class="token-list" id="token-list"></div>
+                <button class="btn-reclaim" id="reclaim-btn">Reclaim SOL</button>
+                <p style="margin-top:10px;font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;font-style:italic;">
+                    ⚠ Caution: This process is irreversible, double check before continuing.
+                </p>
+            </div>
+
+            <!-- Success screen (shown after reclaim) -->
+            <div class="hidden" id="success-section">
+                <div class="success-label">SUCCESSFULLY CLAIMED</div>
+                <div class="success-amount" id="success-amount-display">0.0000 SOL</div>
+                <div class="success-image-wrap">
+                    <img src="images/claim-success.png" alt="" id="success-image">
+                </div>
+                <div class="success-buttons">
+                    <button class="btn-success-action" id="go-back-btn">Go Back</button>
+                    <button class="btn-success-action" id="tweet-btn">Tweet</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- HOW IT WORKS TAB -->
+        <div class="tab-content" id="tab-howto">
+            <div class="faq-list">
+
+                <div class="faq-item">
+                    <div class="section-heading">The Concept</div>
+                    <p class="faq-a">On the Solana blockchain, every individual token account requires a small "rent" deposit of approximately <strong>0.00203928 SOL</strong> to exist. If you've held tokens that were eventually sold, rugged, or migrated, those empty accounts are still holding your SOL hostage. This utility identifies those abandoned, zero-balance accounts and shuts them down, instantly returning the locked rent to your main wallet.</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="section-heading">Security &amp; Trust</div>
+                    <p class="faq-a">Your assets remain under your control.</p>
+                    <ul class="faq-bullets">
+                        <li class="faq-a"><strong>Manual Approval:</strong> Every action requires your direct signature via your wallet provider (like Phantom).</li>
+                        <li class="faq-a"><strong>Zero-Balance Protection:</strong> The system is programmed to only interact with accounts that are completely empty. If an account holds even a fraction of a token, it is ignored.</li>
+                        <li class="faq-a"><strong>Non-Custodial:</strong> No tokens are ever transferred out of your possession. The only cost is the negligible Solana network gas fee (approx. 0.000005 SOL).</li>
+                    </ul>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="section-heading">Frequently Asked Questions</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q">Does this impact my eligibility for airdrops?</div>
+                    <p class="faq-a">Absolutely not. Airdrops are tied to your primary wallet address, not specific sub-accounts. If a project sends you tokens in the future, the network simply generates a fresh token account for you. Cleaning up old accounts has no bearing on your future rewards.</p>
+                </div>
+                <hr class="faq-divider">
+                <div class="faq-item">
+                    <div class="faq-q">Why is my "claimable" balance showing as zero?</div>
+                    <p class="faq-a">The tool specifically filters for accounts with a balance of exactly 0. Many rug pulls or failed projects leave behind "dust" (tiny fractions of a token). If an account holds even <strong>0.000001</strong> of a token, it is considered active and will not be displayed for closure to ensure your safety.</p>
+                </div>
+                <hr class="faq-divider">
+                <div class="faq-item">
+                    <div class="faq-q">What are the costs?</div>
+                    <p class="faq-a">A <strong>1.5% service fee</strong> is deducted from the recovered rent in the same transaction. If you joined via a referral link, the fee is split: <strong>1% to Rat Republic</strong> and <strong>0.5% to your referrer</strong>. You also pay the standard Solana network transaction fee (usually <strong>0.000005 SOL</strong>).</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- DISCLAIMER TAB -->
+        <div class="tab-content" id="tab-disclaimer">
+            <div class="faq-list">
+
+                <div class="faq-item">
+                    <div class="section-heading">SOL Account Reclamation</div>
+                    <p class="faq-a">Please read this carefully before proceeding.</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="faq-q">Irreversible Action</div>
+                    <p class="faq-a">The process of reclaiming SOL by closing empty token accounts or associated accounts is permanent and non-reversible. Once the transaction is confirmed on the blockchain, the account is burned and cannot be "un-closed."</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="faq-q">Loss of Access</div>
+                    <p class="faq-a">By reclaiming the rent deposit, you are permanently deleting the account entry for that specific token. If you receive that same token again in the future, a new account will need to be created (which will require a new rent deposit).</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="faq-q">Verify Before You Burn</div>
+                    <p class="faq-a">Ensure that the account you are closing is truly "dust" or empty. Closing an account that still contains active tokens or represents a necessary smart contract state may result in the total loss of those assets.</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="faq-q">No Support Recovery</div>
+                    <p class="faq-a">Because this is a decentralized on-chain action, no developer, wallet provider, or protocol can "undo" this transaction or recover SOL sent to a burn address.</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <p class="faq-a" style="color: rgba(200,224,48,0.6); font-style: italic;">By proceeding, you acknowledge that you are solely responsible for verifying the accounts you choose to close and that you understand the finality of this action.</p>
+                </div>
+
+            </div>
+        </div>
+
+        </div><!-- /main-card -->
+
+        <div class="stats-bar" id="stats-bar">
+            <div class="stat-box">
+                <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="7" r="4" stroke="#C8E030" stroke-width="1.8"/><path d="M2 21c0-4 3.134-7 7-7" stroke="#C8E030" stroke-width="1.8" stroke-linecap="round"/><circle cx="17" cy="10" r="3" stroke="#C8E030" stroke-width="1.8"/><path d="M14 21c0-3 1.343-5 3-5s3 2 3 5" stroke="#C8E030" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div class="stat-num" id="stat-users">—</div>
+                <div class="stat-label">Users Served</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="11" width="14" height="10" rx="2" stroke="#C8E030" stroke-width="1.8"/><path d="M8 11V7a4 4 0 018 0v4" stroke="#C8E030" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16" r="1.5" fill="#C8E030"/></svg></div>
+                <div class="stat-num" id="stat-accounts">—</div>
+                <div class="stat-label">Accounts Closed</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#C8E030" stroke-width="1.8"/><path d="M12 7v10M9.5 9.5C9.5 8.12 10.62 7 12 7c1.38 0 2.5 1.12 2.5 2.5S13.38 12 12 12s-2.5 1.12-2.5 2.5S10.62 17 12 17c1.38 0 2.5-1.12 2.5-2.5" stroke="#C8E030" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div class="stat-num" id="stat-sol">—</div>
+                <div class="stat-label">SOL Recovered</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" stroke="#C8E030" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+                <div class="stat-num" id="stat-highest">—</div>
+                <div class="stat-label">Highest SOL Reclaimed</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wallet picker modal -->
+    <div class="wallet-modal-overlay hidden" id="wallet-modal">
+        <div class="wallet-modal-card">
+            <div class="wallet-modal-header">
+                <span class="wallet-modal-title">Connect Wallet</span>
+                <button class="wallet-modal-close" id="modal-close-btn">✕</button>
+            </div>
+            <div class="wallet-option" id="opt-phantom">
+                <div class="wallet-icon" id="icon-phantom" style="background: linear-gradient(135deg, #9945FF, #6B21F5);"></div>
+                <span class="wallet-name">Phantom</span>
+                <span class="wallet-installed hidden" id="badge-phantom">INSTALLED</span>
+            </div>
+            <div class="wallet-option" id="opt-solflare">
+                <div class="wallet-icon" id="icon-solflare" style="background: linear-gradient(135deg, #FF8C00, #FF4500);"></div>
+                <span class="wallet-name">Solflare</span>
+                <span class="wallet-installed hidden" id="badge-solflare">INSTALLED</span>
+            </div>
+            <div class="wallet-option" id="opt-backpack">
+                <div class="wallet-icon" id="icon-backpack" style="background: linear-gradient(135deg, #E33D43, #A01820);"></div>
+                <span class="wallet-name">Backpack</span>
+                <span class="wallet-installed hidden" id="badge-backpack">INSTALLED</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Buffer polyfill required by @solana/web3.js SystemProgram
+    if (typeof Buffer === 'undefined') {
+        (function () {
+            function mk(u8) {
+                var dv = function(o) { return new DataView(u8.buffer, u8.byteOffset + (o||0)); };
+                u8.readUInt8        = function(o)   { return u8[o]; };
+                u8.readUInt16LE     = function(o)   { return dv(o).getUint16(0,true); };
+                u8.readUInt16BE     = function(o)   { return dv(o).getUint16(0,false); };
+                u8.readUInt32LE     = function(o)   { return dv(o).getUint32(0,true)>>>0; };
+                u8.readUInt32BE     = function(o)   { return dv(o).getUint32(0,false)>>>0; };
+                u8.readInt32LE      = function(o)   { return dv(o).getInt32(0,true); };
+                u8.readBigUInt64LE  = function(o)   { return dv(o).getBigUint64(0,true); };
+                u8.readBigUInt64BE  = function(o)   { return dv(o).getBigUint64(0,false); };
+                u8.readDoubleBE     = function(o)   { return dv(o).getFloat64(0,false); };
+                u8.readFloatBE      = function(o)   { return dv(o).getFloat32(0,false); };
+                u8.writeUInt8       = function(v,o) { u8[o]=v&255; return o+1; };
+                u8.writeUInt16LE    = function(v,o) { dv(o).setUint16(0,v,true);  return o+2; };
+                u8.writeUInt16BE    = function(v,o) { dv(o).setUint16(0,v,false); return o+2; };
+                u8.writeUInt32LE    = function(v,o) { dv(o).setUint32(0,v,true);  return o+4; };
+                u8.writeUInt32BE    = function(v,o) { dv(o).setUint32(0,v,false); return o+4; };
+                u8.writeInt8        = function(v,o) { u8[o]=v<0?v+256:v; return o+1; };
+                u8.writeInt16LE     = function(v,o) { dv(o).setInt16(0,v,true);   return o+2; };
+                u8.writeInt32LE     = function(v,o) { dv(o).setInt32(0,v,true);   return o+4; };
+                u8.writeInt32BE     = function(v,o) { dv(o).setInt32(0,v,false);  return o+4; };
+                u8.writeDoubleBE    = function(v,o) { dv(o).setFloat64(0,v,false); return o+8; };
+                u8.writeFloatBE     = function(v,o) { dv(o).setFloat32(0,v,false); return o+4; };
+                u8.writeBigUInt64LE = function(v,o) { dv(o).setBigUint64(0,BigInt(v),true);  return o+8; };
+                u8.writeBigInt64LE  = function(v,o) { dv(o).setBigInt64(0,BigInt(v),true);   return o+8; };
+                u8.write = function(s,o,l) { var e=new TextEncoder().encode(s).subarray(0,l); u8.set(e,o||0); return e.length; };
+                u8.toString = function(enc,s,e) {
+                    var sl=u8.subarray(s||0,e);
+                    if(enc==='hex') return Array.from(sl).map(function(x){return('0'+x.toString(16)).slice(-2);}).join('');
+                    return new TextDecoder().decode(sl);
+                };
+                u8.slice  = function(s,e) { return mk(u8.subarray(s,e)); };
+                u8.copy   = function(t,ts,ss,se) { t.set(u8.subarray(ss||0,se||u8.length),ts||0); };
+                u8.fill   = function(v,s,e) { Uint8Array.prototype.fill.call(u8,v,s,e); return u8; };
+                u8.equals = function(o) { if(u8.length!==o.length)return false; for(var i=0;i<u8.length;i++)if(u8[i]!==o[i])return false; return true; };
+                u8.indexOf = function(v) { return Array.prototype.indexOf.call(u8,v); };
+                u8._isBuffer = true;
+                return u8;
+            }
+            var B = {
+                isBuffer:      function(b) { return b instanceof Uint8Array && b._isBuffer===true; },
+                alloc:         function(n,f) { var u=new Uint8Array(n); if(f!==undefined)u.fill(typeof f==='string'?f.charCodeAt(0):f); return mk(u); },
+                allocUnsafe:   function(n)  { return mk(new Uint8Array(n)); },
+                from: function(src,enc) {
+                    if(typeof src==='string') {
+                        if(enc==='hex'){var b=new Uint8Array(src.length/2);for(var i=0;i<b.length;i++)b[i]=parseInt(src.substr(i*2,2),16);return mk(b);}
+                        if(enc==='base64'){var bin=atob(src),b=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);return mk(b);}
+                        return mk(new TextEncoder().encode(src));
+                    }
+                    if(src instanceof ArrayBuffer) return mk(new Uint8Array(src));
+                    return mk(new Uint8Array(src));
+                },
+                concat: function(list,len) {
+                    if(len===undefined)len=list.reduce(function(s,b){return s+b.length;},0);
+                    var out=new Uint8Array(len),off=0;
+                    list.forEach(function(b){out.set(b,off);off+=b.length;});
+                    return mk(out);
+                },
+                byteLength: function(s,enc) { if(enc==='hex')return s.length/2; return new TextEncoder().encode(s).length; },
+                compare:    function(a,b)   { return a.equals(b)?0:1; },
+                isEncoding: function()      { return true; }
+            };
+            B.allocUnsafeSlow = B.allocUnsafe;
+            window.Buffer = B;
+        })();
+    }
+    </script>
+    <script src="https://unpkg.com/@solana/web3.js@1.77.3/lib/index.iife.min.js"></script>
+    <script src="js/cleanup.js?v=16"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+</body>
+</html>

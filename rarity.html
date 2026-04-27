@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rat Republic — Trait Rarity</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a1f0f;
+            background-image: url('images/Background.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: #fff;
+            font-family: monospace, 'Courier New', sans-serif;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            color: #C8E030;
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-shadow: 0 0 12px rgba(200, 224, 48, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 30px;
+            background-color: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            color: #C8E030;
+            text-decoration: none;
+            font-family: monospace;
+            font-weight: bold;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            border-color: #C8E030;
+            color: #C8E030;
+            box-shadow: 0 0 10px rgba(200, 224, 48, 0.3);
+        }
+
+        .trait-card {
+            background-color: rgba(20, 28, 12, 0.88);
+            border: 1px solid #5A7A18;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .trait-card-header {
+            background-color: rgba(30, 45, 10, 0.95);
+            border-bottom: 1px solid #5A7A18;
+            padding: 10px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .trait-card-header h5 {
+            color: #C8E030;
+            margin: 0;
+            font-size: 1rem;
+            text-shadow: 0 0 6px rgba(200, 224, 48, 0.4);
+            letter-spacing: 1px;
+        }
+
+        .trait-badge {
+            font-size: 0.75rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .badge-required {
+            background-color: rgba(200, 224, 48, 0.2);
+            color: #C8E030;
+            border: 1px solid #5A7A18;
+        }
+
+        .badge-optional {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .trait-card-body {
+            padding: 14px 18px;
+        }
+
+        .rarity-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 7px;
+        }
+
+        .rarity-name {
+            width: 140px;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.85);
+            text-transform: capitalize;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .rarity-bar-wrap {
+            flex: 1;
+            background-color: rgba(255,255,255,0.08);
+            border-radius: 4px;
+            height: 8px;
+        }
+
+        .rarity-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #5A7A18, #C8E030);
+        }
+
+        .rarity-pct {
+            width: 46px;
+            text-align: right;
+            font-size: 0.78rem;
+            color: #C8E030;
+            font-weight: bold;
+        }
+
+        .none-row .rarity-name { color: rgba(255,255,255,0.4); font-style: italic; }
+        .none-row .rarity-bar { background: rgba(255,255,255,0.2); }
+        .none-row .rarity-pct { color: rgba(255,255,255,0.4); }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width:760px;">
+        <a href="index.html" class="back-btn">← Back to Home</a>
+
+        <div class="page-header">
+            <h1>TRAIT RARITY</h1>
+            <p>Every trait and its probability of appearing in a randomly generated Rat Republic PFP.</p>
+        </div>
+
+        <div id="rarity-container"></div>
+    </div>
+
+    <script>
+        const traits = [
+            {
+                name: 'Background',
+                required: true,
+                items: ['bg1','bg2','bg3','bg4','bg5','bg6','bg7','bg8','bg9','bg10',
+                        'bg11','bg12','bg13','bg14','bg15','bg16','bg17','bg18','bg19','bg20',
+                        'bg21','bg22','bg23','bg24','bg25','bg26','bg27']
+            },
+            {
+                name: 'Skin',
+                required: true,
+                items: ['Taffy','Azure','Bumblebee','Carolina','Chili','Coffee','Honey',
+                        'Jungle','Lemon','Lilac','Lollipop','Mint','Mulberry','Normal',
+                        'Plum','Punch','Ruby','Sea','Space','Tiger']
+            },
+            {
+                name: 'Outfit',
+                required: false,
+                items: ['Anime','Antique','Bones','Cosmos','Dawn','Elf','Fall','Gold','Gray',
+                        'GreatWave','Heart','IceCubes','NordicBlue','Orange','Red Hoodie','Red',
+                        'Sakura','Santa','Solana','Stitch','Sunrise','Trenches','Vintage',
+                        'WhiteFlame','YellowHoodie','Zebra','Akatsuki']
+            },
+            {
+                name: 'Mouth',
+                required: false,
+                items: ['mouth1','mouth2','mouth3','mouth4','mouth5','mouth6','mouth7','mouth8','mouth9',
+                        'mouth10','mouth11','mouth12','mouth13','mouth14','mouth15','mouth16','mouth17']
+            },
+            {
+                name: 'Eyes',
+                required: false,
+                items: ['eyes1','eyes2','eyes3','eyes4','eyes5','eyes6','eyes7','eyes8','eyes9','eyes10',
+                        'eyes11','eyes12','eyes13','eyes14','eyes15','eyes16','eyes17','eyes18','eyes19',
+                        'eyes20','eyes21','eyes22','eyes23','eyes24','eyes25','eyes26']
+            },
+            {
+                name: 'Head',
+                required: false,
+                items: ['head1','head2','head3','head4','head5','head6','head7','head8','head9',
+                        'head10','head11','head12','head13','head14','head15','head16','head17','head18']
+            }
+        ];
+
+        const SKIP_CHANCE = 0.33;
+
+        function calcPct(trait) {
+            if (trait.required) {
+                return { none: 0, each: 100 / trait.items.length };
+            } else {
+                return { none: SKIP_CHANCE * 100, each: ((1 - SKIP_CHANCE) * 100) / trait.items.length };
+            }
+        }
+
+        const container = document.getElementById('rarity-container');
+
+        traits.forEach(function(trait) {
+            const pct = calcPct(trait);
+            const maxBar = trait.required ? pct.each : Math.max(pct.none, pct.each);
+
+            let rows = '';
+            if (!trait.required) {
+                const barW = (pct.none / maxBar * 100).toFixed(1);
+                rows += `<div class="rarity-row none-row">
+                    <span class="rarity-name">None</span>
+                    <div class="rarity-bar-wrap"><div class="rarity-bar" style="width:${barW}%"></div></div>
+                    <span class="rarity-pct">${pct.none.toFixed(1)}%</span>
+                </div>`;
+            }
+
+            trait.items.forEach(function(item) {
+                const barW = (pct.each / maxBar * 100).toFixed(1);
+                rows += `<div class="rarity-row">
+                    <span class="rarity-name">${item}</span>
+                    <div class="rarity-bar-wrap"><div class="rarity-bar" style="width:${barW}%"></div></div>
+                    <span class="rarity-pct">${pct.each.toFixed(1)}%</span>
+                </div>`;
+            });
+
+            container.innerHTML += `
+                <div class="trait-card">
+                    <div class="trait-card-header">
+                        <h5>${trait.name.toUpperCase()}</h5>
+                        <span class="trait-badge ${trait.required ? 'badge-required' : 'badge-optional'}">
+                            ${trait.required ? 'Required' : 'Optional · 33% None'}
+                        </span>
+                    </div>
+                    <div class="trait-card-body">${rows}</div>
+                </div>`;
+        });
+    </script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+</body>
+</html>

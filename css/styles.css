@@ -1,0 +1,311 @@
+/*==========================================================*/
+/* Global Scrolling */
+/*==========================================================*/
+html {
+    /* Ensures smooth animation when clicking navigation links */
+    scroll-behavior: smooth;
+}
+
+/*==========================================================*/
+/* Base & Background Styling (CRITICAL FIX) */
+/*==========================================================*/
+body {
+    /* Set the background color to the desired blue color (fallback/color below the image) */
+    background-color: #90E0EF; 
+    
+    /* NEW: Apply the fixed background image to the entire body */
+    background-image: url('../images/Background.png');
+    background-size: cover;
+    background-repeat: no-repeat; 
+    background-attachment: fixed; /* Makes it fixed everywhere */
+    background-position: center center; 
+}
+
+.hero-section {
+    /* Set minimum height to fill the screen */
+    min-height: 100vh;
+    /* Align content vertically center */
+    display: flex;
+    align-items: center;
+    padding-top: 56px; /* Offset for the fixed navbar */
+}
+
+/*==========================================================*/
+/* Navbar Styling */
+/*==========================================================*/
+.navbar-custom {
+    /* Make the navbar transparent */
+    background-color: transparent !important;
+}
+
+/* Add subtle shadow to navigation text for better contrast over fixed background */
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link,
+.navbar-custom small {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+.navbar-custom .nav-link:hover {
+    color: #C8E030 !important;
+}
+
+/*==========================================================*/
+/* Content Block and Typography */
+/*==========================================================*/
+.hero-content {
+    /* Container for the text block on the left with slight white transparency for readability */
+    background: rgba(255, 255, 255, 0.9);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    max-width: 450px;
+    margin: 0 auto; 
+}
+
+.display-rat {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+/*==========================================================*/
+/* Custom Button Styles */
+/*==========================================================*/
+.btn-green-custom {
+    background-color: rgba(20, 28, 12, 0.92);
+    border: 2px solid #5A7A18;
+    color: #C8E030;
+    font-weight: bold;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+    text-shadow: 0 0 6px rgba(200, 224, 48, 0.4);
+}
+
+.btn-green-custom a {
+    color: #C8E030;
+    text-decoration: none;
+}
+
+.btn-green-custom:hover {
+    background-color: rgba(40, 60, 15, 0.98);
+    border-color: #C8E030;
+    color: #C8E030;
+    box-shadow: 0 0 10px rgba(200, 224, 48, 0.35);
+}
+
+.btn-yellow-custom {
+    background-color: rgba(20, 28, 12, 0.92);
+    border: 2px solid #5A7A18;
+    color: #C8E030;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    text-shadow: 0 0 6px rgba(200, 224, 48, 0.4);
+}
+
+.btn-yellow-custom a {
+    color: #C8E030;
+    text-decoration: none;
+}
+
+.btn-yellow-custom:hover {
+    background-color: rgba(40, 60, 15, 0.98);
+    border-color: #C8E030;
+    color: #C8E030;
+    box-shadow: 0 0 10px rgba(200, 224, 48, 0.35);
+}
+
+/* Custom shift for the main character image */
+.rat-main-image {
+    /* Pushes the image 80 pixels horizontally to the left for alignment */
+    transform: translateX(-80px); 
+    /* Add some vertical padding for spacing */
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/*==========================================================*/
+/* Price Ticker */
+/*==========================================================*/
+.ticker-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(20, 28, 12, 0.85);
+    border: 1px solid #5A7A18;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+.ticker-label {
+    color: #C8E030;
+    font-weight: bold;
+    text-shadow: 0 0 6px rgba(200, 224, 48, 0.5);
+}
+
+.ticker-value {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.ticker-change {
+    font-weight: bold;
+}
+
+.ticker-mcap {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.78rem;
+}
+
+/*==========================================================*/
+/* CA Copy Box */
+/*==========================================================*/
+.ca-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(20, 28, 12, 0.88);
+    border: 1px solid #5A7A18;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: monospace;
+}
+
+.ca-label {
+    color: #C8E030;
+    font-weight: bold;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.ca-address {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.72rem;
+    word-break: break-all;
+    flex: 1;
+}
+
+#copy-ca-btn {
+    background-color: transparent;
+    border: 1px solid #5A7A18;
+    color: #C8E030;
+    border-radius: 5px;
+    padding: 2px 10px;
+    font-family: monospace;
+    font-size: 0.8rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+#copy-ca-btn:hover {
+    border-color: #C8E030;
+    box-shadow: 0 0 8px rgba(200, 224, 48, 0.3);
+}
+
+/*==========================================================*/
+/* Artworks Section Styling (Low Opacity White) */
+/*==========================================================*/
+
+/* New class to set the Artworks section to semi-transparent white over the fixed body image */
+.artwork-transparent {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/*==========================================================*/
+/* Responsiveness Fixes */
+/*==========================================================*/
+@media (max-width: 991.98px) {
+    /* Resets the image transform on tablets and smaller devices */
+    .rat-main-image {
+        transform: none;
+        padding-top: 1rem;
+        padding-bottom: 2rem;
+    }
+
+    /* Centers the text content on small screens */
+    .hero-content {
+        text-align: center;
+        margin: 2rem auto; /* Add vertical space when stacked */
+    }
+}
+
+/*==========================================================*/
+/* Owl Carousel Styling Fixes */
+/*==========================================================*/
+/*==========================================================*/
+/* PFP GENERATOR SPECIFIC STYLING FIXES */
+/*==========================================================*/
+
+/* New rules to target Owl Carousel navigation ONLY within the PFP Generator */
+.owl-generator.owl-theme .owl-nav {
+    margin-top: 10px;
+}
+
+.owl-generator.owl-theme .owl-nav [class*=owl-] {
+    /* Use your bright green button color for the arrow symbol */
+    background-color: #C8E030 !important; /* Your custom green */
+    font-size: 24px !important;
+    color: #ffffff !important;
+    border-radius: 50%;
+    border: none;
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.owl-generator.owl-theme .owl-nav .owl-prev {
+    left: -20px;
+    top: 20%;
+}
+  
+.owl-generator.owl-theme .owl-nav .owl-next {
+    right: 12px !important;
+    top: 20%;
+}
+
+/* Ensure the generator items scale down correctly for the options */
+.owl-generator .owl-item img {
+    width: 70px !important;
+    height: 70px !important;
+}
+
+/* Resetting the main carousel arrows (Artworks section) to use the site's default clean arrows */
+.owl-carousel.owl-theme .owl-nav [class*=owl-] {
+    /* Default site arrows */
+    color: #C8E030 !important; 
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 50% !important;
+    font-size: 1.5rem !important;
+    width: 40px; 
+    height: 40px; 
+    line-height: 40px; 
+    margin: 5px;
+    padding: 0;
+    text-align: center;
+    
+    /* ADDED: Positioning for a clean look */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: opacity 0.3s ease; /* Smooth hover transition */
+}
+
+/* Position arrows for main Artworks carousel */
+.owl-carousel.owl-theme .owl-nav .owl-prev {
+    left: -20px; 
+}
+
+.owl-carousel.owl-theme .owl-nav .owl-next {
+    right: -20px; 
+}
+
+/* Added: Hover state for clean navigation */
+.owl-carousel.owl-theme .owl-nav [class*=owl-]:hover {
+    background: white !important; /* Brighter on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

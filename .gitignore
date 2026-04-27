@@ -1,0 +1,17 @@
+# Secrets — never commit
+api/config.php
+
+# User uploads — don't commit user data
+images/avatars/
+
+# Zip / backup files
+*.zip
+
+# Scratch folders
+New folder/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+*.log

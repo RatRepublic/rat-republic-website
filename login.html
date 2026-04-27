@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rat Republic — Login</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #1a1f0f;
+            background-image: url('images/Background.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: #fff;
+            font-family: monospace, 'Courier New', sans-serif;
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .container { width: 100%; max-width: 420px; }
+        @font-face {
+            font-family: 'NftOpensea';
+            src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 24px;
+            background-color: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            color: #C8E030;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+        .back-btn:hover { border-color: #C8E030; box-shadow: 0 0 10px rgba(200,224,48,0.3); }
+        .main-card {
+            background: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            border-radius: 16px;
+            padding: 32px 28px;
+        }
+        .page-title {
+            text-align: center;
+            font-family: 'NftOpensea', monospace;
+            color: #fff;
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            margin-bottom: 6px;
+        }
+        .page-sub {
+            text-align: center;
+            color: rgba(255,255,255,0.35);
+            font-size: 0.68rem;
+            letter-spacing: 2px;
+            margin-bottom: 28px;
+        }
+        .field { margin-bottom: 18px; }
+        .field label {
+            display: block;
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+        .field input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid #5A7A18;
+            border-radius: 8px;
+            color: #fff;
+            font-family: monospace;
+            font-size: 0.9rem;
+            padding: 11px 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .field input:focus { border-color: #C8E030; }
+        .field input::placeholder { color: rgba(255,255,255,0.2); }
+        .btn-submit {
+            width: 100%;
+            background-color: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            color: #C8E030;
+            font-weight: bold;
+            font-family: 'NftOpensea', monospace;
+            font-size: 0.95rem;
+            padding: 13px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+        .btn-submit:hover {
+            border-color: #C8E030;
+            box-shadow: 0 0 14px rgba(200,224,48,0.35);
+            background-color: rgba(40,60,15,0.98);
+        }
+        .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+        .msg {
+            margin-top: 14px;
+            font-size: 0.78rem;
+            text-align: center;
+            min-height: 1.2em;
+        }
+        .msg.error { color: #ff8080; }
+        .msg.success { color: #C8E030; }
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.74rem;
+            color: rgba(255,255,255,0.35);
+        }
+        .register-link a { color: #C8E030; text-decoration: none; }
+        .register-link a:hover { text-decoration: underline; }
+        .forgot-link {
+            text-align: right;
+            margin-top: -10px;
+            margin-bottom: 16px;
+            font-size: 0.7rem;
+        }
+        .forgot-link a {
+            color: rgba(255,255,255,0.3);
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .forgot-link a:hover { color: #C8E030; }
+        .forgot-panel {
+            display: none;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #3d5510;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .forgot-panel label {
+            display: block;
+            font-size: 0.62rem;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+        .forgot-panel input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid #5A7A18;
+            border-radius: 8px;
+            color: #fff;
+            font-family: monospace;
+            font-size: 0.88rem;
+            padding: 10px 12px;
+            outline: none;
+            transition: border-color 0.2s;
+            margin-bottom: 10px;
+        }
+        .forgot-panel input:focus { border-color: #C8E030; }
+        .forgot-panel input::placeholder { color: rgba(255,255,255,0.2); }
+        .btn-forgot-send {
+            width: 100%;
+            background: transparent;
+            border: 1.5px solid #5A7A18;
+            color: #C8E030;
+            font-family: monospace;
+            font-size: 0.82rem;
+            padding: 9px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+        .btn-forgot-send:hover { border-color: #C8E030; box-shadow: 0 0 10px rgba(200,224,48,0.2); }
+        .btn-forgot-send:disabled { opacity: 0.35; cursor: not-allowed; }
+        .resend-bar {
+            display: none;
+            margin-top: 12px;
+            padding: 12px 14px;
+            background: rgba(255,200,0,0.06);
+            border: 1px solid rgba(255,200,0,0.2);
+            border-radius: 8px;
+            font-size: 0.74rem;
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+            line-height: 1.6;
+        }
+        .btn-resend {
+            background: transparent;
+            border: 1.5px solid #5A7A18;
+            color: rgba(255,255,255,0.5);
+            font-family: monospace;
+            font-size: 0.72rem;
+            padding: 5px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+        .btn-resend:hover { border-color: #C8E030; color: #C8E030; }
+        .btn-resend:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="tools.html" class="back-btn">← Back to Utilities</a>
+        <div class="main-card">
+            <div class="page-title">LOGIN</div>
+            <div class="page-sub">WELCOME BACK, RAT</div>
+
+            <div class="field">
+                <label>EMAIL OR USERNAME</label>
+                <input type="text" id="email" placeholder="you@example.com or RatKing" autocomplete="username">
+            </div>
+            <div class="field">
+                <label>PASSWORD</label>
+                <input type="password" id="password" placeholder="Your password" autocomplete="current-password">
+            </div>
+
+            <div class="forgot-link"><a id="forgot-toggle">Forgot password?</a></div>
+
+            <!-- Forgot password panel -->
+            <div class="forgot-panel" id="forgot-panel">
+                <label>ENTER YOUR EMAIL</label>
+                <input type="email" id="forgot-email" placeholder="you@example.com" autocomplete="email">
+                <button class="btn-forgot-send" id="forgot-send-btn">Send Reset Link</button>
+                <div class="msg" id="forgot-msg" style="margin-top:8px;"></div>
+            </div>
+
+            <button class="btn-submit" id="login-btn">Log In</button>
+            <div class="msg" id="msg"></div>
+
+            <!-- Shown when account exists but email not verified -->
+            <div class="resend-bar" id="resend-bar">
+                Your email address hasn't been verified yet.<br>
+                <button class="btn-resend" id="resend-btn">Resend Verification Email</button>
+                <div class="msg" id="resend-msg" style="margin-top:6px;font-size:0.72rem;"></div>
+            </div>
+
+            <div class="register-link">Don't have an account? <a href="register.html">Register</a></div>
+        </div>
+    </div>
+
+    <script>
+        // If already logged in, skip to profile
+        if (localStorage.getItem('rr_token')) {
+            window.location.href = 'profile.html';
+        }
+
+        var btn = document.getElementById('login-btn');
+        var msg = document.getElementById('msg');
+
+        // Allow Enter key to submit
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !btn.disabled) btn.click();
+        });
+
+        var lastEmail = '';
+
+        btn.addEventListener('click', async function () {
+            var email    = document.getElementById('email').value.trim();
+            var password = document.getElementById('password').value;
+
+            msg.className = 'msg';
+            msg.textContent = '';
+            document.getElementById('resend-bar').style.display = 'none';
+
+            if (!email || !password) {
+                msg.className = 'msg error';
+                msg.textContent = 'Email and password are required.';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Logging in...';
+            lastEmail = email;
+
+            try {
+                var resp = await fetch('api/auth.php?action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, password: password })
+                });
+                var data = await resp.json();
+
+                if (!resp.ok) {
+                    msg.className = 'msg error';
+                    msg.textContent = data.error || 'Login failed.';
+                    btn.disabled = false;
+                    btn.textContent = 'Log In';
+                    if (data.unverified) {
+                        document.getElementById('resend-bar').style.display = 'block';
+                    }
+                    return;
+                }
+
+                localStorage.setItem('rr_token', data.token);
+                localStorage.setItem('rr_username', data.username);
+                window.location.href = 'profile.html';
+            } catch (e) {
+                msg.className = 'msg error';
+                msg.textContent = 'Network error. Please try again.';
+                btn.disabled = false;
+                btn.textContent = 'Log In';
+            }
+        });
+
+        // Forgot password toggle
+        document.getElementById('forgot-toggle').addEventListener('click', function () {
+            var panel = document.getElementById('forgot-panel');
+            var isOpen = panel.style.display === 'block';
+            panel.style.display = isOpen ? 'none' : 'block';
+            this.textContent = isOpen ? 'Forgot password?' : 'Cancel';
+            if (!isOpen) document.getElementById('forgot-email').focus();
+        });
+
+        // Send reset link
+        var forgotCooldown = false;
+        document.getElementById('forgot-send-btn').addEventListener('click', async function () {
+            if (forgotCooldown) return;
+            var email    = document.getElementById('forgot-email').value.trim();
+            var forgotMsg = document.getElementById('forgot-msg');
+
+            forgotMsg.className = 'msg';
+            forgotMsg.textContent = '';
+
+            if (!email) {
+                forgotMsg.className = 'msg error';
+                forgotMsg.textContent = 'Please enter your email address.';
+                return;
+            }
+
+            this.disabled = true;
+            this.textContent = 'Sending...';
+            forgotCooldown = true;
+
+            try {
+                await fetch('api/auth.php?action=forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+                forgotMsg.className = 'msg success';
+                forgotMsg.textContent = 'If that email is registered, a reset link is on its way.';
+                this.textContent = 'Sent';
+            } catch (e) {
+                forgotMsg.className = 'msg error';
+                forgotMsg.textContent = 'Network error. Try again.';
+                this.disabled = false;
+                this.textContent = 'Send Reset Link';
+                forgotCooldown = false;
+            }
+
+            // Re-enable after 60 seconds
+            setTimeout(function () {
+                var btn = document.getElementById('forgot-send-btn');
+                btn.disabled = false;
+                btn.textContent = 'Send Reset Link';
+                forgotCooldown = false;
+            }, 60000);
+        });
+
+        // Resend verification from login page
+        var resendCooldown = false;
+        document.getElementById('resend-btn').addEventListener('click', async function () {
+            if (resendCooldown || !lastEmail) return;
+            var resendBtn = this;
+            var resendMsg = document.getElementById('resend-msg');
+            resendBtn.disabled = true;
+            resendMsg.className = 'msg';
+            resendMsg.textContent = 'Sending...';
+            resendCooldown = true;
+
+            try {
+                await fetch('api/auth.php?action=resend-verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: lastEmail })
+                });
+                resendMsg.className = 'msg success';
+                resendMsg.textContent = 'Verification email sent! Check your inbox.';
+            } catch (e) {
+                resendMsg.className = 'msg error';
+                resendMsg.textContent = 'Network error. Try again.';
+            }
+
+            setTimeout(function () {
+                resendBtn.disabled = false;
+                resendCooldown = false;
+            }, 60000);
+        });
+    </script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+</body>
+</html>

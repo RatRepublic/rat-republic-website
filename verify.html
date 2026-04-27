@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rat Republic — Verify Email</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #1a1f0f;
+            background-image: url('images/Background.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: #fff;
+            font-family: monospace, 'Courier New', sans-serif;
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .container { width: 100%; max-width: 420px; }
+        @font-face {
+            font-family: 'NftOpensea';
+            src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
+        }
+        .main-card {
+            background: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            border-radius: 16px;
+            padding: 40px 28px;
+            text-align: center;
+        }
+        .state-icon { font-size: 3rem; margin-bottom: 16px; }
+        .state-title {
+            font-family: 'NftOpensea', monospace;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+        .state-title.success { color: #C8E030; }
+        .state-title.error   { color: #ff8080; }
+        .state-title.loading { color: rgba(255,255,255,0.5); }
+        .state-body {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8rem;
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            color: #C8E030;
+            text-decoration: none;
+            font-weight: bold;
+            font-family: 'NftOpensea', monospace;
+            font-size: 0.9rem;
+            padding: 11px 28px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+        .btn:hover { border-color: #C8E030; box-shadow: 0 0 14px rgba(200,224,48,0.35); }
+        .countdown {
+            margin-top: 12px;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-card" id="card">
+            <!-- Loading -->
+            <div id="state-loading">
+                <div class="state-icon">⏳</div>
+                <div class="state-title loading">VERIFYING...</div>
+                <div class="state-body">Checking your verification link.</div>
+            </div>
+
+            <!-- Success -->
+            <div id="state-success" style="display:none;">
+                <div class="state-icon">✅</div>
+                <div class="state-title success">EMAIL VERIFIED</div>
+                <div class="state-body">
+                    Your account is now active.<br>
+                    Taking you to your profile…
+                </div>
+                <a href="profile.html" class="btn">Go to Profile →</a>
+                <div class="countdown" id="countdown"></div>
+            </div>
+
+            <!-- Expired -->
+            <div id="state-expired" style="display:none;">
+                <div class="state-icon">⌛</div>
+                <div class="state-title error">LINK EXPIRED</div>
+                <div class="state-body">
+                    This verification link has expired.<br>
+                    Register again to get a new one.
+                </div>
+                <a href="register.html" class="btn">Back to Register →</a>
+            </div>
+
+            <!-- Error -->
+            <div id="state-error" style="display:none;">
+                <div class="state-icon">❌</div>
+                <div class="state-title error">INVALID LINK</div>
+                <div class="state-body" id="error-body">
+                    This verification link is invalid or has already been used.<br>
+                    Try logging in, or register again.
+                </div>
+                <a href="login.html" class="btn">Go to Login →</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var token = new URLSearchParams(window.location.search).get('token');
+
+        function show(stateId) {
+            ['state-loading','state-success','state-expired','state-error'].forEach(function (id) {
+                document.getElementById(id).style.display = id === stateId ? 'block' : 'none';
+            });
+        }
+
+        if (!token) {
+            show('state-error');
+        } else {
+            fetch('api/auth.php?action=verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token })
+            })
+            .then(function (resp) { return resp.json().then(function (d) { return { ok: resp.ok, d: d }; }); })
+            .then(function (r) {
+                if (r.d.token) {
+                    localStorage.setItem('rr_token', r.d.token);
+                    localStorage.setItem('rr_username', r.d.username);
+                    show('state-success');
+
+                    // Countdown redirect
+                    var secs = 4;
+                    var cd = document.getElementById('countdown');
+                    cd.textContent = 'Redirecting in ' + secs + 's…';
+                    var timer = setInterval(function () {
+                        secs--;
+                        if (secs <= 0) {
+                            clearInterval(timer);
+                            window.location.href = 'profile.html';
+                        } else {
+                            cd.textContent = 'Redirecting in ' + secs + 's…';
+                        }
+                    }, 1000);
+                } else if (r.d.expired) {
+                    show('state-expired');
+                } else {
+                    show('state-error');
+                    if (r.d.error) {
+                        document.getElementById('error-body').textContent = r.d.error;
+                    }
+                }
+            })
+            .catch(function () {
+                show('state-error');
+                document.getElementById('error-body').textContent = 'Network error. Please try again.';
+            });
+        }
+    </script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+</body>
+</html>
