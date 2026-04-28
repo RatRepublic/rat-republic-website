@@ -180,6 +180,18 @@
             font-size: 0.7rem;
             letter-spacing: 1px;
         }
+        .identity-rank {
+            display: inline-block;
+            margin-top: 5px;
+            font-size: 0.62rem;
+            letter-spacing: 2px;
+            color: #C8E030;
+            background: rgba(200,224,48,0.08);
+            border: 1px solid rgba(200,224,48,0.25);
+            border-radius: 4px;
+            padding: 2px 8px;
+            text-transform: uppercase;
+        }
         .username-row {
             display: flex;
             align-items: center;
@@ -439,6 +451,75 @@
             padding: 20px 0;
             font-style: italic;
         }
+        .activity-filter-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+        .activity-filter-row input[type="date"] {
+            background: rgba(12,17,6,0.8);
+            border: 1.5px solid #5A7A18;
+            color: rgba(255,255,255,0.7);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-family: monospace;
+            font-size: 0.72rem;
+            outline: none;
+            transition: border-color 0.2s;
+            color-scheme: dark;
+        }
+        .activity-filter-row input[type="date"]:focus { border-color: #C8E030; }
+        .activity-filter-row label {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 1px;
+        }
+        .btn-filter-apply {
+            background: rgba(200,224,48,0.1);
+            border: 1.5px solid #5A7A18;
+            color: #C8E030;
+            font-family: monospace;
+            font-size: 0.72rem;
+            font-weight: bold;
+            padding: 5px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+        .btn-filter-apply:hover { border-color: #C8E030; background: rgba(200,224,48,0.18); }
+        .btn-filter-clear {
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.3);
+            font-family: monospace;
+            font-size: 0.72rem;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-filter-clear:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.5); }
+        .btn-load-more {
+            display: block;
+            width: 100%;
+            margin-top: 14px;
+            background: rgba(20,28,12,0.9);
+            border: 1.5px solid #5A7A18;
+            color: #C8E030;
+            font-family: monospace;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 9px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+        .btn-load-more:hover { border-color: #C8E030; box-shadow: 0 0 8px rgba(200,224,48,0.2); }
+        .btn-load-more:disabled { opacity: 0.35; pointer-events: none; }
 
         /* Referral box */
         .referral-box {
@@ -484,6 +565,31 @@
             letter-spacing: 0.5px;
         }
         .referral-count span { color: #C8E030; font-weight: bold; }
+        .referral-stats {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .referral-stat-box {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #3d5510;
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+        }
+        .referral-stat-num {
+            font-family: 'NftOpensea', monospace;
+            font-size: 1.1rem;
+            color: #C8E030;
+            margin-bottom: 4px;
+        }
+        .referral-stat-label {
+            font-size: 0.55rem;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
         /* Payout wallet */
         .payout-display-row {
             display: flex;
@@ -580,6 +686,7 @@
             padding: 40px 0;
             letter-spacing: 2px;
         }
+
     </style>
 </head>
 <body>
@@ -608,6 +715,7 @@
                             <button class="edit-username-btn" id="edit-username-btn">Edit</button>
                         </div>
                         <div class="identity-email" id="disp-email"></div>
+                        <div id="disp-rank" class="identity-rank" style="display:none;"></div>
                         <div id="avatar-msg" style="font-size:0.65rem;margin-top:6px;min-height:1em;"></div>
 
                         <!-- Inline edit form -->
@@ -665,6 +773,16 @@
                     <button class="copy-ref-btn" id="copy-ref-btn" onclick="copyReferral()">Copy</button>
                 </div>
                 <div class="referral-count" id="referral-count"></div>
+                <div class="referral-stats">
+                    <div class="referral-stat-box">
+                        <div class="referral-stat-num" id="ref-sol-earned">0 SOL</div>
+                        <div class="referral-stat-label">SOL Earned</div>
+                    </div>
+                    <div class="referral-stat-box">
+                        <div class="referral-stat-num" id="ref-count-stat">0</div>
+                        <div class="referral-stat-label">Referrals</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Payout Wallet -->
@@ -695,9 +813,18 @@
             <!-- Recent activity -->
             <div class="card">
                 <div class="section-label">Recent Activity</div>
+                <div class="activity-filter-row">
+                    <label>FROM</label>
+                    <input type="date" id="filter-date-from">
+                    <label>TO</label>
+                    <input type="date" id="filter-date-to">
+                    <button class="btn-filter-apply" id="filter-apply-btn">Apply</button>
+                    <button class="btn-filter-clear" id="filter-clear-btn">Clear</button>
+                </div>
                 <div class="activity-wrap">
                     <div id="history-inner"><div class="no-data">No activity yet.</div></div>
                 </div>
+                <button class="btn-load-more" id="load-more-btn" style="display:none;">Load More</button>
             </div>
 
         </div>
@@ -719,6 +846,7 @@
         var token = localStorage.getItem('rr_token');
         if (!token) { window.location.href = 'login.html'; }
 
+
         function maskEmail(email) {
             var at = email.indexOf('@');
             if (at < 0) return email;
@@ -736,6 +864,14 @@
                 end   = local.slice(-3);
             }
             return start + '******' + end + domain;
+        }
+
+        function getRankTier(pos) {
+            if (pos <= 10)   return 'PREDATOR';
+            if (pos <= 100)  return 'PLAGUE LORD';
+            if (pos <= 500)  return 'TUNNEL RUNNER';
+            if (pos <= 1000) return 'NORMIE';
+            return 'SEWER DWELLER';
         }
 
         function shortAddr(addr) {
@@ -762,9 +898,10 @@
                 + '&sol='      + encodeURIComponent(shareSol)
                 + '&accounts=' + encodeURIComponent(shareAccounts)
                 + '&txs='      + encodeURIComponent(shareTxs)
-                + '&username=' + encodeURIComponent(shareUsername);
+                + '&username=' + encodeURIComponent(shareUsername)
+                + '&r='        + Date.now();
             var text = 'I claimed a total of ' + shareSol + ' $SOL using Scavenger!\n'
-                + 'Join Rat Republic to claim yours!\n'
+                + 'Join Rat Republic to claim your 10% Discount - Forever!\n'
                 + shareRefLink;
             shareImageUrl = imageUrl;
             shareTweetUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
@@ -800,6 +937,10 @@
             // Identity
             document.getElementById('disp-username').textContent = data.username || data.email;
             document.getElementById('disp-email').textContent = maskEmail(data.email);
+            var rankEl = document.getElementById('disp-rank');
+            var rankPos = data.rank_position || 1;
+            rankEl.textContent = 'Rank #' + rankPos + ' [' + getRankTier(rankPos) + ']';
+            rankEl.style.display = 'inline-block';
 
             // Avatar
             var img = document.getElementById('avatar-img');
@@ -846,33 +987,94 @@
                 var count = data.referral_count || 0;
                 document.getElementById('referral-count').innerHTML =
                     'You have referred <span>' + count + '</span> verified user' + (count !== 1 ? 's' : '') + '.';
+                document.getElementById('ref-sol-earned').textContent =
+                    parseFloat(data.referral_sol_earned || 0).toFixed(4) + ' SOL';
+                document.getElementById('ref-count-stat').textContent = count;
             } else {
                 document.getElementById('referral-card').style.display = 'none';
             }
 
-            // Recent activity
-            var hEl = document.getElementById('history-inner');
-            if (data.history && data.history.length > 0) {
-                hEl.innerHTML = '<table>' +
-                    '<thead><tr>' +
-                    '<th>DATE / TIME</th><th>WALLET</th><th>CLOSED</th><th>SOL</th><th>TX</th>' +
-                    '</tr></thead><tbody>' +
-                    data.history.map(function (h) {
-                        var sigHtml = h.tx_signature
-                            ? '<a href="https://solscan.io/tx/' + h.tx_signature + '" target="_blank" rel="noopener" title="' + h.tx_signature + '">' + shortSig(h.tx_signature) + '</a>'
-                            : '<span style="color:rgba(255,255,255,0.15)">—</span>';
-                        return '<tr>' +
-                            '<td>' + formatDateTime(h.claimed_at) + '</td>' +
-                            '<td>' + shortAddr(h.wallet_address) + '</td>' +
-                            '<td class="highlight">' + h.accounts_closed + ' closed</td>' +
-                            '<td class="highlight">' + parseFloat(h.sol_amount).toFixed(4) + ' SOL</td>' +
-                            '<td class="sig">' + sigHtml + '</td>' +
-                            '</tr>';
-                    }).join('') +
-                    '</tbody></table>';
-            } else {
-                hEl.innerHTML = '<div class="no-data">No reclaims recorded yet.</div>';
+            // Recent activity — initial page from me.php
+            var activityOffset   = 0;
+            var activityHasMore  = data.history && data.history.length === 25;
+            var activityFiltered = false;
+
+            function rowsHtml(rows) {
+                return rows.map(function (h) {
+                    var sigHtml = h.tx_signature
+                        ? '<a href="https://solscan.io/tx/' + h.tx_signature + '" target="_blank" rel="noopener" title="' + h.tx_signature + '">' + shortSig(h.tx_signature) + '</a>'
+                        : '<span style="color:rgba(255,255,255,0.15)">—</span>';
+                    return '<tr>' +
+                        '<td>' + formatDateTime(h.claimed_at) + '</td>' +
+                        '<td>' + shortAddr(h.wallet_address) + '</td>' +
+                        '<td class="highlight">' + h.accounts_closed + ' closed</td>' +
+                        '<td class="highlight">' + parseFloat(h.sol_amount).toFixed(4) + ' SOL</td>' +
+                        '<td class="sig">' + sigHtml + '</td>' +
+                        '</tr>';
+                }).join('');
             }
+
+            function tableWrap(bodyHtml) {
+                return '<table><thead><tr>' +
+                    '<th>DATE / TIME</th><th>WALLET</th><th>CLOSED</th><th>SOL</th><th>TX</th>' +
+                    '</tr></thead><tbody>' + bodyHtml + '</tbody></table>';
+            }
+
+            var hEl      = document.getElementById('history-inner');
+            var lmBtn    = document.getElementById('load-more-btn');
+
+            function renderInitial(rows, hasMore) {
+                activityOffset  = rows.length;
+                activityHasMore = hasMore;
+                hEl.innerHTML   = rows.length > 0 ? tableWrap(rowsHtml(rows)) : '<div class="no-data">No reclaims recorded yet.</div>';
+                lmBtn.style.display = hasMore ? 'block' : 'none';
+            }
+
+            renderInitial(data.history || [], activityHasMore);
+
+            async function fetchActivity(offset, replace) {
+                var dateFrom = document.getElementById('filter-date-from').value;
+                var dateTo   = document.getElementById('filter-date-to').value;
+                var url      = 'api/activity.php?offset=' + offset;
+                if (dateFrom) url += '&date_from=' + encodeURIComponent(dateFrom);
+                if (dateTo)   url += '&date_to='   + encodeURIComponent(dateTo);
+
+                lmBtn.disabled = true;
+                try {
+                    var resp = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
+                    var d    = await resp.json();
+                    if (d.error) throw new Error(d.error);
+                    if (replace) {
+                        activityOffset = 0;
+                        hEl.innerHTML  = d.rows.length > 0 ? tableWrap(rowsHtml(d.rows)) : '<div class="no-data">No results for that date range.</div>';
+                    } else {
+                        var tbody = hEl.querySelector('tbody');
+                        if (tbody) tbody.insertAdjacentHTML('beforeend', rowsHtml(d.rows));
+                    }
+                    activityOffset  += d.rows.length;
+                    activityHasMore  = d.has_more;
+                    lmBtn.style.display = d.has_more ? 'block' : 'none';
+                } catch(e) {
+                    if (replace) hEl.innerHTML = '<div class="no-data">Failed to load: ' + e.message + '</div>';
+                }
+                lmBtn.disabled = false;
+            }
+
+            lmBtn.addEventListener('click', function () {
+                fetchActivity(activityOffset, false);
+            });
+
+            document.getElementById('filter-apply-btn').addEventListener('click', function () {
+                activityFiltered = true;
+                fetchActivity(0, true);
+            });
+
+            document.getElementById('filter-clear-btn').addEventListener('click', function () {
+                document.getElementById('filter-date-from').value = '';
+                document.getElementById('filter-date-to').value   = '';
+                activityFiltered = false;
+                renderInitial(data.history || [], data.history && data.history.length === 25);
+            });
 
             document.getElementById('loading-card').style.display = 'none';
             document.getElementById('profile-content').style.display = 'block';

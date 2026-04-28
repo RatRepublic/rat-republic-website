@@ -154,6 +154,108 @@
             box-shadow: 0 0 10px rgba(200, 224, 48, 0.35);
             background-color: rgba(40, 60, 15, 0.98);
         }
+
+        /* ── Perks Popup ── */
+        .perks-overlay {
+            position: fixed; inset: 0; z-index: 99999;
+            background: rgba(0,0,0,0.75);
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .perks-overlay.hidden { display: none; }
+        .perks-card {
+            background: rgba(14,20,7,0.97);
+            border: 2px solid #C8E030;
+            border-radius: 16px;
+            padding: 32px 28px 24px;
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(200,224,48,0.15);
+        }
+        .perks-title {
+            font-family: 'NftOpensea', monospace;
+            font-size: 1.6rem;
+            color: #fff;
+            letter-spacing: 3px;
+            margin-bottom: 18px;
+        }
+        .perks-badge {
+            display: inline-block;
+            font-family: 'NftOpensea', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: #C8E030;
+            border: 2px solid #C8E030;
+            border-radius: 6px;
+            padding: 5px 16px;
+            margin-bottom: 24px;
+        }
+        .perk-item { margin-bottom: 16px; }
+        .perk-name {
+            font-family: 'NftOpensea', monospace;
+            font-size: 1rem;
+            color: #fff;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        .perk-sub {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.4);
+        }
+        .perks-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .perks-btns a, .perks-btns button {
+            font-family: monospace;
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 8px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+        .btn-perks-docs {
+            background: transparent;
+            border: 1.5px solid #5A7A18;
+            color: rgba(255,255,255,0.6);
+        }
+        .btn-perks-docs:hover { border-color: #C8E030; color: #C8E030; }
+        .btn-perks-register {
+            background: rgba(200,224,48,0.12);
+            border: 1.5px solid #C8E030;
+            color: #C8E030;
+        }
+        .btn-perks-register:hover { background: rgba(200,224,48,0.22); box-shadow: 0 0 10px rgba(200,224,48,0.3); }
+        .btn-perks-skip {
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.3);
+        }
+        .btn-perks-skip:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.5); }
+        .perks-dsa {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            user-select: none;
+            margin-top: 14px;
+        }
+        .perks-dsa input[type="checkbox"] {
+            accent-color: #C8E030;
+            width: 13px; height: 13px;
+            cursor: pointer;
+        }
+        .perks-dsa:hover { color: rgba(255,255,255,0.5); }
     </style>
 </head>
 <body>
@@ -170,7 +272,7 @@
             <div class="col-md-6">
                 <div class="tool-card">
                     <img src="images/utilities/scavenger.png" alt="Reclaim SOL" class="tool-card-img">
-                    <span class="tool-badge">1.5% service fee</span>
+                    <span class="tool-badge">2% service fee</span>
                     <p class="tool-desc">Wallet full of rugged tokens? Scan for zero-balance SPL accounts, close them in bulk, and reclaim the locked SOL rent (~0.002 SOL per account).</p>
                     <a href="cleanup.html" class="btn-launch">Launch →</a>
                 </div>
@@ -184,6 +286,14 @@
                 </div>
             </div>
             <div class="col-md-6">
+                <div class="tool-card">
+                    <img src="images/utilities/pfp-gen.png" alt="PFP Generator" class="tool-card-img">
+                    <span class="tool-badge">FREE · Runs in your browser</span>
+                    <p class="tool-desc">Design your own Rat Republic character. Mix and match backgrounds, skins, outfits, accessories, and more — then download your PFP or flaunt it on X.</p>
+                    <a href="generator.html" class="btn-launch">Launch →</a>
+                </div>
+            </div>
+            <div class="col-md-6">
                 <div class="tool-card coming-soon">
                     <div class="tool-icon">⚙️</div>
                     <div class="tool-name">MORE COMING SOON</div>
@@ -194,6 +304,54 @@
             </div>
         </div>
     </div>
+    <!-- Perks popup — shown to guests only -->
+    <div class="perks-overlay hidden" id="perks-overlay">
+        <div class="perks-card">
+            <div class="perks-title">NOT YET REGISTERED?</div>
+            <div class="perks-badge">REGISTERED USER PERKS</div>
+
+            <div class="perk-item">
+                <div class="perk-name">10% Fee Discount</div>
+                <div class="perk-sub">if you join under a referral</div>
+            </div>
+            <div class="perk-item">
+                <div class="perk-name">Referral Earnings</div>
+                <div class="perk-sub">25% of fees forever</div>
+            </div>
+            <div class="perk-item">
+                <div class="perk-name">Stats Tracking</div>
+                <div class="perk-sub">history and lifetime SOL recovered</div>
+            </div>
+            <div class="perk-item">
+                <div class="perk-name">Leaderboard</div>
+                <div class="perk-sub">climb up and win prizes</div>
+            </div>
+
+            <div class="perks-btns">
+                <a href="https://rat-republic.gitbook.io/rat-republic-docs" target="_blank" class="btn-perks-docs">Docs</a>
+                <a href="register.html" class="btn-perks-register">Register</a>
+                <button class="btn-perks-skip" id="perks-skip-btn">Continue browsing</button>
+            </div>
+            <label class="perks-dsa">
+                <input type="checkbox" id="perks-dsa-check">
+                Don't show this message again
+            </label>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            if (!localStorage.getItem('rr_token') && !localStorage.getItem('rr_skip_perks_popup')) {
+                document.getElementById('perks-overlay').classList.remove('hidden');
+            }
+            document.getElementById('perks-skip-btn').addEventListener('click', function () {
+                if (document.getElementById('perks-dsa-check').checked) {
+                    localStorage.setItem('rr_skip_perks_popup', '1');
+                }
+                document.getElementById('perks-overlay').classList.add('hidden');
+            });
+        })();
+    </script>
     <script src="js/header.js"></script>
     <script src="js/footer.js"></script>
 </body>

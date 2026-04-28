@@ -11,6 +11,7 @@
     let walletPublicKey = null;
     let closableAccounts = [];
     let feeInfo = null;
+    let userRefLink = 'https://ratrepublic.art/register.html';
 
     const connectBtn      = document.getElementById('connect-btn');
     const walletModal     = document.getElementById('wallet-modal');
@@ -62,7 +63,9 @@
         } else if (count === 0) {
             unclaimedDisplay.textContent = '0 SOL';
         } else {
-            unclaimedDisplay.textContent = (count * RENT_PER_ACCOUNT).toFixed(4) + ' SOL';
+            const fi = getActiveFeeInfo();
+            const net = (count * RENT_PER_ACCOUNT) * (1 - fi.total_bps / 10000);
+            unclaimedDisplay.textContent = net.toFixed(4) + ' SOL';
         }
     }
 
@@ -86,7 +89,7 @@
 
     tweetBtn.addEventListener('click', function () {
         const amount = successAmount.textContent.replace(' SOL', '');
-        const text = 'I just claimed ' + amount + ' $SOL in rent on @solana using @rat_republicsol.';
+        const text = 'I just claimed ' + amount + ' $SOL in rent on @solana using @rat_republicsol.\n\nJoin Rat Republic to claim your 10% Discount - Forever!\n' + userRefLink;
         window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
     });
 
@@ -133,16 +136,22 @@
                 feeInfo = data;
                 updateSummary();
             }
+            if (token) {
+                fetch('api/me.php', { headers: { 'Authorization': 'Bearer ' + token } })
+                    .then(function (r) { return r.ok ? r.json() : null; })
+                    .then(function (d) { if (d && d.referral_link) userRefLink = d.referral_link; })
+                    .catch(function () {});
+            }
         } catch (e) {}
     }
 
     function getActiveFeeInfo() {
         return feeInfo || {
             treasury:       TREASURY,
-            treasury_bps:   150,
+            treasury_bps:   200,
             referrer_wallet: null,
             referrer_bps:   0,
-            total_bps:      150
+            total_bps:      200
         };
     }
 
@@ -168,7 +177,7 @@
             .catch(function () {});
     }
 
-    function recordReclaim(walletAddr, accountsClosed, solAmount, txSignature) {
+    function recordReclaim(walletAddr, accountsClosed, solAmount, txSignature, referrerWallet, referrerSol) {
         var token = localStorage.getItem('rr_token');
         fetch('api/record-reclaim.php', {
             method: 'POST',
@@ -178,7 +187,9 @@
                 accounts_closed: accountsClosed,
                 sol_recovered:   parseFloat(solAmount),
                 tx_signature:    txSignature || null,
-                token:           token || null
+                token:           token || null,
+                referrer_wallet: referrerWallet || null,
+                referrer_sol:    referrerSol || null
             })
         })
         .then(function () { loadStats(); })
@@ -386,7 +397,7 @@
         const fi = getActiveFeeInfo();
         const grossSol = count * RENT_PER_ACCOUNT;
         const netSol   = grossSol * (1 - fi.total_bps / 10000);
-        summaryText.textContent = count + ' selected · ~' + netSol.toFixed(4) + ' SOL after fee';
+        summaryText.textContent = count + ' selected';
         reclaimBtn.disabled = count === 0;
     }
 
@@ -472,8 +483,9 @@
                 totalNetLamports += netLamports;
                 totalAccounts    += chunks[ci].length;
 
-                const chunkNetSol = (netLamports / 1e9).toFixed(4);
-                recordReclaim(walletPublicKey, chunks[ci].length, chunkNetSol, sig);
+                const chunkNetSol    = (netLamports / 1e9).toFixed(4);
+                const chunkRefSol   = referrerLamports > 0 ? referrerLamports / 1e9 : null;
+                recordReclaim(walletPublicKey, chunks[ci].length, chunkNetSol, sig, fi.referrer_wallet, chunkRefSol);
             }
 
             const totalNetSol = (totalNetLamports / 1e9).toFixed(4);

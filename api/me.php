@@ -47,8 +47,8 @@ try {
         $stmt->execute($addresses);
         $walletBreakdown = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Recent activity (last 50 transactions)
-        $stmt = $db->prepare("SELECT wallet_address, sol_amount, accounts_closed, claimed_at, tx_signature FROM reclaim_history WHERE wallet_address IN ($ph) ORDER BY claimed_at DESC LIMIT 50");
+        // Recent activity (first page — 25 rows)
+        $stmt = $db->prepare("SELECT wallet_address, sol_amount, accounts_closed, claimed_at, tx_signature FROM reclaim_history WHERE wallet_address IN ($ph) ORDER BY claimed_at DESC LIMIT 25");
         $stmt->execute($addresses);
         $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -58,6 +58,28 @@ try {
     if (!empty($user['avatar'])) {
         $avatar = 'uploads/avatars/' . $user['avatar'];
     }
+
+    // Lifetime referral SOL earned (matched against user's payout wallet)
+    $refSolEarned = 0;
+    if (!empty($payoutWallet)) {
+        $refEarnStmt = $db->prepare('SELECT COALESCE(SUM(referrer_sol), 0) FROM reclaim_history WHERE referrer_wallet = ?');
+        $refEarnStmt->execute([$payoutWallet]);
+        $refSolEarned = round((float)$refEarnStmt->fetchColumn(), 9);
+    }
+
+    // Leaderboard rank position
+    $rankStmt = $db->prepare(
+        "SELECT COUNT(*) + 1 AS rank_pos
+         FROM (
+             SELECT uw.user_id, SUM(rh.sol_amount) AS user_total
+             FROM user_wallets uw
+             JOIN reclaim_history rh ON rh.wallet_address = uw.wallet_address
+             GROUP BY uw.user_id
+             HAVING user_total > ?
+         ) ranked"
+    );
+    $rankStmt->execute([$stats['total_sol']]);
+    $rankPos = (int)$rankStmt->fetchColumn();
 
     // Referral info + payout wallet
     $refStmt = $db->prepare('SELECT referral_code, payout_wallet FROM users WHERE id = ?');
@@ -71,18 +93,20 @@ try {
     $refCount = (int)$refCountStmt->fetchColumn();
 
     echo json_encode([
-        'id'               => (int)$user['id'],
-        'username'         => $user['username'],
-        'email'            => $user['email'],
-        'avatar'           => $avatar,
-        'wallets'          => $wallets,
-        'stats'            => $stats,
+        'id'             => (int)$user['id'],
+        'username'       => $user['username'],
+        'email'          => $user['email'],
+        'avatar'         => $avatar,
+        'wallets'        => $wallets,
+        'stats'          => $stats,
         'wallet_breakdown' => $walletBreakdown,
-        'history'          => $history,
-        'referral_code'    => $refCode,
-        'referral_link'    => $refCode ? SITE_URL . '/register.html?ref=' . $refCode : null,
-        'referral_count'   => $refCount,
-        'payout_wallet'    => $payoutWallet,
+        'history'        => $history,
+        'referral_code'  => $refCode,
+        'referral_link'  => $refCode ? SITE_URL . '/register.html?ref=' . $refCode : null,
+        'referral_count'    => $refCount,
+        'referral_sol_earned' => $refSolEarned,
+        'payout_wallet'     => $payoutWallet,
+        'rank_position'     => $rankPos,
     ]);
 } catch (PDOException $e) {
     http_response_code(500);

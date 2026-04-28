@@ -9,12 +9,14 @@ require_once __DIR__ . '/db.php';
 
 $input = json_decode(file_get_contents('php://input'), true) ?: [];
 
-$walletAddress = trim($input['wallet_address'] ?? '');
-$closed        = intval($input['accounts_closed'] ?? 0);
-$sol           = floatval($input['sol_recovered']  ?? 0);
-$token         = $input['token'] ?? null;
-$txSig         = trim($input['tx_signature'] ?? '');
-$txSig         = (strlen($txSig) >= 44 && strlen($txSig) <= 128) ? $txSig : null;
+$walletAddress  = trim($input['wallet_address'] ?? '');
+$closed         = intval($input['accounts_closed'] ?? 0);
+$sol            = floatval($input['sol_recovered']  ?? 0);
+$token          = $input['token'] ?? null;
+$txSig          = trim($input['tx_signature'] ?? '');
+$txSig          = (strlen($txSig) >= 44 && strlen($txSig) <= 128) ? $txSig : null;
+$referrerWallet = trim($input['referrer_wallet'] ?? '') ?: null;
+$referrerSol    = ($input['referrer_sol'] ?? 0) > 0 ? floatval($input['referrer_sol']) : null;
 
 if (!$walletAddress || $closed < 1 || $closed > 2500 || $sol <= 0 || $sol > 5.1) {
     http_response_code(400);
@@ -26,8 +28,8 @@ try {
     $db = getDB();
 
     // Save to reclaim history
-    $stmt = $db->prepare('INSERT INTO reclaim_history (wallet_address, accounts_closed, sol_amount, tx_signature) VALUES (?, ?, ?, ?)');
-    $stmt->execute([$walletAddress, $closed, $sol, $txSig]);
+    $stmt = $db->prepare('INSERT INTO reclaim_history (wallet_address, accounts_closed, sol_amount, tx_signature, referrer_wallet, referrer_sol) VALUES (?, ?, ?, ?, ?, ?)');
+    $stmt->execute([$walletAddress, $closed, $sol, $txSig, $referrerWallet, $referrerSol]);
 
     // If user is logged in, auto-link wallet to their account
     if ($token) {

@@ -4,6 +4,10 @@
     // ── Styles ────────────────────────────────────────────────────────────
     var css = document.createElement('style');
     css.textContent = [
+        '@font-face {',
+        '  font-family: "NftOpensea";',
+        '  src: url("fonts/NftOpenseaRegular-jEJvR.ttf") format("truetype");',
+        '}',
         '#rr-header {',
         '  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;',
         '  height: ' + HEADER_H + 'px;',
@@ -14,7 +18,7 @@
         '  padding: 0 20px; box-sizing: border-box;',
         '}',
         '#rr-header-brand {',
-        '  color: #C8E030; text-decoration: none; font-family: monospace;',
+        '  color: #C8E030; text-decoration: none; font-family: "NftOpensea", monospace;',
         '  font-weight: bold; font-size: 0.82rem; letter-spacing: 2px;',
         '  white-space: nowrap; opacity: 0.85; transition: opacity 0.2s;',
         '}',
@@ -80,6 +84,13 @@
         '#rr-header-login:hover { border-color: #C8E030; box-shadow: 0 0 8px rgba(200,224,48,0.2); }',
 
         '#rr-header-right { display: flex; align-items: center; gap: 10px; }',
+        '#rr-header-home {',
+        '  background: rgba(20,28,12,0.9); border: 1.5px solid #5A7A18;',
+        '  color: #C8E030; text-decoration: none; font-family: monospace;',
+        '  font-size: 0.78rem; padding: 6px 14px; border-radius: 8px;',
+        '  transition: all 0.2s; letter-spacing: 1px; white-space: nowrap;',
+        '}',
+        '#rr-header-home:hover { border-color: #C8E030; box-shadow: 0 0 8px rgba(200,224,48,0.2); }',
         '#rr-header-utilities {',
         '  background: rgba(20,28,12,0.9); border: 1.5px solid #5A7A18;',
         '  color: #C8E030; text-decoration: none; font-family: monospace;',
@@ -114,6 +125,12 @@
     // ── Right-side container ──────────────────────────────────────────
     var rightSide = document.createElement('div');
     rightSide.id = 'rr-header-right';
+
+    var homeLink = document.createElement('a');
+    homeLink.id = 'rr-header-home';
+    homeLink.href = 'index.html';
+    homeLink.textContent = 'Home';
+    rightSide.appendChild(homeLink);
 
     var utilitiesLink = document.createElement('a');
     utilitiesLink.id = 'rr-header-utilities';

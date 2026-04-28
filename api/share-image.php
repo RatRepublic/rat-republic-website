@@ -15,7 +15,8 @@ if ($type === 'stats') {
 
     $activeFont = file_exists($fontImpact) ? $fontImpact : $font;
 
-    $templatePath = __DIR__ . '/../images/share-card-template.png';
+    $templateNum  = rand(1, 3);
+    $templatePath = __DIR__ . '/../images/share-card-template-' . $templateNum . '.png';
 
     if (file_exists($templatePath)) {
         $img = imagecreatefrompng($templatePath);

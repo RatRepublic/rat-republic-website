@@ -19,7 +19,7 @@ function jsonOut($data) {
 
 const TREASURY = 'ratU71Bedbf7196sexgCyBoRxM2Zjb7vBxJ5MJeBYGb';
 
-$treasuryBps    = 150; // 1.5%
+$treasuryBps    = 200; // 2%
 $referrerWallet = null;
 $referrerBps    = 0;
 
@@ -30,30 +30,34 @@ try {
         $user = getUserFromToken($db, $token);
 
         if ($user) {
-            // Check if this user was referred by a verified user who has a payout wallet
+            // Check if user was referred
             $stmt = $db->prepare(
                 'SELECT u2.payout_wallet
                    FROM users u1
                    JOIN users u2 ON u2.id = u1.referred_by
                   WHERE u1.id = ?
                     AND u1.verified = 1
-                    AND u2.verified = 1
-                    AND u2.payout_wallet IS NOT NULL
-                    AND u2.payout_wallet != \'\''
+                    AND u2.verified = 1'
             );
             $stmt->execute([$user['id']]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($row) {
-                $treasuryBps    = 100; // 1%
-                $referrerWallet = $row['payout_wallet'];
-                $referrerBps    = 50;  // 0.5%
+                // Referred user always gets 10% discount (1.8% total)
+                $treasuryBps = 180;
+                $referrerBps = 0;
+
+                // If referrer has a payout wallet, split off their 0.5%
+                if (!empty($row['payout_wallet'])) {
+                    $treasuryBps    = 130;
+                    $referrerWallet = $row['payout_wallet'];
+                    $referrerBps    = 50;
+                }
             }
         }
     }
 } catch (Exception $e) {
-    // On any error, fall back to full 1.5% to treasury
-    $treasuryBps    = 150;
+    $treasuryBps    = 200;
     $referrerWallet = null;
     $referrerBps    = 0;
 }
@@ -63,5 +67,5 @@ jsonOut([
     'treasury_bps'    => $treasuryBps,
     'referrer_wallet' => $referrerWallet,
     'referrer_bps'    => $referrerBps,
-    'total_bps'       => $treasuryBps + $referrerBps, // always 150
+    'total_bps'       => $treasuryBps + $referrerBps,
 ]);

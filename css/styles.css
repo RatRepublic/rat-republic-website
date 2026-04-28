@@ -1,3 +1,8 @@
+@font-face {
+    font-family: 'NftOpensea';
+    src: url('../fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
+}
+
 /*==========================================================*/
 /* Global Scrolling */
 /*==========================================================*/
@@ -63,6 +68,7 @@ body {
 }
 
 .display-rat {
+    font-family: 'NftOpensea', monospace;
     font-size: 3rem;
     font-weight: 700;
 }

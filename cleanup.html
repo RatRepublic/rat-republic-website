@@ -482,6 +482,85 @@
         }
 
         .hidden { display: none !important; }
+
+        /* ── Login Reminder Popup ── */
+        .login-overlay {
+            position: fixed; inset: 0; z-index: 99999;
+            background: rgba(0,0,0,0.75);
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .login-overlay.hidden { display: none; }
+        .login-card {
+            background: rgba(14,20,7,0.97);
+            border: 2px solid #C8E030;
+            border-radius: 16px;
+            padding: 32px 28px 24px;
+            max-width: 360px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(200,224,48,0.15);
+        }
+        .login-card-title {
+            font-family: 'NftOpensea', monospace;
+            font-size: 1.5rem;
+            color: #fff;
+            letter-spacing: 3px;
+            line-height: 1.3;
+            margin-bottom: 10px;
+        }
+        .login-card-sub {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.45);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        .login-card-btns {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+        .login-card-btns a, .login-card-btns button {
+            font-family: monospace;
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+        .btn-login-go {
+            background: rgba(200,224,48,0.12);
+            border: 1.5px solid #C8E030;
+            color: #C8E030;
+        }
+        .btn-login-go:hover { background: rgba(200,224,48,0.22); box-shadow: 0 0 10px rgba(200,224,48,0.3); }
+        .btn-login-skip {
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.3);
+        }
+        .btn-login-skip:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.5); }
+        .login-card-dsa {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            user-select: none;
+        }
+        .login-card-dsa input[type="checkbox"] {
+            accent-color: #C8E030;
+            width: 13px; height: 13px;
+            cursor: pointer;
+        }
+        .login-card-dsa:hover { color: rgba(255,255,255,0.5); }
     </style>
 </head>
 <body>
@@ -604,7 +683,7 @@
                 <hr class="faq-divider">
                 <div class="faq-item">
                     <div class="faq-q">What are the costs?</div>
-                    <p class="faq-a">A <strong>1.5% service fee</strong> is deducted from the recovered rent in the same transaction. If you joined via a referral link, the fee is split: <strong>1% to Rat Republic</strong> and <strong>0.5% to your referrer</strong>. You also pay the standard Solana network transaction fee (usually <strong>0.000005 SOL</strong>).</p>
+                    <p class="faq-a">A <strong>2% service fee</strong> is deducted from the recovered rent in the same transaction. If you joined via a referral link, the fee is split: <strong>1.5% to Rat Republic</strong> and <strong>0.5% to your referrer</strong>. You also pay the standard Solana network transaction fee (usually <strong>0.000005 SOL</strong>).</p>
                 </div>
 
             </div>
@@ -777,6 +856,35 @@
             window.Buffer = B;
         })();
     }
+    </script>
+    <!-- Login reminder popup — shown to guests only -->
+    <div class="login-overlay hidden" id="login-overlay">
+        <div class="login-card">
+            <div class="login-card-title">DONT FORGET TO LOGIN FOR THE LEADERBOARD</div>
+            <div class="login-card-sub">Track your reclaimed SOL, earn referral rewards, and climb the Crowned Vermins leaderboard.</div>
+            <div class="login-card-btns">
+                <a href="login.html" class="btn-login-go">Login</a>
+                <button class="btn-login-skip" id="login-skip-btn">Continue with Scavenger</button>
+            </div>
+            <label class="login-card-dsa">
+                <input type="checkbox" id="login-dsa-check">
+                Don't show this message again
+            </label>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            if (!localStorage.getItem('rr_token') && !localStorage.getItem('rr_skip_login_popup')) {
+                document.getElementById('login-overlay').classList.remove('hidden');
+            }
+            document.getElementById('login-skip-btn').addEventListener('click', function () {
+                if (document.getElementById('login-dsa-check').checked) {
+                    localStorage.setItem('rr_skip_login_popup', '1');
+                }
+                document.getElementById('login-overlay').classList.add('hidden');
+            });
+        })();
     </script>
     <script src="https://unpkg.com/@solana/web3.js@1.77.3/lib/index.iife.min.js"></script>
     <script src="js/cleanup.js?v=16"></script>

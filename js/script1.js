@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById('pfp-flaunt-btn').addEventListener('click', function () {
-        const tweetText = encodeURIComponent('I am a certified Sewer Dweller, Viva Rat Republic!');
+        const tweetText = encodeURIComponent('I am a certified Sewer Dweller, come join the Republic!\nhttps://ratrepublic.art/generator.html');
         const tweetUrl = 'https://twitter.com/intent/tweet?text=' + tweetText;
         document.getElementById('pfp-share-canvas').toBlob(function (blob) {
             const link = document.createElement('a');
