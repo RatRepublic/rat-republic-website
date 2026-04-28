@@ -86,7 +86,7 @@ try {
                     AND u.verified = 1
                   GROUP BY u.id
                   ORDER BY weekly_sol DESC
-                  LIMIT 3'
+                  LIMIT 5'
             );
             $prevRows = $prev->fetchAll(PDO::FETCH_ASSOC);
             $ins = $db->prepare(

@@ -168,8 +168,22 @@
             gap: 20px; padding: 14px 20px 14px 16px;
             max-width: 520px; margin: 0 auto;
         }
+        .podium-card.rank-4 {
+            border-color: #5A7A18;
+            display: flex; align-items: center;
+            gap: 20px; padding: 14px 20px 14px 16px;
+            max-width: 520px; margin: 0 auto;
+        }
+        .podium-card.rank-5 {
+            border-color: #3d5510;
+            display: flex; align-items: center;
+            gap: 20px; padding: 14px 20px 14px 16px;
+            max-width: 520px; margin: 0 auto;
+        }
         .podium-card.rank-2 .podium-avatar,
-        .podium-card.rank-3 .podium-avatar {
+        .podium-card.rank-3 .podium-avatar,
+        .podium-card.rank-4 .podium-avatar,
+        .podium-card.rank-5 .podium-avatar {
             width: 150px; height: 150px;
             flex-shrink: 0;
             border-radius: 50%;
@@ -180,52 +194,74 @@
         }
         .podium-card.rank-2 .podium-avatar { border: 3px solid #b8c860; }
         .podium-card.rank-3 .podium-avatar { border: 3px solid #8aa030; }
+        .podium-card.rank-4 .podium-avatar { border: 3px solid #5A7A18; }
+        .podium-card.rank-5 .podium-avatar { border: 3px solid #3d5510; }
         .podium-card.rank-2 .podium-avatar img,
-        .podium-card.rank-3 .podium-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .podium-card.rank-3 .podium-avatar img,
+        .podium-card.rank-4 .podium-avatar img,
+        .podium-card.rank-5 .podium-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         .podium-card.rank-2 .podium-info,
-        .podium-card.rank-3 .podium-info {
+        .podium-card.rank-3 .podium-info,
+        .podium-card.rank-4 .podium-info,
+        .podium-card.rank-5 .podium-info {
             flex: 1;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             text-align: center;
         }
         .podium-card.rank-2 .podium-rank-title,
-        .podium-card.rank-3 .podium-rank-title {
+        .podium-card.rank-3 .podium-rank-title,
+        .podium-card.rank-4 .podium-rank-title,
+        .podium-card.rank-5 .podium-rank-title {
             font-family: 'NftOpensea', monospace;
             font-size: 2rem; letter-spacing: 3px; margin-bottom: 4px;
         }
         .rank-2 .podium-rank-title { color: #b8c860; text-shadow: 0 0 14px rgba(184,200,96,0.4); }
         .rank-3 .podium-rank-title { color: #8aa030; text-shadow: 0 0 14px rgba(138,160,48,0.4); }
+        .rank-4 .podium-rank-title { color: #5A7A18; }
+        .rank-5 .podium-rank-title { color: #3d5510; }
         .podium-card.rank-2 .podium-username,
-        .podium-card.rank-3 .podium-username {
+        .podium-card.rank-3 .podium-username,
+        .podium-card.rank-4 .podium-username,
+        .podium-card.rank-5 .podium-username {
             font-family: 'NftOpensea', monospace;
             font-size: 1.4rem; color: #C8E030;
             letter-spacing: 2px; margin-bottom: 12px;
         }
         .podium-card.rank-2 hr.podium-divider,
-        .podium-card.rank-3 hr.podium-divider {
+        .podium-card.rank-3 hr.podium-divider,
+        .podium-card.rank-4 hr.podium-divider,
+        .podium-card.rank-5 hr.podium-divider {
             border: none; border-top: 1px solid rgba(200,224,48,0.2);
             width: 100%; margin-bottom: 10px;
         }
         .podium-card.rank-2 .podium-sol,
-        .podium-card.rank-3 .podium-sol {
+        .podium-card.rank-3 .podium-sol,
+        .podium-card.rank-4 .podium-sol,
+        .podium-card.rank-5 .podium-sol {
             font-size: 1.8rem; font-weight: 800;
             color: #C8E030; text-shadow: 0 0 10px rgba(200,224,48,0.4);
         }
         .podium-card.rank-2 .podium-sol-label,
-        .podium-card.rank-3 .podium-sol-label {
+        .podium-card.rank-3 .podium-sol-label,
+        .podium-card.rank-4 .podium-sol-label,
+        .podium-card.rank-5 .podium-sol-label {
             font-size: 0.62rem; color: rgba(255,255,255,0.3);
             letter-spacing: 2.5px; margin-top: 2px;
         }
         .podium-card.rank-2 .podium-meta,
-        .podium-card.rank-3 .podium-meta {
+        .podium-card.rank-3 .podium-meta,
+        .podium-card.rank-4 .podium-meta,
+        .podium-card.rank-5 .podium-meta {
             font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-top: 6px;
         }
 
         @media (max-width: 560px) {
             .podium-card.rank-1,
             .podium-card.rank-2,
-            .podium-card.rank-3 { flex-direction: column; padding: 18px 16px; }
+            .podium-card.rank-3,
+            .podium-card.rank-4,
+            .podium-card.rank-5 { flex-direction: column; padding: 18px 16px; }
         }
 
         /* Rank table */
@@ -344,6 +380,65 @@
         }
 
         .hidden { display: none !important; }
+
+        /* Flex IT button */
+        .flex-btn {
+            background: rgba(200,224,48,0.1);
+            border: 1.5px solid #C8E030;
+            color: #C8E030;
+            font-family: monospace;
+            font-size: 0.72rem;
+            font-weight: bold;
+            padding: 5px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            white-space: nowrap;
+            margin-top: 10px;
+        }
+        .flex-btn:hover { background: rgba(200,224,48,0.22); box-shadow: 0 0 8px rgba(200,224,48,0.3); }
+        .flex-btn-inline { margin-top: 0; margin-left: 10px; padding: 3px 10px; font-size: 0.68rem; }
+
+        /* Flex modal */
+        .flex-overlay {
+            position: fixed; inset: 0; z-index: 99999;
+            background: rgba(0,0,0,0.82);
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .flex-overlay.hidden { display: none; }
+        .flex-modal {
+            background: rgba(14,20,7,0.97);
+            border: 2px solid #C8E030;
+            border-radius: 16px;
+            padding: 28px 24px;
+            max-width: 740px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(200,224,48,0.15);
+        }
+        #flex-canvas {
+            max-width: 100%;
+            border-radius: 8px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        .flex-modal-btns {
+            display: flex; gap: 10px;
+            justify-content: center; flex-wrap: wrap;
+        }
+        .flex-modal-btns button {
+            font-family: monospace; font-size: 0.8rem; font-weight: bold;
+            padding: 8px 20px; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; letter-spacing: 1px;
+        }
+        .btn-flex-dl { background: rgba(200,224,48,0.12); border: 1.5px solid #C8E030; color: #C8E030; }
+        .btn-flex-dl:hover { background: rgba(200,224,48,0.22); box-shadow: 0 0 10px rgba(200,224,48,0.3); }
+        .btn-flex-tweet { background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); }
+        .btn-flex-tweet:hover { border-color: #C8E030; color: #C8E030; }
+        .btn-flex-close { background: transparent; border: 1.5px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); }
+        .btn-flex-close:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.5); }
     </style>
 </head>
 <body>
@@ -363,6 +458,18 @@
         </div>
 
         <div class="loading-state" id="loading">LOADING…</div>
+
+        <!-- Flex IT modal -->
+        <div class="flex-overlay hidden" id="flex-overlay">
+            <div class="flex-modal">
+                <canvas id="flex-canvas"></canvas>
+                <div class="flex-modal-btns">
+                    <button class="btn-flex-dl" id="flex-download-btn">Download</button>
+                    <button class="btn-flex-tweet" id="flex-tweet-btn">Tweet 𝕏</button>
+                    <button class="btn-flex-close" id="flex-close-btn">Close</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Podium (top 3) -->
         <div class="podium hidden" id="podium"></div>
@@ -434,7 +541,7 @@
         }
 
         function buildPodium(entries) {
-            var titles = ['🥇 ALPHA RAT', '🥈 BETA RAT', '🥉 GAMMA RAT'];
+            var titles = ['🥇 ALPHA RAT', '🥈 BETA RAT', '🥉 GAMMA RAT', 'DELTA RAT', 'EPSILON RAT'];
             var podium = document.getElementById('podium');
             podium.innerHTML = '';
 
@@ -481,8 +588,25 @@
                 return card;
             }
 
-            var top3 = entries.slice(0, 3);
-            top3.forEach(function(e, i) { podium.appendChild(makeCard(e, i)); });
+            var top5 = entries.slice(0, 5);
+            top5.forEach(function(e, i) {
+                var card = makeCard(e, i);
+                if (myUserId && String(e.id) === String(myUserId)) {
+                    var wrap = document.createElement('div');
+                    wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:8px;';
+                    wrap.appendChild(card);
+                    var fb = document.createElement('button');
+                    fb.className = 'flex-btn';
+                    fb.textContent = 'FLEX IT';
+                    (function(entry, rank, c) {
+                        fb.addEventListener('click', function() { openFlex(entry, rank, c); });
+                    })(e, i + 1, card);
+                    wrap.appendChild(fb);
+                    podium.appendChild(wrap);
+                } else {
+                    podium.appendChild(card);
+                }
+            });
 
             podium.classList.remove('hidden');
         }
@@ -490,13 +614,14 @@
         function buildTable(entries) {
             var tbody = document.getElementById('rank-body');
             tbody.innerHTML = '';
-            var rest = entries.slice(3);
+            var rest = entries.slice(5);
             if (rest.length === 0) return;
 
             rest.forEach(function(e, i) {
-                var rank = i + 4;
+                var rank = i + 6;
                 var tr = document.createElement('tr');
-                if (myUserId && String(e.id) === String(myUserId)) tr.classList.add('is-me');
+                var isMe = myUserId && String(e.id) === String(myUserId);
+                if (isMe) tr.classList.add('is-me');
 
                 var tdRank = document.createElement('td');
                 tdRank.className = 'rank-num';
@@ -509,6 +634,15 @@
                 var span = document.createElement('span');
                 span.textContent = e.username;
                 cell.appendChild(span);
+                if (isMe) {
+                    var fb = document.createElement('button');
+                    fb.className = 'flex-btn flex-btn-inline';
+                    fb.textContent = 'FLEX IT';
+                    (function(entry, r) {
+                        fb.addEventListener('click', function() { openFlex(entry, r); });
+                    })(e, rank);
+                    cell.appendChild(fb);
+                }
                 tdUser.appendChild(cell);
 
                 var tdSol = document.createElement('td');
@@ -596,7 +730,7 @@
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     if (!data.weeks || data.weeks.length === 0) return;
-                    var titles = ['🥇 ALPHA RAT', '🥈 BETA RAT', '🥉 GAMMA RAT'];
+                    var titles = ['🥇 ALPHA RAT', '🥈 BETA RAT', '🥉 GAMMA RAT', 'DELTA RAT', 'EPSILON RAT'];
                     var list = document.getElementById('past-winners-list');
                     list.innerHTML = '';
 
@@ -661,9 +795,153 @@
                 .catch(function() {});
         }
 
+        // ── Flex IT ──────────────────────────────────────────────────────────
+        var FLEX_TITLES = ['🥇 ALPHA RAT', '🥈 BETA RAT', '🥉 GAMMA RAT', 'DELTA RAT', 'EPSILON RAT'];
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            ctx.lineTo(x + r, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+        }
+
+        function buildFlexCard(entry, rank, callback) {
+            var W = 700, H = 200;
+            var offscreen = document.createElement('canvas');
+            offscreen.width = W; offscreen.height = H;
+            var ctx = offscreen.getContext('2d');
+            var title = (FLEX_TITLES[rank - 1] || ('#' + rank)).toUpperCase();
+
+            function draw(avatarImg) {
+                ctx.fillStyle = '#0d1508';
+                ctx.fillRect(0, 0, W, H);
+
+                ctx.strokeStyle = '#C8E030';
+                ctx.lineWidth = 3;
+                roundRect(ctx, 2, 2, W - 4, H - 4, 12);
+                ctx.stroke();
+
+                var av = 152, ax = 22, ay = (H - av) / 2;
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(ax + av / 2, ay + av / 2, av / 2, 0, Math.PI * 2);
+                ctx.clip();
+                ctx.drawImage(avatarImg, ax, ay, av, av);
+                ctx.restore();
+                ctx.strokeStyle = '#C8E030';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(ax + av / 2, ay + av / 2, av / 2, 0, Math.PI * 2);
+                ctx.stroke();
+
+                var rx = ax + av + 22;
+                ctx.textAlign = 'left';
+
+                ctx.font = 'bold 26px "NftOpensea", monospace';
+                ctx.fillStyle = '#C8E030';
+                ctx.fillText(title, rx, 52);
+
+                ctx.font = 'bold 20px "NftOpensea", monospace';
+                ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                ctx.fillText((entry.username || 'Anonymous').toUpperCase(), rx, 82);
+
+                ctx.strokeStyle = 'rgba(200,224,48,0.2)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(rx, 94); ctx.lineTo(W - 20, 94);
+                ctx.stroke();
+
+                ctx.font = 'bold 38px "NftOpensea", monospace';
+                ctx.fillStyle = '#C8E030';
+                ctx.fillText(parseFloat(entry.weekly_sol).toFixed(4) + ' SOL', rx, 136);
+
+                ctx.font = '11px monospace';
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.fillText('RECLAIMED THIS WEEK', rx, 156);
+
+                ctx.font = '13px monospace';
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.fillText(entry.weekly_accounts + ' accounts  ·  ' + entry.weekly_txs + ' txs', rx, 178);
+
+                ctx.font = 'bold 11px "NftOpensea", monospace';
+                ctx.fillStyle = 'rgba(200,224,48,0.4)';
+                ctx.textAlign = 'right';
+                ctx.fillText('RAT REPUBLIC', W - 16, 18);
+
+                callback(offscreen);
+            }
+
+            document.fonts.ready.then(function() {
+                var img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = function() { draw(img); };
+                img.onerror = function() {
+                    var fb = new Image();
+                    fb.onload = function() { draw(fb); };
+                    fb.src = 'images/Default-Avatar.png';
+                };
+                img.src = entry.avatar_url || 'images/Default-Avatar.png';
+            });
+        }
+
+        function openFlex(entry, rank, cardEl) {
+            var target = cardEl || document.querySelector('.podium-card.is-me');
+            if (target && typeof html2canvas !== 'undefined') {
+                html2canvas(target, { scale: 2, useCORS: true, backgroundColor: null })
+                    .then(function(shot) {
+                        var c = document.getElementById('flex-canvas');
+                        c.width = shot.width; c.height = shot.height;
+                        c.getContext('2d').drawImage(shot, 0, 0);
+                        document.getElementById('flex-overlay').classList.remove('hidden');
+                    });
+            } else {
+                buildFlexCard(entry, rank, function(card) {
+                    var c = document.getElementById('flex-canvas');
+                    c.width = card.width; c.height = card.height;
+                    c.getContext('2d').drawImage(card, 0, 0);
+                    document.getElementById('flex-overlay').classList.remove('hidden');
+                });
+            }
+        }
+
+        document.getElementById('flex-close-btn').addEventListener('click', function() {
+            document.getElementById('flex-overlay').classList.add('hidden');
+        });
+        document.getElementById('flex-overlay').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.add('hidden');
+        });
+        document.getElementById('flex-download-btn').addEventListener('click', function() {
+            document.getElementById('flex-canvas').toBlob(function(blob) {
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'rat-republic-flex.png';
+                a.click();
+                URL.revokeObjectURL(a.href);
+            });
+        });
+        document.getElementById('flex-tweet-btn').addEventListener('click', function() {
+            var text = encodeURIComponent('I\'m on the @rat_republicsol leaderboard!\nratrepublic.art/leaderboard.html');
+            document.getElementById('flex-canvas').toBlob(function(blob) {
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'rat-republic-flex.png';
+                a.click();
+                URL.revokeObjectURL(a.href);
+                setTimeout(function() { window.open('https://twitter.com/intent/tweet?text=' + text, '_blank'); }, 500);
+            });
+        });
+
         load();
     </script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="js/header.js"></script>
     <script src="js/footer.js"></script>
 </body>

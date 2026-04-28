@@ -4,6 +4,12 @@ api/config.php
 # User uploads — don't commit user data
 images/avatars/
 
+# Design source files
+*.psd
+
+# Claude Code local data
+.claude/
+
 # Zip / backup files
 *.zip
 

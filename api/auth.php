@@ -22,6 +22,12 @@ if ($action === 'register') {
         echo json_encode(['error' => 'Invalid email address']);
         exit;
     }
+    $emailDomain = substr(strrchr($email, '@'), 1);
+    if (!checkdnsrr($emailDomain, 'MX')) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Please enter a valid email address']);
+        exit;
+    }
     if (strlen($password) < 8) {
         http_response_code(400);
         echo json_encode(['error' => 'Password must be at least 8 characters']);
@@ -38,12 +44,18 @@ if ($action === 'register') {
 
         // Check if username is already taken
         if ($username) {
-            $stmt = $db->prepare('SELECT id FROM users WHERE username = ?');
+            $stmt = $db->prepare('SELECT id, verified FROM users WHERE username = ?');
             $stmt->execute([$username]);
-            if ($stmt->fetch()) {
-                http_response_code(409);
-                echo json_encode(['error' => 'Username already taken. Please choose another.']);
-                exit;
+            $existingByUsername = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($existingByUsername) {
+                if ($existingByUsername['verified']) {
+                    http_response_code(409);
+                    echo json_encode(['error' => 'Username already taken. Please choose another.']);
+                    exit;
+                }
+                // Unverified ghost account — purge it so the new registration can claim the username
+                $db->prepare('DELETE FROM email_verifications WHERE user_id = ?')->execute([$existingByUsername['id']]);
+                $db->prepare('DELETE FROM users WHERE id = ?')->execute([$existingByUsername['id']]);
             }
         }
 

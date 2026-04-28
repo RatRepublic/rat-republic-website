@@ -5,11 +5,10 @@ $type = $_GET['type'] ?? '';
 
 // ── Lifetime stats share card ────────────────────────────────────────────────
 if ($type === 'stats') {
-    $sol      = preg_replace('/[^0-9.]/',    '', $_GET['sol']      ?? '0');
+    $sol      = number_format(round((float)preg_replace('/[^0-9.]/', '', $_GET['sol'] ?? '0'), 3), 3);
     $accounts = preg_replace('/[^0-9]/',     '', $_GET['accounts'] ?? '0');
     $txs      = preg_replace('/[^0-9]/',     '', $_GET['txs']      ?? '0');
     $username = preg_replace('/[^A-Za-z0-9_\-]/', '', $_GET['username'] ?? '');
-    if (!$sol)      $sol      = '0';
     if (!$accounts) $accounts = '0';
     if (!$txs)      $txs      = '0';
 
@@ -26,23 +25,34 @@ if ($type === 'stats') {
 
         $green = imagecolorallocate($img, 0x58, 0xBF, 0x0D);
         $white = imagecolorallocate($img, 0xFF, 0xFF, 0xFF);
+        $black = imagecolorallocate($img, 0x00, 0x00, 0x00);
 
         $right = $w - 22; // right margin
 
-        // SOL amount — right-aligned
-        $solText = $sol . ' SOL';
-        $bb = imagettfbbox(68, 0, $activeFont, $solText);
-        imagettftext($img, 68, 0, $right - ($bb[2] - $bb[0]), 230, $green, $activeFont, $solText);
+        // SOL amount — right-aligned with black stroke
+        $solText  = $sol . ' SOL';
+        $bb       = imagettfbbox(68, 0, $activeFont, $solText);
+        $solX     = $right - ($bb[2] - $bb[0]);
+        $solY     = 230;
+        $stroke   = 3;
+        for ($sx = -$stroke; $sx <= $stroke; $sx++) {
+            for ($sy = -$stroke; $sy <= $stroke; $sy++) {
+                if ($sx !== 0 || $sy !== 0) {
+                    imagettftext($img, 68, 0, $solX + $sx, $solY + $sy, $black, $activeFont, $solText);
+                }
+            }
+        }
+        imagettftext($img, 68, 0, $solX, $solY, $green, $activeFont, $solText);
 
         // CLAIMED — right-aligned
         $bb = imagettfbbox(42, 0, $activeFont, 'CLAIMED');
         imagettftext($img, 42, 0, $right - ($bb[2] - $bb[0]), 290, $white, $activeFont, 'CLAIMED');
 
-        // @username — right-aligned, extra gap above
+        // @username — right-aligned, near bottom of card
         if ($username) {
             $uText = '@' . $username;
-            $bb = imagettfbbox(34, 0, $activeFont, $uText);
-            imagettftext($img, 34, 0, $right - ($bb[2] - $bb[0]), 360, $white, $activeFont, $uText);
+            $bb    = imagettfbbox(34, 0, $activeFont, $uText);
+            imagettftext($img, 34, 0, $right - ($bb[2] - $bb[0]), $h - 28, $white, $activeFont, $uText);
         }
     } else {
         // Generated fallback (900×450) — used until template is designed

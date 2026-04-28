@@ -59,13 +59,16 @@ try {
         $avatar = 'uploads/avatars/' . $user['avatar'];
     }
 
-    // Lifetime referral SOL earned (matched against user's payout wallet)
-    $refSolEarned = 0;
-    if (!empty($payoutWallet)) {
-        $refEarnStmt = $db->prepare('SELECT COALESCE(SUM(referrer_sol), 0) FROM reclaim_history WHERE referrer_wallet = ?');
-        $refEarnStmt->execute([$payoutWallet]);
-        $refSolEarned = round((float)$refEarnStmt->fetchColumn(), 9);
-    }
+    // Lifetime referral SOL earned — 0.5% of all SOL reclaimed by referred users
+    $refEarnStmt = $db->prepare(
+        'SELECT COALESCE(SUM(rh.sol_amount) * 0.005, 0)
+           FROM reclaim_history rh
+           JOIN user_wallets uw ON uw.wallet_address = rh.wallet_address
+           JOIN users ru ON ru.id = uw.user_id
+          WHERE ru.referred_by = ?'
+    );
+    $refEarnStmt->execute([$user['id']]);
+    $refSolEarned = round((float)$refEarnStmt->fetchColumn(), 4);
 
     // Leaderboard rank position
     $rankStmt = $db->prepare(

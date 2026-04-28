@@ -188,7 +188,9 @@ function fmtWeek($start, $end) {
                     <tbody>
                         <?php foreach ($week['entries'] as $e): ?>
                             <tr>
-                                <td class="rank rank-<?= $e['rank'] ?>"><?= $e['rank'] === 1 ? '🥇' : ($e['rank'] === 2 ? '🥈' : '🥉') ?></td>
+                                <td class="rank rank-<?= $e['rank'] ?>"><?php
+                                    echo match((int)$e['rank']) { 1 => '🥇', 2 => '🥈', 3 => '🥉', default => '#' . $e['rank'] };
+                                ?></td>
                                 <td>
                                     <div class="username"><?= htmlspecialchars($e['username'] ?: 'Anonymous') ?></div>
                                     <div class="email"><?= htmlspecialchars($e['email']) ?></div>
