@@ -1,9 +1,17 @@
 <?php
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Origin: https://ratrepublic.art');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit; }
+
+// Block requests from outside ratrepublic.art
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if ($origin && $origin !== 'https://ratrepublic.art') {
+    http_response_code(403);
+    echo json_encode(['error' => 'Forbidden']);
+    exit;
+}
 
 require_once __DIR__ . '/db.php';
 
@@ -18,15 +26,36 @@ $txSig          = (strlen($txSig) >= 44 && strlen($txSig) <= 128) ? $txSig : nul
 $referrerWallet = trim($input['referrer_wallet'] ?? '') ?: null;
 $referrerSol    = ($input['referrer_sol'] ?? 0) > 0 ? floatval($input['referrer_sol']) : null;
 
+// Validate wallet address format (base58, 32-44 chars)
+if (!preg_match('/^[1-9A-HJ-NP-Za-km-z]{32,44}$/', $walletAddress)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'invalid values']);
+    exit;
+}
+
 if (!$walletAddress || $closed < 1 || $closed > 2500 || $sol <= 0 || $sol > 5.1) {
     http_response_code(400);
     echo json_encode(['error' => 'invalid values']);
     exit;
 }
 
+// Rate limit: max 10 reclaim records per wallet per minute
 try {
     $db = getDB();
+    $rl = $db->prepare(
+        'SELECT COUNT(*) FROM reclaim_history
+          WHERE wallet_address = ?
+            AND claimed_at >= DATE_SUB(NOW(), INTERVAL 1 MINUTE)'
+    );
+    $rl->execute([$walletAddress]);
+    if ((int)$rl->fetchColumn() >= 10) {
+        http_response_code(429);
+        echo json_encode(['error' => 'Too many requests']);
+        exit;
+    }
+} catch (Exception $e) { /* proceed if rate limit check fails */ }
 
+try {
     // Save to reclaim history
     $stmt = $db->prepare('INSERT INTO reclaim_history (wallet_address, accounts_closed, sol_amount, tx_signature, referrer_wallet, referrer_sol) VALUES (?, ?, ?, ?, ?, ?)');
     $stmt->execute([$walletAddress, $closed, $sol, $txSig, $referrerWallet, $referrerSol]);

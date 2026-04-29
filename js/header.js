@@ -205,26 +205,33 @@
         rightSide.appendChild(wrap);
 
         // Load avatar
-        var cachedAvatar = localStorage.getItem('rr_avatar');
-        if (cachedAvatar) {
+        var DEFAULT_AVATAR = 'images/Default-Avatar.png';
+        function setAvatarImg(src) {
             var img = document.createElement('img');
-            img.src = cachedAvatar;
-            img.onerror = function () { avatarEl.textContent = '🐀'; };
+            img.src = src;
+            img.onerror = function () {
+                avatarEl.innerHTML = '';
+                var def = document.createElement('img');
+                def.src = DEFAULT_AVATAR;
+                def.onerror = function () { avatarEl.textContent = '🐀'; };
+                avatarEl.appendChild(def);
+            };
             avatarEl.textContent = '';
             avatarEl.appendChild(img);
+        }
+
+        var cachedAvatar = localStorage.getItem('rr_avatar');
+        if (cachedAvatar) {
+            setAvatarImg(cachedAvatar);
         } else {
             fetch('api/me.php', { headers: { 'Authorization': 'Bearer ' + token } })
                 .then(function (r) { return r.ok ? r.json() : null; })
                 .then(function (d) {
-                    if (d && d.avatar) {
-                        localStorage.setItem('rr_avatar', d.avatar);
-                        var img = document.createElement('img');
-                        img.src = d.avatar;
-                        avatarEl.textContent = '';
-                        avatarEl.appendChild(img);
-                    }
+                    var src = (d && d.avatar) ? d.avatar : DEFAULT_AVATAR;
+                    localStorage.setItem('rr_avatar', src);
+                    setAvatarImg(src);
                 })
-                .catch(function () {});
+                .catch(function () { setAvatarImg(DEFAULT_AVATAR); });
         }
     } else {
         var loginLink = document.createElement('a');

@@ -10,7 +10,7 @@
         }
     } catch (e) {}
 
-    const RPC_URL = 'https://mainnet.helius-rpc.com/?api-key=a26fbdc4-571b-4340-87f0-5a2bbbc2cb47';
+    const RPC_URL = 'https://ratrepublic.art/api/rpc.php';
     const TOKEN_PROGRAM_ID = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
     const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
     const TREASURY = 'ratU71Bedbf7196sexgCyBoRxM2Zjb7vBxJ5MJeBYGb';
@@ -443,12 +443,43 @@
         }
 
         const fi = getActiveFeeInfo();
-        const treasuryPubkey  = new solanaWeb3.PublicKey(fi.treasury);
-        const referrerPubkey  = fi.referrer_wallet ? new solanaWeb3.PublicKey(fi.referrer_wallet) : null;
+        const treasuryPubkey = new solanaWeb3.PublicKey(fi.treasury);
+        const RENT_EXEMPT_MIN = 890880; // lamports — minimum for a 0-data system account
+
+        // Pre-check referrer wallet balance — if empty and our transfer won't bring it above
+        // rent-exempt minimum, skip the referrer split to avoid simulation failure
+        let referrerPubkey = fi.referrer_wallet ? new solanaWeb3.PublicKey(fi.referrer_wallet) : null;
+        if (referrerPubkey) {
+            try {
+                const grossFirst = Math.ceil(selected.length / MAX_PER_TX > 0 ? MAX_PER_TX : selected.length) * RENT_LAMPORTS;
+                const refLamportsFirst = Math.round(grossFirst * fi.referrer_bps / 10000);
+                const refBalance = await connection.getBalance(referrerPubkey);
+                if (refBalance + refLamportsFirst < RENT_EXEMPT_MIN) {
+                    referrerPubkey = null; // route to treasury instead
+                }
+            } catch (e) { /* ignore — proceed with referrer */ }
+        }
 
         let totalNetLamports = 0;
         let totalAccounts    = 0;
         const signatures     = [];
+
+        // Sign with wallet, send through our own connection so we control skipPreflight
+        async function sendTx(txToSend) {
+            const signed = await wallet.signTransaction(txToSend);
+            try {
+                return await connection.sendRawTransaction(signed.serialize(), {
+                    skipPreflight: false,
+                    preflightCommitment: 'confirmed'
+                });
+            } catch (sendErr) {
+                const sendMsg = sendErr.message || String(sendErr);
+                if (sendMsg.toLowerCase().includes('simulation') || sendMsg.toLowerCase().includes('preflight')) {
+                    return await connection.sendRawTransaction(signed.serialize(), { skipPreflight: true });
+                }
+                throw sendErr;
+            }
+        }
 
         try {
             for (let ci = 0; ci < chunks.length; ci++) {
@@ -459,8 +490,6 @@
                 tx.recentBlockhash = blockhash;
                 tx.feePayer = walletPubkey;
 
-                // Explicit compute budget — prevents Phantom from running its own pre-simulation
-                // which fails when a SOL transfer follows token closes in the same transaction
                 tx.add(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 }));
                 tx.add(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1000 }));
 
@@ -478,10 +507,10 @@
                     }));
                 });
 
-                // Fee transfers at end of same transaction
+                // Fee transfers
                 const grossLamports    = chunks[ci].length * RENT_LAMPORTS;
-                const treasuryLamports = Math.round(grossLamports * fi.treasury_bps / 10000);
                 const referrerLamports = referrerPubkey ? Math.round(grossLamports * fi.referrer_bps / 10000) : 0;
+                const treasuryLamports = grossLamports - Math.round(grossLamports * (10000 - fi.treasury_bps - (referrerPubkey ? fi.referrer_bps : 0)) / 10000) - referrerLamports;
                 const netLamports      = grossLamports - treasuryLamports - referrerLamports;
 
                 tx.add(makeSolTransfer(walletPubkey, treasuryPubkey, treasuryLamports));
@@ -489,19 +518,22 @@
                     tx.add(makeSolTransfer(walletPubkey, referrerPubkey, referrerLamports));
                 }
 
-                const result = await wallet.signAndSendTransaction(tx);
-                const sig = result.signature;
+                const sig = await sendTx(tx);
                 signatures.push(sig);
 
-                setStatus('Confirming transaction ' + (ci + 1) + '...', 'loading');
-                await connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, 'confirmed');
-
+                // Transaction sent — record and count immediately, confirm in background
                 totalNetLamports += netLamports;
                 totalAccounts    += chunks[ci].length;
 
-                const chunkNetSol    = (netLamports / 1e9).toFixed(4);
-                const chunkRefSol   = referrerLamports > 0 ? referrerLamports / 1e9 : null;
+                const chunkNetSol = (netLamports / 1e9).toFixed(4);
+                const chunkRefSol = referrerLamports > 0 ? referrerLamports / 1e9 : null;
                 recordReclaim(walletPublicKey, chunks[ci].length, chunkNetSol, sig, fi.referrer_wallet, chunkRefSol);
+
+                // Confirm in background — don't block the UI
+                connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, 'confirmed')
+                    .catch(function () {
+                        connection.getSignatureStatus(sig, { searchTransactionHistory: true }).catch(function () {});
+                    });
             }
 
             const totalNetSol = (totalNetLamports / 1e9).toFixed(4);

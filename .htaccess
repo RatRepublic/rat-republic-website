@@ -1,0 +1,51 @@
+# ── Security Headers ──────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    # Prevent clickjacking
+    Header always set X-Frame-Options "DENY"
+
+    # Prevent MIME-type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Referrer policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Disable browser features not needed
+    Header always set Permissions-Policy "camera=(), microphone=(), payment=(), geolocation=()"
+
+    # Content Security Policy
+    # - Scripts: self + pinned CDNs only
+    # - Styles: self + inline (needed for JS-injected styles) + CDNs
+    # - Connect: self + Helius RPC + Printr API
+    # - Images: self + data URIs + blob (for canvas/share images)
+    # - Fonts: self
+    # - Frames: none
+    Header always set Content-Security-Policy "\
+default-src 'self'; \
+script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; \
+style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; \
+img-src 'self' data: blob:; \
+font-src 'self'; \
+connect-src 'self' https://mainnet.helius-rpc.com https://*.helius-rpc.com https://api-preview.printr.money; \
+frame-src 'none'; \
+object-src 'none'; \
+base-uri 'self';"
+</IfModule>
+
+# ── Rate limiting on API endpoints (requires mod_ratelimit or use PHP fallback) ─
+# Handled in PHP — see api/db.php
+
+# ── Disable directory listing ─────────────────────────────────────────────────
+Options -Indexes
+
+# ── Block access to sensitive files ──────────────────────────────────────────
+<FilesMatch "(^\.env|config\.php|config\.sample\.php|db\.php|\.git)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# ── Force HTTPS ───────────────────────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
