@@ -1,4 +1,15 @@
 (function () {
+    // Phantom Connect SDK — identifies this app to Phantom for review/approval
+    let phantomSDK = null;
+    try {
+        if (window.PhantomBrowserSDK) {
+            phantomSDK = new window.PhantomBrowserSDK.BrowserSDK({
+                providers: ['injected'],
+                appId: 'e4174ab1-e8a1-4791-b14e-7b2850580960'
+            });
+        }
+    } catch (e) {}
+
     const RPC_URL = 'https://mainnet.helius-rpc.com/?api-key=a26fbdc4-571b-4340-87f0-5a2bbbc2cb47';
     const TOKEN_PROGRAM_ID = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
     const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
@@ -198,9 +209,9 @@
 
     // --- Wallet detection ---
     function getProvider(name) {
-        if (name === 'phantom')  return window.phantom?.solana || null;
-        if (name === 'solflare') return window.solflare        || null;
-        if (name === 'backpack') return window.backpack        || null;
+        if (name === 'phantom')  return (phantomSDK && window.phantom?.solana) ? phantomSDK.solana : (window.phantom?.solana || null);
+        if (name === 'solflare') return window.solflare || null;
+        if (name === 'backpack') return window.backpack || null;
         return null;
     }
 
@@ -281,9 +292,14 @@
         if (!provider) return;
         closeModal();
         try {
-            const resp = await provider.connect();
-            wallet = provider;
-            walletPublicKey = (resp && resp.publicKey ? resp.publicKey : provider.publicKey).toString();
+            if (name === 'phantom' && phantomSDK) {
+                await phantomSDK.connect({ provider: 'injected' });
+                wallet = phantomSDK.solana;
+            } else {
+                const resp = await provider.connect();
+                wallet = provider;
+            }
+            walletPublicKey = wallet.publicKey.toString();
             walletDisplay.textContent = trunc(walletPublicKey);
             connectSection.classList.add('hidden');
             scanSection.classList.remove('hidden');
