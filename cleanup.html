@@ -20,7 +20,7 @@
             padding: 30px 20px 60px;
         }
 
-        .container { max-width: 580px; margin: 0 auto; }
+        .container { max-width: 760px; margin: 0 auto; }
 
         .back-btn {
             display: inline-block;
@@ -66,7 +66,7 @@
             font-size: 0.78rem;
             font-weight: bold;
             letter-spacing: 1.5px;
-            padding: 10px 20px;
+            padding: 10px 14px;
             cursor: pointer;
             border-bottom: 2px solid transparent;
             margin-bottom: -2px;
@@ -115,6 +115,58 @@
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-8px); }
+        }
+
+        /* Mode toggle */
+        .mode-toggle {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .mode-btn {
+            background: rgba(20,28,12,0.9);
+            border: 1.5px solid #5A7A18;
+            color: rgba(255,255,255,0.45);
+            font-family: 'NftOpensea', monospace;
+            font-size: 0.78rem;
+            padding: 6px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            transition: all 0.2s;
+        }
+        .mode-btn.active {
+            border-color: #C8E030;
+            color: #C8E030;
+            box-shadow: 0 0 10px rgba(200,224,48,0.25);
+        }
+        #mode-expert-btn.active {
+            border-color: #FF8C00;
+            color: #FF8C00;
+            box-shadow: 0 0 10px rgba(255,140,0,0.35);
+        }
+        .mode-btn:hover { border-color: #C8E030; color: #C8E030; }
+        #mode-expert-btn:hover { border-color: #FF8C00; color: #FF8C00; }
+        .expert-only { display: none; }
+        .expert-mode .expert-only { display: inline-flex; }
+        .expert-content { display: none !important; }
+        .expert-mode .noob-content { display: none !important; }
+        .expert-mode .expert-content { display: flex !important; }
+        .expert-coming-soon {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255,255,255,0.3);
+            font-family: 'NftOpensea', monospace;
+            letter-spacing: 3px;
+            font-size: 0.9rem;
+        }
+        .expert-coming-soon span {
+            display: block;
+            font-size: 0.72rem;
+            margin-top: 8px;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 1px;
+            font-family: monospace;
         }
 
         /* Connect area */
@@ -418,9 +470,13 @@
         .success-buttons {
             display: flex;
             gap: 12px;
+            justify-content: center;
         }
         .btn-success-action {
             flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: rgba(20,28,12,0.92);
             border: 2px solid #5A7A18;
             color: #C8E030;
@@ -431,6 +487,9 @@
             cursor: pointer;
             transition: all 0.2s;
             letter-spacing: 1px;
+            text-decoration: none;
+            text-align: center;
+            box-sizing: border-box;
         }
         .btn-success-action:hover {
             border-color: #C8E030;
@@ -561,18 +620,40 @@
             cursor: pointer;
         }
         .login-card-dsa:hover { color: rgba(255,255,255,0.5); }
+
+        /* ── Scanner Tab ── */
+        .scanner-intro { color: rgba(255,255,255,0.45); font-size: 0.82rem; text-align: center; margin-bottom: 20px; letter-spacing: 0.5px; }
+        .scanner-input-row { display: flex; gap: 8px; margin-bottom: 14px; }
+        .scanner-input { flex: 1; background: rgba(20,28,12,0.8); border: 1.5px solid #5A7A18; border-radius: 8px; color: #fff; font-family: monospace; font-size: 0.82rem; padding: 10px 12px; outline: none; }
+        .scanner-input:focus { border-color: #C8E030; }
+        .btn-scanner-scan { background: rgba(90,122,24,0.3); border: 1.5px solid #C8E030; color: #C8E030; font-family: 'NftOpensea', monospace; font-size: 0.82rem; padding: 10px 18px; border-radius: 8px; cursor: pointer; letter-spacing: 1px; white-space: nowrap; }
+        .btn-scanner-scan:hover { background: rgba(90,122,24,0.6); }
+        .scanner-status { font-size: 0.8rem; color: rgba(255,255,255,0.4); text-align: center; min-height: 20px; margin-bottom: 10px; }
+        .scanner-result { text-align: center; margin-top: 10px; }
+        .scanner-summary { font-size: 1.1rem; color: #C8E030; font-family: 'NftOpensea', monospace; letter-spacing: 2px; margin-bottom: 18px; }
+        .scanner-dot { color: rgba(255,255,255,0.3); margin: 0 8px; }
+        .btn-scanner-connect { background: rgba(90,122,24,0.3); border: 1.5px solid #C8E030; color: #C8E030; font-family: 'NftOpensea', monospace; font-size: 0.85rem; padding: 12px 24px; border-radius: 10px; cursor: pointer; letter-spacing: 1px; }
+        .btn-scanner-connect:hover { background: rgba(90,122,24,0.7); }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="tools.html" class="back-btn">← Back to Utilities</a>
+        <a href="tools" class="back-btn">← Back to Utilities</a>
 
         <div class="main-card">
 
         <div class="page-title">SCAVENGER</div>
 
+        <div class="mode-toggle">
+            <button class="mode-btn active" id="mode-noob-btn" onclick="switchMode('noob')">NOOB</button>
+            <button class="mode-btn" id="mode-expert-btn" onclick="switchMode('expert')">EXPERT</button>
+        </div>
+
         <div class="tabs">
             <button class="tab-btn active" id="tab-claim-btn" onclick="switchTab('claim')">CLAIM</button>
+            <button class="tab-btn" id="tab-scanner-btn" onclick="switchTab('scanner')">SCANNER</button>
+            <button class="tab-btn expert-only" id="tab-tokens-btn" onclick="switchTab('tokens')">TOKENS</button>
+            <button class="tab-btn expert-only" id="tab-nft-btn" onclick="switchTab('nft')">NFT</button>
             <button class="tab-btn" id="tab-howto-btn" onclick="switchTab('howto')">HOW IT WORKS</button>
             <button class="tab-btn" id="tab-disclaimer-btn" onclick="switchTab('disclaimer')">DISCLAIMER</button>
         </div>
@@ -593,8 +674,8 @@
             <!-- Auth indicator (shown when logged in) -->
             <div id="auth-indicator" style="display:none;text-align:center;margin-bottom:10px;font-size:0.72rem;color:rgba(255,255,255,0.45);letter-spacing:1px;">
                 Logged in as <strong id="auth-username" style="color:#C8E030;"></strong>
-                &nbsp;·&nbsp;<a href="profile.html" style="color:#C8E030;text-decoration:none;">Profile</a>
-                &nbsp;·&nbsp;<a href="login.html" id="auth-logout-link" style="color:rgba(255,255,255,0.35);text-decoration:none;">Log out</a>
+                &nbsp;·&nbsp;<a href="profile" style="color:#C8E030;text-decoration:none;">Profile</a>
+                &nbsp;·&nbsp;<a href="login" id="auth-logout-link" style="color:rgba(255,255,255,0.35);text-decoration:none;">Log out</a>
             </div>
 
             <!-- Connect section -->
@@ -638,15 +719,52 @@
                 </div>
                 <div class="success-buttons">
                     <button class="btn-success-action" id="go-back-btn">Go Back</button>
+                    <a class="btn-success-action" id="see-tx-btn" href="#" target="_blank" rel="noopener">See TX</a>
                     <button class="btn-success-action" id="tweet-btn">Tweet</button>
                 </div>
             </div>
 
         </div>
 
+        <!-- SCANNER TAB -->
+        <div class="tab-content" id="tab-scanner">
+            <div class="scanner-intro">Paste any Solana wallet address to see recoverable SOL — no connection needed.</div>
+            <div class="scanner-input-row">
+                <input id="scanner-address-input" class="scanner-input" type="text" maxlength="44" placeholder="Wallet address (base58)">
+                <button id="scanner-scan-btn" class="btn-scanner-scan">Scan</button>
+            </div>
+            <div id="scanner-status" class="scanner-status"></div>
+            <div id="scanner-result" class="scanner-result hidden">
+                <div class="scanner-summary">
+                    <span id="scanner-count">—</span> empty accounts
+                    <span class="scanner-dot">·</span>
+                    ~<span id="scanner-sol">—</span> SOL recoverable
+                </div>
+                <button id="scanner-connect-btn" class="btn-scanner-connect">Connect Wallet to Reclaim →</button>
+            </div>
+        </div>
+
+        <!-- TOKENS TAB (Expert) -->
+        <div class="tab-content" id="tab-tokens">
+            <div class="expert-coming-soon">
+                COMING SOON
+                <span>Burn tokens with balance and reclaim rent</span>
+            </div>
+        </div>
+
+        <!-- NFT TAB (Expert) -->
+        <div class="tab-content" id="tab-nft">
+            <div class="expert-coming-soon">
+                COMING SOON
+                <span>Burn unwanted NFTs and reclaim rent</span>
+            </div>
+        </div>
+
         <!-- HOW IT WORKS TAB -->
         <div class="tab-content" id="tab-howto">
-            <div class="faq-list">
+
+            <!-- NOOB version -->
+            <div class="faq-list mode-content noob-content">
 
                 <div class="faq-item">
                     <div class="section-heading">The Concept</div>
@@ -680,18 +798,61 @@
                     <div class="faq-q">Why is my "claimable" balance showing as zero?</div>
                     <p class="faq-a">The tool specifically filters for accounts with a balance of exactly 0. Many rug pulls or failed projects leave behind "dust" (tiny fractions of a token). If an account holds even <strong>0.000001</strong> of a token, it is considered active and will not be displayed for closure to ensure your safety.</p>
                 </div>
-                <hr class="faq-divider">
-                <div class="faq-item">
-                    <div class="faq-q">What are the costs?</div>
-                    <p class="faq-a">A <strong>2% service fee</strong> is deducted from the recovered rent in the same transaction. If you joined via a referral link, the fee is split: <strong>1.5% to Rat Republic</strong> and <strong>0.5% to your referrer</strong>. You also pay the standard Solana network transaction fee (usually <strong>0.000005 SOL</strong>).</p>
-                </div>
 
             </div>
+
+            <!-- EXPERT version -->
+            <div class="faq-list mode-content expert-content">
+
+                <div class="faq-item">
+                    <div class="section-heading">Expert Mode — Full Toolkit</div>
+                    <p class="faq-a">Expert mode unlocks every cleanup tool available on Rat Republic. Each tab targets a different type of on-chain clutter. Use them independently or in sequence to fully reclaim your wallet's locked SOL.</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="faq-q">CLAIM — Empty Account Closer</div>
+                    <p class="faq-a">The core tool. Scans your wallet for SPL token accounts with a balance of exactly <strong>0</strong> and closes them in batches of up to 22 per transaction. Each closed account returns <strong>~0.00203928 SOL</strong> minus the service fee. Safe by design — only zero-balance accounts are ever touched.</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="faq-q">SCANNER — No-Connect Preview</div>
+                    <p class="faq-a">Paste any Solana wallet address to instantly see how many empty accounts it holds and how much SOL is recoverable — no wallet connection required. Use it to check your own wallet first, or share it so others can see their potential before connecting.</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="faq-q">TOKENS — Burn Fungible Tokens</div>
+                    <p class="faq-a">For tokens you want completely gone. This tab lists every SPL token in your wallet that still carries a balance — rugs, dead memes, junk airdrops. Selecting a token burns its entire supply held by you and closes the account in the same transaction, returning the <strong>~0.00203928 SOL</strong> rent. The standard service fee applies. <strong>Use with care: the token balance is permanently destroyed, not transferred.</strong></p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="faq-q">NFT — Burn NFTs &amp; pNFTs</div>
+                    <p class="faq-a">Displays every regular NFT and programmable NFT (pNFT) in your wallet. You can burn individual pieces to reclaim the <strong>~0.01–0.02 SOL</strong> locked across the mint account, metadata account, and token account. Burning destroys the NFT on-chain permanently — metadata, image, and any associated utility or access rights are gone forever.</p>
+                </div>
+
+
+            </div>
+
         </div>
 
         <!-- DISCLAIMER TAB -->
         <div class="tab-content" id="tab-disclaimer">
-            <div class="faq-list">
+
+            <!-- NOOB version -->
+            <div class="faq-list mode-content noob-content">
+
+                <div class="faq-item">
+                    <p class="faq-a" style="color: rgba(200,224,48,0.6); font-style: italic;">By proceeding, you acknowledge that you are solely responsible for verifying the accounts you choose to close and that you understand the finality of this action.</p>
+                </div>
+
+                <hr class="faq-divider">
 
                 <div class="faq-item">
                     <div class="section-heading">SOL Account Reclamation</div>
@@ -726,13 +887,59 @@
                     <p class="faq-a">Because this is a decentralized on-chain action, no developer, wallet provider, or protocol can "undo" this transaction or recover SOL sent to a burn address.</p>
                 </div>
 
+            </div>
+
+            <!-- EXPERT version -->
+            <div class="faq-list mode-content expert-content">
+
+                <div class="faq-item">
+                    <p class="faq-a" style="color: #FF8C00; font-style: italic;">By using Expert mode, you confirm that you understand the irreversible nature of these actions and accept full responsibility for every transaction you sign.</p>
+                </div>
+
                 <hr class="faq-divider">
 
                 <div class="faq-item">
-                    <p class="faq-a" style="color: rgba(200,224,48,0.6); font-style: italic;">By proceeding, you acknowledge that you are solely responsible for verifying the accounts you choose to close and that you understand the finality of this action.</p>
+                    <div class="section-heading">Expert Mode — Read Before Using</div>
+                    <p class="faq-a">Expert mode exposes tools that interact with tokens and NFTs that still carry value. Every action here is <strong>permanent and on-chain</strong>. There is no undo.</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="faq-q">CLAIM — Closing Empty Accounts</div>
+                    <p class="faq-a">Closing a token account permanently removes it from the blockchain. If you receive that token again in the future, a new account will be created at the cost of a new rent deposit (~0.00203928 SOL). This tool only touches zero-balance accounts — but confirm before signing.</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="faq-q">TOKENS — Burning with Balance</div>
+                    <p class="faq-a">The TOKENS tab burns tokens that still hold a balance. This is <strong>not</strong> a transfer — the token supply is destroyed at the protocol level. The market value of those tokens is forfeited entirely. Only use this for tokens you are certain are worthless. Double-check the token name and amount before signing. No refund is possible.</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="faq-q">NFT — Burning NFTs &amp; pNFTs</div>
+                    <p class="faq-a">Burning an NFT destroys the mint account, token account, and on-chain metadata permanently. The image may remain on IPFS or Arweave, but the on-chain ownership record is gone. Any utility, access, or whitelist tied to that NFT is permanently lost. Verify the NFT name and image carefully before confirming.</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="faq-q">No Recovery — Ever</div>
+                    <p class="faq-a">These are decentralized on-chain transactions. No developer, wallet provider, or support team can reverse a confirmed burn. Rat Republic has no custody over your assets and cannot intervene once a transaction is signed and submitted.</p>
+                </div>
+
+                <hr class="faq-divider">
+
+                <div class="faq-item">
+                    <div class="faq-q">You Are Responsible</div>
+                    <p class="faq-a">Expert mode is provided as-is for experienced users who understand Solana account mechanics. Rat Republic is not liable for any unintended asset loss resulting from use of these tools.</p>
                 </div>
 
             </div>
+
         </div>
 
         </div><!-- /main-card -->
@@ -756,7 +963,7 @@
             <div class="stat-box">
                 <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" stroke="#C8E030" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
                 <div class="stat-num" id="stat-highest">—</div>
-                <div class="stat-label">Highest SOL Reclaimed</div>
+                <div class="stat-label">Most SOL (Single User)</div>
             </div>
         </div>
     </div>
@@ -863,7 +1070,7 @@
             <div class="login-card-title">DONT FORGET TO LOGIN FOR THE LEADERBOARD</div>
             <div class="login-card-sub">Track your reclaimed SOL, earn referral rewards, and climb the Crowned Vermins leaderboard.</div>
             <div class="login-card-btns">
-                <a href="login.html" class="btn-login-go">Login</a>
+                <a href="login" class="btn-login-go">Login</a>
                 <button class="btn-login-skip" id="login-skip-btn">Continue with Scavenger</button>
             </div>
             <label class="login-card-dsa">
@@ -888,7 +1095,7 @@
     </script>
     <script src="https://unpkg.com/@solana/web3.js@1.77.3/lib/index.iife.min.js" integrity="sha384-1h+8qk74Ovmn+r0huewEXrWzZZ4WNl8Ws0o7aP46Falb2DBgrxufJ4nBEZhaDIMQ" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@phantom/browser-sdk@2.0.2/dist/browser-sdk.umd.js" integrity="sha384-X2FDneBw6XI1NqE3gFKPlYZHFC0bsljNwiFOzC/+BGkp5iREQB1CXj5UDdnxuvgJ" crossorigin="anonymous"></script>
-    <script src="js/cleanup.js?v=23"></script>
+    <script src="js/cleanup.js?v=24"></script>
     <script src="js/header.js"></script>
     <script src="js/footer.js"></script>
 </body>

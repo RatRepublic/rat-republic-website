@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rat Republic — Roadmap</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        @font-face {
+            font-family: 'NftOpensea';
+            src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #1a1f0f;
+            background-image: url('images/Background.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: #fff;
+            font-family: monospace, 'Courier New', sans-serif;
+            min-height: 100vh;
+            padding: 40px 20px 80px;
+        }
+
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-family: 'NftOpensea', monospace;
+            font-size: 2.8rem;
+            color: #fff;
+            letter-spacing: 4px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(255,255,255,0.15);
+            margin-bottom: 8px;
+        }
+
+        .page-sub {
+            text-align: center;
+            color: rgba(255,255,255,0.35);
+            font-size: 0.78rem;
+            letter-spacing: 1.5px;
+            margin-bottom: 56px;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 48px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: linear-gradient(to bottom, #C8E030 0%, #5A7A18 40%, rgba(90,122,24,0.2) 100%);
+        }
+
+        /* Phase block */
+        .phase {
+            position: relative;
+            margin-bottom: 36px;
+        }
+
+        .phase-dot {
+            position: absolute;
+            left: -40px;
+            top: 18px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #5A7A18;
+            background: #1a1f0f;
+            z-index: 1;
+        }
+
+        .phase.complete .phase-dot {
+            background: #C8E030;
+            border-color: #C8E030;
+            box-shadow: 0 0 10px rgba(200,224,48,0.5);
+        }
+
+        .phase.next .phase-dot {
+            background: #1a1f0f;
+            border-color: #C8E030;
+            box-shadow: 0 0 14px rgba(200,224,48,0.6);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 8px rgba(200,224,48,0.4); }
+            50%       { box-shadow: 0 0 18px rgba(200,224,48,0.8); }
+        }
+
+        .phase-card {
+            background: rgba(20, 28, 12, 0.92);
+            border: 2px solid #5A7A18;
+            border-radius: 14px;
+            padding: 22px 24px;
+            transition: border-color 0.2s;
+        }
+
+        .phase.complete .phase-card { border-color: rgba(200,224,48,0.25); }
+        .phase.next .phase-card {
+            border-color: #C8E030;
+            box-shadow: 0 0 24px rgba(200,224,48,0.1);
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .phase-number {
+            font-family: 'NftOpensea', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .phase-name {
+            font-family: 'NftOpensea', monospace;
+            font-size: 1.05rem;
+            color: #fff;
+            letter-spacing: 2px;
+            flex: 1;
+        }
+
+        .phase-badge {
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .badge-complete {
+            background: rgba(200,224,48,0.12);
+            border: 1px solid rgba(200,224,48,0.4);
+            color: #C8E030;
+        }
+
+        .badge-next {
+            background: rgba(200,224,48,0.15);
+            border: 1px solid #C8E030;
+            color: #C8E030;
+            box-shadow: 0 0 8px rgba(200,224,48,0.2);
+        }
+
+        .badge-upcoming {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.35);
+        }
+
+        .phase-items {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .phase-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.4;
+        }
+
+        .phase-item .icon {
+            flex-shrink: 0;
+            margin-top: 1px;
+            font-size: 0.75rem;
+        }
+
+        .phase.complete .phase-item { color: rgba(255,255,255,0.45); text-decoration: line-through; }
+        .phase-item.done { color: rgba(255,255,255,0.45); text-decoration: line-through; }
+        .phase.complete .phase-item .icon { color: #C8E030; }
+
+        .phase.next .phase-item .icon { color: #C8E030; }
+
+        .phase.upcoming .phase-item .icon { color: rgba(90,122,24,0.7); }
+
+        .item-tba {
+            color: rgba(255,255,255,0.25);
+            font-style: italic;
+            font-size: 0.75rem;
+        }
+
+        .item-tba .icon { color: rgba(90,122,24,0.4) !important; }
+
+        /* divider between phase number and name */
+        .phase-divider {
+            width: 1px;
+            height: 14px;
+            background: rgba(255,255,255,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-title">ROADMAP</div>
+        <div class="page-sub">WHAT WE'VE BUILT · WHAT'S NEXT · WHAT'S COMING</div>
+
+        <div class="timeline">
+
+            <!-- Phase 1 -->
+            <div class="phase complete">
+                <div class="phase-dot"></div>
+                <div class="phase-card">
+                    <div class="phase-header">
+                        <span class="phase-number">PHASE 1</span>
+                        <div class="phase-divider"></div>
+                        <span class="phase-name">CORE</span>
+                        <span class="phase-badge badge-complete">Complete</span>
+                    </div>
+                    <ul class="phase-items">
+                        <li class="phase-item"><span class="icon">✓</span> Token account closer</li>
+                        <li class="phase-item"><span class="icon">✓</span> Fee + referral system</li>
+                        <li class="phase-item"><span class="icon">✓</span> Referral dashboard on profile</li>
+                        <li class="phase-item"><span class="icon">✓</span> Leaderboard + weekly prizes</li>
+                        <li class="phase-item"><span class="icon">✓</span> User accounts + profiles</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Phase 2 -->
+            <div class="phase next">
+                <div class="phase-dot"></div>
+                <div class="phase-card">
+                    <div class="phase-header">
+                        <span class="phase-number">PHASE 2</span>
+                        <div class="phase-divider"></div>
+                        <span class="phase-name">TOKEN LAUNCH</span>
+                        <span class="phase-badge badge-next">Next</span>
+                    </div>
+                    <ul class="phase-items">
+                        <li class="phase-item"><span class="icon">→</span> Launch token on Pumpfun</li>
+                        <li class="phase-item"><span class="icon">→</span> Token CA displayed on site</li>
+                        <li class="phase-item"><span class="icon">→</span> Manual treasury buyback + burn</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Phase 3 -->
+            <div class="phase upcoming">
+                <div class="phase-dot"></div>
+                <div class="phase-card">
+                    <div class="phase-header">
+                        <span class="phase-number">PHASE 3</span>
+                        <div class="phase-divider"></div>
+                        <span class="phase-name">TOOL EXPANSION</span>
+                        <span class="phase-badge badge-upcoming">Upcoming</span>
+                    </div>
+                    <ul class="phase-items">
+                        <li class="phase-item done"><span class="icon">·</span> Pre-scan preview — estimate recoverable SOL before connecting</li>
+                        <li class="phase-item"><span class="icon">·</span> NFT account closer</li>
+                        <li class="phase-item"><span class="icon">·</span> Domain account closer (.sol domains)</li>
+                        <li class="phase-item"><span class="icon">·</span> cNFT closer (compressed NFTs)</li>
+                        <li class="phase-item"><span class="icon">·</span> LP token closer (empty liquidity pool positions)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Phase 4 -->
+            <div class="phase upcoming">
+                <div class="phase-dot"></div>
+                <div class="phase-card">
+                    <div class="phase-header">
+                        <span class="phase-number">PHASE 4</span>
+                        <div class="phase-divider"></div>
+                        <span class="phase-name">GROWTH</span>
+                        <span class="phase-badge badge-upcoming">Upcoming</span>
+                    </div>
+                    <ul class="phase-items">
+                        <li class="phase-item"><span class="icon">·</span> X account linking on profile</li>
+                        <li class="phase-item"><span class="icon">·</span> Automated weekly prize payout from treasury</li>
+                        <li class="phase-item"><span class="icon">·</span> Reward top token holders — scales with tool volume</li>
+                        <li class="phase-item"><span class="icon">·</span> Partner referral program — other projects earn % of fees</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Phase 5 -->
+            <div class="phase upcoming">
+                <div class="phase-dot"></div>
+                <div class="phase-card">
+                    <div class="phase-header">
+                        <span class="phase-number">PHASE 5</span>
+                        <div class="phase-divider"></div>
+                        <span class="phase-name">ECOSYSTEM</span>
+                        <span class="phase-badge badge-upcoming">Upcoming</span>
+                    </div>
+                    <ul class="phase-items">
+                        <li class="phase-item"><span class="icon">·</span> Multi-wallet scanner — paste multiple addresses, see combined recoverable SOL</li>
+                        <li class="phase-item"><span class="icon">·</span> More wallet support — OKX, Jupiter, Ledger, and others</li>
+                        <li class="phase-item item-tba"><span class="icon">·</span> More TBA</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+</body>
+</html>

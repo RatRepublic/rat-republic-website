@@ -22,7 +22,7 @@
     let walletPublicKey = null;
     let closableAccounts = [];
     let feeInfo = null;
-    let userRefLink = 'https://ratrepublic.art/register.html';
+    let userRefLink = 'https://ratrepublic.art/register';
 
     const connectBtn      = document.getElementById('connect-btn');
     const walletModal     = document.getElementById('wallet-modal');
@@ -50,6 +50,7 @@
     const successSection  = document.getElementById('success-section');
     const successAmount   = document.getElementById('success-amount-display');
     const goBackBtn       = document.getElementById('go-back-btn');
+    const seeTxBtn        = document.getElementById('see-tx-btn');
     const tweetBtn        = document.getElementById('tweet-btn');
 
     function trunc(addr) { return addr.slice(0, 4) + '...' + addr.slice(-4); }
@@ -80,13 +81,19 @@
         }
     }
 
-    function showSuccess(solAmount) {
+    function showSuccess(solAmount, txSig) {
         solDisplayWrap.classList.add('hidden');
         toolImageWrap.classList.add('hidden');
         scanSection.classList.add('hidden');
         clearStatus();
         resultsSection.classList.add('hidden');
         successAmount.textContent = solAmount + ' SOL';
+        if (txSig) {
+            seeTxBtn.href = 'https://solscan.io/tx/' + txSig;
+            seeTxBtn.style.display = '';
+        } else {
+            seeTxBtn.style.display = 'none';
+        }
         successSection.classList.remove('hidden');
     }
 
@@ -110,6 +117,28 @@
         document.getElementById('tab-' + tab + '-btn').classList.add('active');
         document.getElementById('tab-' + tab).classList.add('active');
     };
+
+    window.switchMode = function (mode) {
+        var card = document.querySelector('.main-card');
+        document.getElementById('mode-noob-btn').classList.toggle('active', mode === 'noob');
+        document.getElementById('mode-expert-btn').classList.toggle('active', mode === 'expert');
+        if (mode === 'expert') {
+            card.classList.add('expert-mode');
+        } else {
+            card.classList.remove('expert-mode');
+            // If an expert-only tab is active, switch back to claim
+            var activeTab = document.querySelector('.tab-btn.active');
+            if (activeTab && activeTab.classList.contains('expert-only')) {
+                switchTab('claim');
+            }
+        }
+        localStorage.setItem('rr_mode', mode);
+    };
+
+    // Restore saved mode
+    if (localStorage.getItem('rr_mode') === 'expert') {
+        switchMode('expert');
+    }
 
     // --- Auth ---
     function initAuthIndicator() {
@@ -183,7 +212,7 @@
                 document.getElementById('stat-users').textContent    = Number(s.users_served).toLocaleString();
                 document.getElementById('stat-accounts').textContent = Number(s.accounts_closed).toLocaleString();
                 document.getElementById('stat-sol').textContent      = Number(s.sol_recovered).toFixed(2);
-                document.getElementById('stat-highest').textContent  = Number(s.highest_sol).toFixed(4);
+                document.getElementById('stat-highest').textContent  = Number(s.top_user_sol).toFixed(4);
             })
             .catch(function () {});
     }
@@ -539,7 +568,7 @@
             const totalNetSol = (totalNetLamports / 1e9).toFixed(4);
             const closedSet = new Set(selected.map(function (a) { return a.pubkey; }));
             closableAccounts = closableAccounts.filter(function (a) { return !closedSet.has(a.pubkey); });
-            showSuccess(totalNetSol);
+            showSuccess(totalNetSol, signatures[signatures.length - 1]);
 
         } catch (e) {
             const msg = e.message || String(e);
@@ -552,5 +581,46 @@
         }
 
         scanBtn.disabled = false;
+    });
+
+    // ── Scanner Tab ───────────────────────────────────────────────────────────
+    document.getElementById('scanner-scan-btn').addEventListener('click', async function () {
+        var addr     = document.getElementById('scanner-address-input').value.trim();
+        var statusEl = document.getElementById('scanner-status');
+        var resultEl = document.getElementById('scanner-result');
+
+        resultEl.classList.add('hidden');
+        statusEl.textContent = '';
+
+        if (!addr || addr.length < 32) { statusEl.textContent = 'Enter a valid Solana wallet address.'; return; }
+
+        var owner;
+        try { owner = new solanaWeb3.PublicKey(addr); }
+        catch (e) { statusEl.textContent = 'Invalid wallet address.'; return; }
+
+        statusEl.textContent = 'Scanning…';
+        try {
+            var connection = new solanaWeb3.Connection(RPC_URL, 'confirmed');
+            var [splResult, t22Result] = await Promise.all([
+                connection.getParsedTokenAccountsByOwner(owner, { programId: new solanaWeb3.PublicKey(TOKEN_PROGRAM_ID) }),
+                connection.getParsedTokenAccountsByOwner(owner, { programId: new solanaWeb3.PublicKey(TOKEN_2022_PROGRAM_ID) })
+            ]);
+            var empty = [...splResult.value, ...t22Result.value].filter(function (a) {
+                return a.account.data.parsed.info.tokenAmount.amount === '0';
+            });
+            statusEl.textContent = '';
+            if (empty.length === 0) { statusEl.textContent = 'No empty accounts found for this wallet.'; return; }
+            var solEst = (empty.length * RENT_PER_ACCOUNT * (1 - 200 / 10000)).toFixed(4);
+            document.getElementById('scanner-count').textContent = empty.length;
+            document.getElementById('scanner-sol').textContent   = solEst;
+            resultEl.classList.remove('hidden');
+        } catch (e) {
+            statusEl.textContent = 'Scan failed. Check the address and try again.';
+        }
+    });
+
+    document.getElementById('scanner-connect-btn').addEventListener('click', function () {
+        switchTab('claim');
+        if (!walletPublicKey) document.getElementById('connect-btn').click();
     });
 })();
