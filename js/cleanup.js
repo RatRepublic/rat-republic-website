@@ -29,10 +29,8 @@
     const modalCloseBtn   = document.getElementById('modal-close-btn');
     const optPhantom      = document.getElementById('opt-phantom');
     const optSolflare     = document.getElementById('opt-solflare');
-    const optBackpack     = document.getElementById('opt-backpack');
     const badgePhantom    = document.getElementById('badge-phantom');
     const badgeSolflare   = document.getElementById('badge-solflare');
-    const badgeBackpack   = document.getElementById('badge-backpack');
     const connectSection  = document.getElementById('connect-section');
     const scanSection     = document.getElementById('scan-section');
     const walletDisplay   = document.getElementById('wallet-display');
@@ -240,21 +238,18 @@
     function getProvider(name) {
         if (name === 'phantom')  return (phantomSDK && window.phantom?.solana) ? phantomSDK.solana : (window.phantom?.solana || null);
         if (name === 'solflare') return window.solflare || null;
-        if (name === 'backpack') return window.backpack || null;
         return null;
     }
 
     var WALLET_ICONS = {
-        phantom:  '<svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><rect width="36" height="36" rx="9" fill="#9945FF"/><path d="M18 8C12.477 8 8 12.477 8 18v10l3-2 3 2 3-2 2 2 2-2 3 2 3-2V18C27 12.477 22.523 8 18 8z" fill="white"/><circle cx="14.5" cy="19" r="2" fill="#9945FF"/><circle cx="21.5" cy="19" r="2" fill="#9945FF"/></svg>',
-        solflare: '<svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><rect width="36" height="36" rx="9" fill="#FC7C00"/><path d="M22 13.5C22 13.5 21 11 18 11 15 11 13 13 13 15c0 2 1.5 3 4 3.5 2.5.5 4.5 1.5 4.5 4 0 2.5-2 3.5-4 3.5-2.5 0-4-2-4-2" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>',
-        backpack: '<svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><rect width="36" height="36" rx="9" fill="#E33D43"/><rect x="11" y="16" width="14" height="13" rx="2.5" fill="white"/><path d="M15 16v-2.5a3 3 0 016 0V16" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/><rect x="14.5" y="20" width="7" height="4" rx="1.5" fill="#E33D43"/></svg>'
+        phantom:  '<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA4IiBoZWlnaHQ9IjEwOCIgdmlld0JveD0iMCAwIDEwOCAxMDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDgiIGhlaWdodD0iMTA4IiByeD0iMjYiIGZpbGw9IiNBQjlGRjIiLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik00Ni41MjY3IDY5LjkyMjlDNDIuMDA1NCA3Ni44NTA5IDM0LjQyOTIgODUuNjE4MiAyNC4zNDggODUuNjE4MkMxOS41ODI0IDg1LjYxODIgMTUgODMuNjU2MyAxNSA3NS4xMzQyQzE1IDUzLjQzMDUgNDQuNjMyNiAxOS44MzI3IDcyLjEyNjggMTkuODMyN0M4Ny43NjggMTkuODMyNyA5NCAzMC42ODQ2IDk0IDQzLjAwNzlDOTQgNTguODI1OCA4My43MzU1IDc2LjkxMjIgNzMuNTMyMSA3Ni45MTIyQzcwLjI5MzkgNzYuOTEyMiA2OC43MDUzIDc1LjEzNDIgNjguNzA1MyA3Mi4zMTRDNjguNzA1MyA3MS41NzgzIDY4LjgyNzUgNzAuNzgxMiA2OS4wNzE5IDY5LjkyMjlDNjUuNTg5MyA3NS44Njk5IDU4Ljg2ODUgODEuMzg3OCA1Mi41NzU0IDgxLjM4NzhDNDcuOTkzIDgxLjM4NzggNDUuNjcxMyA3OC41MDYzIDQ1LjY3MTMgNzQuNDU5OEM0NS42NzEzIDcyLjk4ODQgNDUuOTc2OCA3MS40NTU2IDQ2LjUyNjcgNjkuOTIyOVpNODMuNjc2MSA0Mi41Nzk0QzgzLjY3NjEgNDYuMTcwNCA4MS41NTc1IDQ3Ljk2NTggNzkuMTg3NSA0Ny45NjU4Qzc2Ljc4MTYgNDcuOTY1OCA3NC42OTg5IDQ2LjE3MDQgNzQuNjk4OSA0Mi41Nzk0Qzc0LjY5ODkgMzguOTg4NSA3Ni43ODE2IDM3LjE5MzEgNzkuMTg3NSAzNy4xOTMxQzgxLjU1NzUgMzcuMTkzMSA4My42NzYxIDM4Ljk4ODUgODMuNjc2MSA0Mi41Nzk0Wk03MC4yMTAzIDQyLjU3OTVDNzAuMjEwMyA0Ni4xNzA0IDY4LjA5MTYgNDcuOTY1OCA2NS43MjE2IDQ3Ljk2NThDNjMuMzE1NyA0Ny45NjU4IDYxLjIzMyA0Ni4xNzA0IDYxLjIzMyA0Mi41Nzk1QzYxLjIzMyAzOC45ODg1IDYzLjMxNTcgMzcuMTkzMSA2NS43MjE2IDM3LjE5MzFDNjguMDkxNiAzNy4xOTMxIDcwLjIxMDMgMzguOTg4NSA3MC4yMTAzIDQyLjU3OTVaIiBmaWxsPSIjRkZGREY4Ii8+Cjwvc3ZnPgo=" style="width:100%;height:100%;border-radius:10px;object-fit:cover;">',
+        solflare: '<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIGlkPSJTIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MCA1MCI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOiMwMjA1MGE7c3Ryb2tlOiNmZmVmNDY7c3Ryb2tlLW1pdGVybGltaXQ6MTA7c3Ryb2tlLXdpZHRoOi41cHg7fS5jbHMtMntmaWxsOiNmZmVmNDY7fTwvc3R5bGU+PC9kZWZzPjxyZWN0IGNsYXNzPSJjbHMtMiIgeD0iMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiByeD0iMTIiIHJ5PSIxMiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTI0LjIzLDI2LjQybDIuNDYtMi4zOCw0LjU5LDEuNWMzLjAxLDEsNC41MSwyLjg0LDQuNTEsNS40MywwLDEuOTYtLjc1LDMuMjYtMi4yNSw0LjkzbC0uNDYuNS4xNy0xLjE3Yy42Ny00LjI2LS41OC02LjA5LTQuNzItNy40M2wtNC4zLTEuMzhoMFpNMTguMDUsMTEuODVsMTIuNTIsNC4xNy0yLjcxLDIuNTktNi41MS0yLjE3Yy0yLjI1LS43NS0zLjAxLTEuOTYtMy4zLTQuNTF2LS4wOGgwWk0xNy4zLDMzLjA2bDIuODQtMi43MSw1LjM0LDEuNzVjMi44LjkyLDMuNzYsMi4xMywzLjQ2LDUuMThsLTExLjY1LTQuMjJoMFpNMTMuNzEsMjAuOTVjMC0uNzkuNDItMS41NCwxLjEzLTIuMTcuNzUsMS4wOSwyLjA1LDIuMDUsNC4wOSwyLjcxbDQuNDIsMS40Ni0yLjQ2LDIuMzgtNC4zNC0xLjQyYy0yLS42Ny0yLjg0LTEuNjctMi44NC0yLjk2TTI2LjgyLDQyLjg3YzkuMTgtNi4wOSwxNC4xMS0xMC4yMywxNC4xMS0xNS4zMiwwLTMuMzgtMi01LjI2LTYuNDMtNi43MmwtMy4zNC0xLjEzLDkuMTQtOC43Ny0xLjg0LTEuOTYtMi43MSwyLjM4LTEyLjgxLTQuMjJjLTMuOTcsMS4yOS04Ljk3LDUuMDktOC45Nyw4Ljg5LDAsLjQyLjA0LjgzLjE3LDEuMjktMy4zLDEuODgtNC42MywzLjYzLTQuNjMsNS44LDAsMi4wNSwxLjA5LDQuMDksNC41NSw1LjIybDIuNzUuOTItOS41Miw5LjE0LDEuODQsMS45NiwyLjk2LTIuNzEsMTQuNzMsNS4yMmgwWiIvPjwvc3ZnPg==" style="width:100%;height:100%;border-radius:10px;object-fit:cover;">',
     };
 
     function initModal() {
         var map = [
             { name: 'phantom',  opt: optPhantom,  badge: badgePhantom,  iconEl: document.getElementById('icon-phantom')  },
             { name: 'solflare', opt: optSolflare, badge: badgeSolflare, iconEl: document.getElementById('icon-solflare') },
-            { name: 'backpack', opt: optBackpack,  badge: badgeBackpack,  iconEl: document.getElementById('icon-backpack')  }
         ];
         map.forEach(function (item) {
             var p = getProvider(item.name);
@@ -284,7 +279,7 @@
     });
 
     function tryAutoConnect() {
-        var names = ['phantom', 'solflare', 'backpack'];
+        var names = ['phantom', 'solflare'];
         for (var i = 0; i < names.length; i++) {
             var p = getProvider(names[i]);
             if (p && p.isConnected && p.publicKey) {
@@ -341,7 +336,6 @@
 
     optPhantom.addEventListener('click',  function () { connectWith('phantom'); });
     optSolflare.addEventListener('click', function () { connectWith('solflare'); });
-    optBackpack.addEventListener('click',  function () { connectWith('backpack'); });
 
     // --- Disconnect ---
     disconnectBtn.addEventListener('click', async function () {

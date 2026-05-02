@@ -46,6 +46,23 @@ Options -Indexes
 # ── Force HTTPS ───────────────────────────────────────────────────────────────
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # Force HTTPS
     RewriteCond %{HTTPS} off
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Redirect /index.html to root
+    RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
+    RewriteRule ^ / [R=301,L]
+
+    # Short referral URLs: /r/CODE → register?ref=CODE
+    RewriteRule ^r/([A-Za-z0-9]+)/?$ /register?ref=$1 [R=302,L]
+
+    # Redirect old /masssend URL to /airdrop
+    RewriteRule ^masssend/?$ /airdrop [R=301,L]
+
+    # Remove .html extension
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^([^/.]+)/?$ $1.html [L]
 </IfModule>

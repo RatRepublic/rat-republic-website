@@ -1,4 +1,8 @@
 <?php
+ob_start();
+error_reporting(0);
+ini_set('display_errors', 0);
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
@@ -9,7 +13,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit; }
 $file = __DIR__ . '/stats.json';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    echo file_get_contents($file);
+    $stats = json_decode(file_get_contents($file), true);
+    // Live query: highest all-time SOL total by a single wallet
+    try {
+        require_once __DIR__ . '/api/db.php';
+        $db   = getDB();
+        $stmt = $db->query(
+            'SELECT COALESCE(MAX(t.total),0) AS top FROM (
+                SELECT SUM(rh.sol_amount) AS total
+                FROM reclaim_history rh
+                JOIN user_wallets uw ON uw.wallet_address = rh.wallet_address
+                JOIN users u ON u.id = uw.user_id
+                WHERE u.verified = 1
+                GROUP BY u.id
+             ) t'
+        );
+        $stats['top_user_sol'] = round((float)$stmt->fetchColumn(), 4);
+    } catch (Exception $e) {
+        $stats['top_user_sol'] = 0;
+    }
+    ob_clean();
+    echo json_encode($stats);
     exit;
 }
 
@@ -36,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stats['users_served']    += 1;
     $stats['accounts_closed'] += $closed;
     $stats['sol_recovered']    = round($stats['sol_recovered'] + $sol, 9);
-    $stats['highest_sol']      = max(floatval($stats['highest_sol']), $sol);
+    // top_user_sol is calculated live from DB on GET — no update needed here
 
     ftruncate($fp, 0);
     rewind($fp);

@@ -20,12 +20,26 @@ try {
     $db      = getDB();
     $siteUrl = defined('SITE_URL') ? rtrim(SITE_URL, '/') : '';
 
-    $stmt = $db->query(
-        'SELECT week_start, week_end, rank, user_id, username, avatar,
-                sol_amount, accounts_closed, tx_count
-           FROM weekly_winners
-          ORDER BY week_start DESC, rank ASC'
+    // Get only the most recent week_start for period=weekly
+    $latestStmt = $db->query(
+        "SELECT week_start FROM weekly_winners WHERE period = 'weekly' ORDER BY week_start DESC LIMIT 1"
     );
+    $latestWeek = $latestStmt->fetchColumn();
+
+    if (!$latestWeek) {
+        jsonOut(['weeks' => []]);
+    }
+
+    $stmt = $db->prepare(
+        'SELECT ww.week_start, ww.week_end, ww.rank, ww.user_id, ww.username,
+                COALESCE(u.avatar, ww.avatar) AS avatar,
+                ww.sol_amount, ww.accounts_closed, ww.tx_count
+           FROM weekly_winners ww
+           LEFT JOIN users u ON u.id = ww.user_id
+          WHERE ww.week_start = ? AND ww.period = ? AND ww.rank <= 5
+          ORDER BY ww.rank ASC'
+    );
+    $stmt->execute([$latestWeek, 'weekly']);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Group by week_start

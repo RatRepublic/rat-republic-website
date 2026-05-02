@@ -10,18 +10,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" integrity="sha384-kcNNzf7wI8//ZkNUaDd5JwxLoFaBgkj9Z4O4NwtuX9Lkmsz0HoITOxJsGkYxDuyG" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" integrity="sha384-8/AzSKHReNfZT4HGFTyRyJ1jXhhx/ZMnmX08Cy6TeaKWj0Vzho0AabG06C8mh02i" crossorigin="anonymous">
     
-    <link rel="stylesheet" href="css/styles.css"> 
-    
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .beta-banner {
+            font-family: 'NftOpensea', monospace;
+            font-size: 1.4rem;
+            color: #ff4444;
+            letter-spacing: 4px;
+            text-align: center;
+            text-shadow: 0 0 16px rgba(255,68,68,0.7), 0 0 32px rgba(255,68,68,0.4);
+            padding: 14px 0 4px;
+            animation: betapulse 2.5s ease-in-out infinite;
+        }
+        @keyframes betapulse {
+            0%, 100% { text-shadow: 0 0 12px rgba(255,68,68,0.6), 0 0 28px rgba(255,68,68,0.3); }
+            50%       { text-shadow: 0 0 22px rgba(255,68,68,0.9), 0 0 44px rgba(255,68,68,0.5); }
+        }
+    </style>
 </head>
 <body id="top">
-
 
 <section class="hero-section">
     <div class="container-fluid">
         <div class="row align-items-center">
-            
+
             <div class="col-lg-6">
                 <div class="hero-content">
+                    <div class="beta-banner">BETA TESTING</div>
                     <h1 class="display-rat">Rat Republic</h1>
                     <p class="lead">Building tools and a reward ecosystem for the underground community. Empowering the unseen with tech and incentives to modernize and dignify subterranean life.</p>
                     
@@ -39,7 +54,7 @@
                                 <a href="https://dexscreener.com/solana/" target="_blank" class="btn btn-green-custom btn-lg rounded-3 w-100">Dexscreener</a>
                             </div>
                             <div class="col-6">
-                                <a href="tools.html" class="btn btn-green-custom btn-lg rounded-3 w-100">Utilities</a>
+                                <a href="tools" class="btn btn-green-custom btn-lg rounded-3 w-100">Utilities</a>
                             </div>
                         </div>
                         <div class="row g-2 mb-2">
@@ -52,7 +67,7 @@
                         </div>
                         <div class="row g-2 mb-2">
                             <div class="col-12">
-                                <a href="generator.html" class="btn btn-green-custom btn-lg rounded-3 w-100">Rat Republic PFP Generator</a>
+                                <a href="generator" class="btn btn-green-custom btn-lg rounded-3 w-100">Rat Republic PFP Generator</a>
                             </div>
                         </div>
                         <div class="row g-2 mb-2">

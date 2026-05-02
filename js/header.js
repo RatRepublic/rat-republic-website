@@ -21,8 +21,10 @@
         '  color: #C8E030; text-decoration: none; font-family: "NftOpensea", monospace;',
         '  font-weight: bold; font-size: 0.82rem; letter-spacing: 2px;',
         '  white-space: nowrap; opacity: 0.85; transition: opacity 0.2s;',
+        '  display: inline-flex; align-items: center; gap: 8px;',
         '}',
         '#rr-header-brand:hover { opacity: 1; color: #C8E030; }',
+        '#rr-header-brand img { width: 28px; height: 28px; object-fit: contain; flex-shrink: 0; }',
 
         /* Profile wrapper — anchors the dropdown */
         '#rr-header-profile-wrap {',
@@ -105,6 +107,13 @@
         '  transition: all 0.2s; letter-spacing: 1px; white-space: nowrap;',
         '}',
         '#rr-header-leaderboard:hover { border-color: #C8E030; box-shadow: 0 0 8px rgba(200,224,48,0.2); }',
+        '#rr-header-roadmap {',
+        '  background: rgba(20,28,12,0.9); border: 1.5px solid #5A7A18;',
+        '  color: #C8E030; text-decoration: none; font-family: monospace;',
+        '  font-size: 0.78rem; padding: 6px 14px; border-radius: 8px;',
+        '  transition: all 0.2s; letter-spacing: 1px; white-space: nowrap;',
+        '}',
+        '#rr-header-roadmap:hover { border-color: #C8E030; box-shadow: 0 0 8px rgba(200,224,48,0.2); }',
     ].join('\n');
     document.head.appendChild(css);
 
@@ -118,8 +127,17 @@
 
     var brand = document.createElement('a');
     brand.id = 'rr-header-brand';
-    brand.href = 'index.html';
-    brand.textContent = 'RAT REPUBLIC';
+    brand.href = '/';
+
+    var logoImg = document.createElement('img');
+    logoImg.src = 'images/branding/rat-republic-logo.svg';
+    logoImg.alt = '';
+    brand.appendChild(logoImg);
+
+    var brandText = document.createElement('span');
+    brandText.textContent = 'RAT REPUBLIC';
+    brand.appendChild(brandText);
+
     header.appendChild(brand);
 
     // ── Right-side container ──────────────────────────────────────────
@@ -128,21 +146,27 @@
 
     var homeLink = document.createElement('a');
     homeLink.id = 'rr-header-home';
-    homeLink.href = 'index.html';
+    homeLink.href = '/';
     homeLink.textContent = 'Home';
     rightSide.appendChild(homeLink);
 
     var utilitiesLink = document.createElement('a');
     utilitiesLink.id = 'rr-header-utilities';
-    utilitiesLink.href = 'tools.html';
+    utilitiesLink.href = 'tools';
     utilitiesLink.textContent = 'Utilities';
     rightSide.appendChild(utilitiesLink);
 
     var leaderboardLink = document.createElement('a');
     leaderboardLink.id = 'rr-header-leaderboard';
-    leaderboardLink.href = 'leaderboard.html';
+    leaderboardLink.href = 'leaderboard';
     leaderboardLink.textContent = 'Crowned Vermins';
     rightSide.appendChild(leaderboardLink);
+
+    var roadmapLink = document.createElement('a');
+    roadmapLink.id = 'rr-header-roadmap';
+    roadmapLink.href = 'roadmap';
+    roadmapLink.textContent = 'Roadmap';
+    rightSide.appendChild(roadmapLink);
 
     var token    = localStorage.getItem('rr_token');
     var username = localStorage.getItem('rr_username');
@@ -154,7 +178,7 @@
         // Clickable profile pill
         var profileLink = document.createElement('a');
         profileLink.id = 'rr-header-profile';
-        profileLink.href = 'profile.html';
+        profileLink.href = 'profile';
 
         var avatarEl = document.createElement('div');
         avatarEl.id = 'rr-header-avatar';
@@ -177,7 +201,7 @@
 
         var ddProfile = document.createElement('a');
         ddProfile.className = 'rr-dd-item';
-        ddProfile.href = 'profile.html';
+        ddProfile.href = 'profile';
         ddProfile.textContent = 'Profile';
 
         var ddLogout = document.createElement('button');
@@ -194,7 +218,7 @@
                     headers: { 'Authorization': 'Bearer ' + t }
                 }).catch(function () {});
             }
-            window.location.href = 'index.html';
+            window.location.href = '/';
         });
 
         inner.appendChild(ddProfile);
@@ -236,7 +260,7 @@
     } else {
         var loginLink = document.createElement('a');
         loginLink.id = 'rr-header-login';
-        loginLink.href = 'login.html';
+        loginLink.href = 'login';
         loginLink.textContent = 'Log In';
         rightSide.appendChild(loginLink);
     }

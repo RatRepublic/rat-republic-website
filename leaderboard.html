@@ -48,6 +48,32 @@
             margin-bottom: 6px;
         }
 
+        /* Period tabs */
+        .period-tabs {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .period-tab {
+            background: rgba(20,28,12,0.9);
+            border: 1.5px solid #5A7A18;
+            color: rgba(255,255,255,0.45);
+            font-family: monospace;
+            font-size: 0.78rem;
+            padding: 6px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+        .period-tab:hover { border-color: #C8E030; color: #C8E030; }
+        .period-tab.active {
+            border-color: #C8E030;
+            color: #C8E030;
+            box-shadow: 0 0 8px rgba(200,224,48,0.2);
+        }
+
         /* Week + countdown */
         .week-bar {
             text-align: center;
@@ -340,6 +366,34 @@
             text-decoration: none;
         }
 
+        /* Rewards not live banner */
+        .rewards-not-live {
+            font-family: 'NftOpensea', monospace;
+            font-size: 1.6rem;
+            color: #ff4444;
+            letter-spacing: 4px;
+            text-align: center;
+            text-shadow: 0 0 16px rgba(255,68,68,0.7), 0 0 32px rgba(255,68,68,0.4);
+            margin-bottom: 14px;
+            animation: redpulse 2.5s ease-in-out infinite;
+        }
+        @keyframes redpulse {
+            0%, 100% { text-shadow: 0 0 12px rgba(255,68,68,0.6), 0 0 28px rgba(255,68,68,0.3); }
+            50%       { text-shadow: 0 0 22px rgba(255,68,68,0.9), 0 0 44px rgba(255,68,68,0.5); }
+        }
+        .crowned-sub {
+            text-align: center;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 1.5px;
+            margin-top: 6px;
+            margin-bottom: 24px;
+        }
+        .rewards-tba {
+            color: #C8E030;
+            opacity: 0.6;
+        }
+
         /* Past Winners */
         .crowned-heading {
             font-family: 'NftOpensea', monospace;
@@ -361,6 +415,9 @@
         .past-week-block {
             max-width: 520px;
             margin: 0 auto 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
         .past-week-label {
             text-align: center;
@@ -450,7 +507,16 @@
             <div id="header-fallback" class="page-header-text hidden">LEADERBOARD</div>
         </div>
 
+        <div class="rewards-not-live">REWARDS NOT YET LIVE</div>
+
         <div class="crowned-heading">CROWNED VERMINS</div>
+        <div class="crowned-sub">Rewarding active users daily, weekly and monthly &nbsp;·&nbsp; <span class="rewards-tba">REWARDS TBA</span></div>
+
+        <div class="period-tabs">
+            <button class="period-tab" data-period="daily">Daily</button>
+            <button class="period-tab active" data-period="weekly">Weekly</button>
+            <button class="period-tab" data-period="monthly">Monthly</button>
+        </div>
 
         <div class="week-bar">
             <div class="week-label" id="week-label">Loading…</div>
@@ -493,13 +559,25 @@
         <!-- Empty state -->
         <div class="empty-state hidden" id="empty-state">
             <p>No reclaims recorded this week yet.<br>
-            Be the first! <a href="cleanup.html">Launch Scavenger →</a></p>
+            Be the first! <a href="cleanup">Launch Scavenger →</a></p>
         </div>
 
-        <!-- Past Winners -->
+        <!-- Yesterday Winners (daily tab) -->
+        <div id="yesterday-section" class="hidden">
+            <div class="past-winners-title">YESTERDAY WINNERS</div>
+            <div id="yesterday-list"></div>
+        </div>
+
+        <!-- Past Winners (weekly tab) -->
         <div id="past-winners-section" class="hidden">
             <div class="past-winners-title">LAST WEEK WINNERS</div>
             <div id="past-winners-list"></div>
+        </div>
+
+        <!-- Last Month Winners (monthly tab) -->
+        <div id="lastmonth-section" class="hidden">
+            <div class="past-winners-title">LAST MONTH WINNERS</div>
+            <div id="lastmonth-list"></div>
         </div>
 
     </div>
@@ -508,6 +586,7 @@
         var myUserId = null;
         var countdownInterval = null;
         var resetInSeconds = 0;
+        var currentPeriod = 'weekly';
 
         function formatCountdown(secs) {
             var d = Math.floor(secs / 86400);
@@ -528,6 +607,25 @@
             var opts = { month: 'short', day: 'numeric', timeZone: 'UTC' };
             return 'Week of ' + s.toLocaleDateString('en-US', opts)
                 + ' – ' + e.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+        }
+
+        function getPeriodLabel(period) {
+            var now = new Date();
+            if (period === 'daily') return now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            if (period === 'monthly') return now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            return null;
+        }
+
+        function getPeriodActionLabel(period) {
+            if (period === 'daily') return 'RECLAIMED TODAY';
+            if (period === 'monthly') return 'RECLAIMED THIS MONTH';
+            return 'RECLAIMED THIS WEEK';
+        }
+
+        function getEmptyMessage(period) {
+            if (period === 'daily') return 'No reclaims recorded today yet.<br>Be the first! <a href="cleanup">Launch Scavenger →</a>';
+            if (period === 'monthly') return 'No reclaims recorded this month yet.<br>Be the first! <a href="cleanup">Launch Scavenger →</a>';
+            return 'No reclaims recorded this week yet.<br>Be the first! <a href="cleanup">Launch Scavenger →</a>';
         }
 
         function avatarEl(avatarUrl, size) {
@@ -562,15 +660,15 @@
 
                 var sol = document.createElement('div');
                 sol.className = 'podium-sol';
-                sol.textContent = parseFloat(e.weekly_sol).toFixed(4) + ' SOL';
+                sol.textContent = parseFloat(e.sol).toFixed(4) + ' SOL';
 
                 var solLabel = document.createElement('div');
                 solLabel.className = 'podium-sol-label';
-                solLabel.textContent = 'RECLAIMED THIS WEEK';
+                solLabel.textContent = getPeriodActionLabel(currentPeriod);
 
                 var meta = document.createElement('div');
                 meta.className = 'podium-meta';
-                meta.textContent = e.weekly_accounts + ' accounts · ' + e.weekly_txs + ' txs';
+                meta.textContent = e.accounts + ' accounts · ' + e.txs + ' txs';
 
                 // All ranks — horizontal: big avatar left, info right
                 var info = document.createElement('div');
@@ -647,13 +745,13 @@
 
                 var tdSol = document.createElement('td');
                 tdSol.className = 'sol-val';
-                tdSol.textContent = parseFloat(e.weekly_sol).toFixed(4);
+                tdSol.textContent = parseFloat(e.sol).toFixed(4);
 
                 var tdAcc = document.createElement('td');
-                tdAcc.textContent = e.weekly_accounts;
+                tdAcc.textContent = e.accounts;
 
                 var tdTxs = document.createElement('td');
-                tdTxs.textContent = e.weekly_txs;
+                tdTxs.textContent = e.txs;
 
                 tr.appendChild(tdRank);
                 tr.appendChild(tdUser);
@@ -666,11 +764,23 @@
             document.getElementById('rank-card').classList.remove('hidden');
         }
 
-        function load() {
-            // Try to get logged-in user id for row highlight
+        function load(period) {
+            period = period || 'weekly';
+            currentPeriod = period;
+
+            // Reset UI
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('loading').textContent = 'LOADING…';
+            document.getElementById('podium').classList.add('hidden');
+            document.getElementById('podium').innerHTML = '';
+            document.getElementById('rank-card').classList.add('hidden');
+            document.getElementById('rank-body').innerHTML = '';
+            document.getElementById('empty-state').classList.add('hidden');
+            if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+
             var token = localStorage.getItem('rr_token');
 
-            fetch('api/leaderboard.php')
+            fetch('api/leaderboard.php?period=' + period)
                 .then(function(r) { return r.text(); })
                 .then(function(text) {
                     var data;
@@ -685,7 +795,12 @@
                     }
                     document.getElementById('loading').classList.add('hidden');
 
-                    document.getElementById('week-label').textContent = formatWeek(data.week_start, data.week_end);
+                    // Period label
+                    if (period === 'weekly' && data.week_start) {
+                        document.getElementById('week-label').textContent = formatWeek(data.week_start, data.week_end);
+                    } else {
+                        document.getElementById('week-label').textContent = getPeriodLabel(period);
+                    }
 
                     resetInSeconds = data.reset_in;
                     document.getElementById('countdown').textContent = formatCountdown(resetInSeconds);
@@ -695,30 +810,54 @@
                     }, 1000);
 
                     if (!data.entries || data.entries.length === 0) {
+                        document.getElementById('empty-state').querySelector('p').innerHTML = getEmptyMessage(period);
                         document.getElementById('empty-state').classList.remove('hidden');
-                        loadWinners();
+                        if (period === 'weekly')  loadWinners();
+                        if (period === 'daily')   loadYesterday();
+                        if (period === 'monthly') loadLastMonth();
                         return;
                     }
 
-                    // Get logged-in user id before rendering
-                    if (token) {
+                    if (token && !myUserId) {
                         fetch('api/me.php', { headers: { 'Authorization': 'Bearer ' + token } })
                             .then(function(r) { return r.ok ? r.json() : null; })
                             .then(function(me) {
                                 if (me) myUserId = me.id;
                                 render(data.entries);
-                                loadWinners();
+                                if (period === 'weekly')  loadWinners();
+                                if (period === 'daily')   loadYesterday();
+                                if (period === 'monthly') loadLastMonth();
                             })
-                            .catch(function() { render(data.entries); loadWinners(); });
+                            .catch(function() {
+                                render(data.entries);
+                                if (period === 'weekly')  loadWinners();
+                                if (period === 'daily')   loadYesterday();
+                                if (period === 'monthly') loadLastMonth();
+                            });
                     } else {
                         render(data.entries);
-                        loadWinners();
+                        if (period === 'weekly')  loadWinners();
+                        if (period === 'daily')   loadYesterday();
+                        if (period === 'monthly') loadLastMonth();
                     }
                 })
                 .catch(function() {
                     document.getElementById('loading').textContent = 'Failed to load leaderboard.';
                 });
         }
+
+        // Tab switching
+        document.querySelectorAll('.period-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.period-tab').forEach(function(t) { t.classList.remove('active'); });
+                tab.classList.add('active');
+                var period = tab.getAttribute('data-period');
+                if (period !== 'weekly')  document.getElementById('past-winners-section').classList.add('hidden');
+                if (period !== 'daily')   document.getElementById('yesterday-section').classList.add('hidden');
+                if (period !== 'monthly') document.getElementById('lastmonth-section').classList.add('hidden');
+                load(period);
+            });
+        });
 
         function render(entries) {
             buildPodium(entries);
@@ -795,6 +934,146 @@
                 .catch(function() {});
         }
 
+        function loadYesterday() {
+            fetch('api/yesterday.php')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data.entries || data.entries.length === 0) return;
+                    var titles = ['🥇 ALPHA RAT', '🥈 BETA RAT', '🥉 GAMMA RAT', 'DELTA RAT', 'EPSILON RAT'];
+                    var list = document.getElementById('yesterday-list');
+                    list.innerHTML = '';
+
+                    var d = new Date(data.date + 'T00:00:00Z');
+                    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                    var label = months[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear();
+
+                    var block = document.createElement('div');
+                    block.className = 'past-week-block';
+
+                    var lbl = document.createElement('div');
+                    lbl.className = 'past-week-label';
+                    lbl.textContent = label;
+                    block.appendChild(lbl);
+
+                    data.entries.forEach(function(e) {
+                        var i = e.rank - 1;
+                        var card = document.createElement('div');
+                        card.className = 'podium-card rank-' + e.rank;
+
+                        var av = avatarEl(e.avatar_url, 'podium');
+                        var info = document.createElement('div');
+                        info.className = 'podium-info';
+
+                        var rankTitle = document.createElement('div');
+                        rankTitle.className = 'podium-rank-title';
+                        rankTitle.textContent = titles[i] || ('#' + e.rank);
+
+                        var uname = document.createElement('div');
+                        uname.className = 'podium-username';
+                        uname.textContent = e.username;
+
+                        var hr = document.createElement('hr');
+                        hr.className = 'podium-divider';
+
+                        var sol = document.createElement('div');
+                        sol.className = 'podium-sol';
+                        sol.textContent = parseFloat(e.sol_amount).toFixed(4) + ' SOL';
+
+                        var solLabel = document.createElement('div');
+                        solLabel.className = 'podium-sol-label';
+                        solLabel.textContent = 'RECLAIMED THAT DAY';
+
+                        var meta = document.createElement('div');
+                        meta.className = 'podium-meta';
+                        meta.textContent = e.accounts_closed + ' accounts · ' + e.tx_count + ' txs';
+
+                        info.appendChild(rankTitle);
+                        info.appendChild(uname);
+                        info.appendChild(hr);
+                        info.appendChild(sol);
+                        info.appendChild(solLabel);
+                        info.appendChild(meta);
+                        card.appendChild(av);
+                        card.appendChild(info);
+                        block.appendChild(card);
+                    });
+
+                    list.appendChild(block);
+                    document.getElementById('yesterday-section').classList.remove('hidden');
+                })
+                .catch(function() {});
+        }
+
+        function loadLastMonth() {
+            fetch('api/lastmonth.php')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data.entries || data.entries.length === 0) return;
+                    var titles = ['🥇 ALPHA RAT', '🥈 BETA RAT', '🥉 GAMMA RAT', 'DELTA RAT', 'EPSILON RAT'];
+                    var list = document.getElementById('lastmonth-list');
+                    list.innerHTML = '';
+
+                    var s = new Date(data.month_start + 'T00:00:00Z');
+                    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                    var label = months[s.getUTCMonth()] + ' ' + s.getUTCFullYear();
+
+                    var block = document.createElement('div');
+                    block.className = 'past-week-block';
+
+                    var lbl = document.createElement('div');
+                    lbl.className = 'past-week-label';
+                    lbl.textContent = label;
+                    block.appendChild(lbl);
+
+                    data.entries.forEach(function(e) {
+                        var i = e.rank - 1;
+                        var card = document.createElement('div');
+                        card.className = 'podium-card rank-' + e.rank;
+
+                        var av = avatarEl(e.avatar_url, 'podium');
+                        var info = document.createElement('div');
+                        info.className = 'podium-info';
+
+                        var rankTitle = document.createElement('div');
+                        rankTitle.className = 'podium-rank-title';
+                        rankTitle.textContent = titles[i] || ('#' + e.rank);
+
+                        var uname = document.createElement('div');
+                        uname.className = 'podium-username';
+                        uname.textContent = e.username;
+
+                        var hr = document.createElement('hr');
+                        hr.className = 'podium-divider';
+
+                        var sol = document.createElement('div');
+                        sol.className = 'podium-sol';
+                        sol.textContent = parseFloat(e.sol_amount).toFixed(4) + ' SOL';
+
+                        var solLabel = document.createElement('div');
+                        solLabel.className = 'podium-sol-label';
+                        solLabel.textContent = 'RECLAIMED THAT MONTH';
+
+                        var meta = document.createElement('div');
+                        meta.className = 'podium-meta';
+                        meta.textContent = e.accounts_closed + ' accounts · ' + e.tx_count + ' txs';
+
+                        info.appendChild(rankTitle);
+                        info.appendChild(uname);
+                        info.appendChild(hr);
+                        info.appendChild(sol);
+                        info.appendChild(solLabel);
+                        info.appendChild(meta);
+                        card.appendChild(av);
+                        card.appendChild(info);
+                        block.appendChild(card);
+                    });
+
+                    list.appendChild(block);
+                    document.getElementById('lastmonth-section').classList.remove('hidden');
+                })
+                .catch(function() {});
+        }
+
         // ── Flex IT ──────────────────────────────────────────────────────────
         var FLEX_TITLES = ['🥇 ALPHA RAT', '🥈 BETA RAT', '🥉 GAMMA RAT', 'DELTA RAT', 'EPSILON RAT'];
 
@@ -860,15 +1139,15 @@
 
                 ctx.font = 'bold 38px "NftOpensea", monospace';
                 ctx.fillStyle = '#C8E030';
-                ctx.fillText(parseFloat(entry.weekly_sol).toFixed(4) + ' SOL', rx, 136);
+                ctx.fillText(parseFloat(entry.sol).toFixed(4) + ' SOL', rx, 136);
 
                 ctx.font = '11px monospace';
                 ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                ctx.fillText('RECLAIMED THIS WEEK', rx, 156);
+                ctx.fillText(getPeriodActionLabel(currentPeriod), rx, 156);
 
                 ctx.font = '13px monospace';
                 ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                ctx.fillText(entry.weekly_accounts + ' accounts  ·  ' + entry.weekly_txs + ' txs', rx, 178);
+                ctx.fillText(entry.accounts + ' accounts  ·  ' + entry.txs + ' txs', rx, 178);
 
                 ctx.font = 'bold 11px "NftOpensea", monospace';
                 ctx.fillStyle = 'rgba(200,224,48,0.4)';
@@ -938,7 +1217,7 @@
             });
         });
 
-        load();
+        load('weekly');
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>

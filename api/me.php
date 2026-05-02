@@ -105,7 +105,7 @@ try {
         'wallet_breakdown' => $walletBreakdown,
         'history'        => $history,
         'referral_code'  => $refCode,
-        'referral_link'  => $refCode ? SITE_URL . '/register.html?ref=' . $refCode : null,
+        'referral_link'  => $refCode ? SITE_URL . '/r/' . $refCode : null,
         'referral_count'    => $refCount,
         'referral_sol_earned' => $refSolEarned,
         'payout_wallet'     => $payoutWallet,

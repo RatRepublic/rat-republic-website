@@ -4,9 +4,13 @@ error_reporting(0);
 ini_set('display_errors', 0);
 
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: https://ratrepublic.art');
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$allowedOrigins = ['https://ratrepublic.art', 'http://localhost', 'http://127.0.0.1'];
+$isAllowed = !$origin || in_array(preg_replace('/:\d+$/', '', $origin), $allowedOrigins);
+
+header('Access-Control-Allow-Origin: ' . ($isAllowed ? $origin ?: 'https://ratrepublic.art' : 'https://ratrepublic.art'));
 header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, solana-client');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { ob_clean(); exit; }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -16,8 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Basic origin check — rejects requests from outside the site
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if ($origin && $origin !== 'https://ratrepublic.art') {
+if (!$isAllowed) {
     ob_clean();
     http_response_code(403);
     exit('{"error":"Forbidden"}');

@@ -729,7 +729,7 @@
                         </div>
                     </div>
                     <div class="identity-actions">
-                        <a href="generator.html" class="btn-pfp-gen">🐀 PFP Generator</a>
+                        <a href="generator" class="btn-pfp-gen">🐀 PFP Generator</a>
                         <button class="btn-logout-card" id="logout-btn">Log Out</button>
                     </div>
                 </div>
@@ -1324,6 +1324,7 @@
                     img.src = r.d.url;
                     img.style.display = 'block';
                     document.getElementById('avatar-placeholder').style.display = 'none';
+                    localStorage.setItem('rr_avatar', r.d.url);
                     setAvatarMsg('Saved!', false);
                     setTimeout(function () { setAvatarMsg(''); }, 3000);
                 } else {
