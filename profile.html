@@ -4,821 +4,482 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rat Republic — Profile</title>
-    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: #1a1f0f;
-            background-image: url('images/Background.png');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            color: #fff;
-            font-family: monospace, 'Courier New', sans-serif;
-            min-height: 100vh;
-            padding: 30px 20px 60px;
+        @font-face { font-family: 'Inter'; src: url('fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype'); font-weight: 100 900; font-style: normal; }
+        @font-face { font-family: 'Inter'; src: url('fonts/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype'); font-weight: 100 900; font-style: italic; }
+        @font-face { font-family: 'NftOpensea'; src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype'); }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #080808; --sidebar-bg: #0d0d0d; --surface: #111111; --surface-2: #161616;
+            --border: rgba(255,255,255,0.07); --border-hover: rgba(255,255,255,0.15);
+            --text: #ffffff; --text-muted: rgba(255,255,255,0.45); --text-dim: rgba(255,255,255,0.22);
+            --accent: #C8E030; --accent-dim: rgba(200,224,48,0.1);
+            --sidebar-w: 220px;
+        }
+
+        html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+        /* ── Sidebar ── */
+        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 100; }
+        .sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 20px 16px; text-decoration: none; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+        .sidebar-brand img { width: 26px; height: 26px; object-fit: contain; flex-shrink: 0; }
+        .sidebar-brand span { font-family: 'NftOpensea'; font-size: 0.85rem; letter-spacing: 0.12em; color: var(--text); }
+        .sidebar-nav { flex: 1; padding: 4px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; text-decoration: none; font-size: 0.84rem; font-weight: 500; color: var(--text-muted); transition: background 0.15s, color 0.15s; }
+        .sidebar-nav a:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+        .sidebar-nav a.active { background: rgba(255,255,255,0.07); color: var(--text); }
+        .sidebar-nav a svg, .nav-group-toggle svg.nav-icon { width: 15px; height: 15px; opacity: 0.6; flex-shrink: 0; }
+        .sidebar-nav a.active svg, .sidebar-nav a:hover svg { opacity: 1; }
+        .sidebar-divider { height: 1px; background: var(--border); margin: 8px 10px; }
+        .nav-group-toggle { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border-radius: 8px; background: none; border: none; font-family: 'Inter'; font-size: 0.84rem; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: background 0.15s, color 0.15s; text-align: left; }
+        .nav-group-toggle:hover, .nav-group-toggle.open { background: rgba(255,255,255,0.05); color: var(--text); }
+        .nav-group-toggle.open svg.nav-icon { opacity: 1; }
+        .nav-group-toggle .chevron { margin-left: auto; width: 13px; height: 13px; opacity: 0.4; transition: transform 0.2s; flex-shrink: 0; }
+        .nav-group-toggle.open .chevron { transform: rotate(180deg); opacity: 0.7; }
+        .nav-sub { display: none; flex-direction: column; gap: 1px; padding-left: 14px; margin-top: 1px; }
+        .nav-sub.open { display: flex; }
+        .nav-sub a { font-size: 0.8rem; padding: 7px 12px; gap: 8px; }
+        .nav-sub a::before { content: ''; width: 1px; height: 14px; background: rgba(255,255,255,0.12); flex-shrink: 0; border-radius: 1px; }
+        .sidebar-bottom { padding: 10px; border-top: 1px solid var(--border); }
+        .sidebar-socials { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; }
+        .sidebar-social-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.08); color: var(--text-dim); text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+        .sidebar-social-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text-muted); }
+        .sidebar-social-btn svg { width: 12px; height: 12px; fill: currentColor; }
+        .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; margin-bottom: 4px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); }
+        .sidebar-avatar { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: #1a1a1a; }
+        .sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .sidebar-username { font-size: 0.82rem; font-weight: 600; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sidebar-rank { font-size: 0.65rem; color: var(--accent); font-weight: 600; }
+        .btn-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border-radius: 8px; font-family: 'Inter'; font-size: 0.82rem; font-weight: 500; color: rgba(255,100,100,0.6); background: transparent; border: none; cursor: pointer; transition: background 0.15s, color 0.15s; }
+        .btn-logout:hover { background: rgba(255,80,80,0.07); color: rgba(255,120,120,0.9); }
+        .btn-logout svg { width: 14px; height: 14px; opacity: 0.7; }
+
+        /* ── Main ── */
+        .main { margin-left: var(--sidebar-w); min-height: 100vh; padding: 40px 36px 80px; }
+
+        .page-heading { margin-bottom: 28px; }
+        .page-heading h1 { font-family: 'NftOpensea'; font-size: 1.9rem; letter-spacing: 0.06em; color: var(--text); margin-bottom: 4px; }
+        .page-heading p { font-size: 0.85rem; color: var(--text-muted); }
+
+        .hidden { display: none !important; }
+
+        /* ── Loading ── */
+        .loading-state { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 60px 24px; text-align: center; color: var(--text-dim); font-size: 0.75rem; letter-spacing: 0.12em; }
+
+        /* ── Profile card ── */
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
             display: flex;
             align-items: flex-start;
-            justify-content: center;
+            gap: 24px;
+            margin-bottom: 18px;
         }
-        .container { width: 100%; max-width: 680px; }
-        @font-face {
-            font-family: 'NftOpensea';
-            src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
+        .profile-avatar-wrap { position: relative; flex-shrink: 0; }
+        .profile-avatar {
+            width: 80px; height: 80px;
+            border-radius: 50%; overflow: hidden;
+            border: 2px solid var(--border-hover);
+            background: #1a1a1a;
         }
-
-        /* Top nav */
-        .top-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            gap: 10px;
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-avatar-upload {
+            position: absolute; bottom: 1px; right: 1px;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: var(--surface-2); border: 1.5px solid var(--border-hover);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: border-color 0.15s;
+            color: var(--text-muted);
         }
-        .back-btn {
-            display: inline-block;
-            background-color: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            color: #C8E030;
-            text-decoration: none;
-            font-weight: bold;
-            padding: 8px 20px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            font-size: 0.85rem;
-        }
-        .back-btn:hover { border-color: #C8E030; box-shadow: 0 0 10px rgba(200,224,48,0.3); }
-        .logout-btn {
-            background: transparent;
-            border: 1.5px solid rgba(255,255,255,0.2);
-            color: rgba(255,255,255,0.45);
-            font-family: monospace;
-            font-size: 0.75rem;
-            padding: 7px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-        }
-        .logout-btn:hover { border-color: #ff8080; color: #ff8080; }
-
-        /* Cards */
-        .card {
-            background: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            border-radius: 14px;
-            padding: 24px 22px;
-            margin-bottom: 16px;
-        }
-
-        /* Avatar + identity */
-        .identity-row {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        .avatar-wrap {
-            position: relative;
-            flex-shrink: 0;
-        }
-        .avatar-img {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            border: 2px solid #5A7A18;
-            object-fit: cover;
-            display: block;
-            background: #2a3510;
-        }
-        .avatar-placeholder {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            border: 2px solid #5A7A18;
-            background: #2a3510;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            color: #5A7A18;
-        }
-        .avatar-upload-btn {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: #C8E030;
-            border: 2px solid #1a1f0f;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.65rem;
-            color: #1a1f0f;
-            font-weight: bold;
-            transition: transform 0.15s;
-        }
-        .avatar-upload-btn:hover { transform: scale(1.15); }
+        .profile-avatar-upload:hover { border-color: var(--accent); color: var(--accent); }
+        .profile-avatar-upload svg { width: 10px; height: 10px; }
         #avatar-file-input { display: none; }
-        .avatar-uploading { opacity: 0.5; pointer-events: none; }
 
-        .identity-info { flex: 1; min-width: 0; }
-        .identity-actions {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-        .btn-pfp-gen {
-            display: inline-block;
-            background: rgba(20,28,12,0.92);
-            border: 2px solid #5A7A18;
-            color: #C8E030;
-            text-decoration: none;
-            font-family: 'NftOpensea', monospace;
-            font-size: 0.72rem;
-            padding: 8px 14px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-            white-space: nowrap;
-            text-align: center;
-        }
-        .btn-pfp-gen:hover { border-color: #C8E030; box-shadow: 0 0 10px rgba(200,224,48,0.25); color: #C8E030; }
-        .btn-logout-card {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.15);
-            color: rgba(255,255,255,0.3);
-            font-family: monospace;
-            font-size: 0.68rem;
-            padding: 6px 12px;
-            border-radius: 7px;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-            white-space: nowrap;
-        }
-        .btn-logout-card:hover { border-color: #ff8080; color: #ff8080; }
-        @media (max-width: 480px) {
-            .identity-actions { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; }
-        }
-        .identity-username {
-            font-family: 'NftOpensea', monospace;
-            font-size: 1.4rem;
-            color: #fff;
-            letter-spacing: 2px;
-            margin-bottom: 3px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .identity-email {
-            color: rgba(255,255,255,0.3);
-            font-size: 0.7rem;
-            letter-spacing: 1px;
-        }
-        .identity-rank {
-            display: inline-block;
-            margin-top: 5px;
-            font-size: 0.62rem;
-            letter-spacing: 2px;
-            color: #C8E030;
-            background: rgba(200,224,48,0.08);
-            border: 1px solid rgba(200,224,48,0.25);
-            border-radius: 4px;
-            padding: 2px 8px;
-            text-transform: uppercase;
-        }
-        .username-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 3px;
-        }
-        .edit-username-btn {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.15);
-            color: rgba(255,255,255,0.3);
-            font-size: 0.65rem;
-            padding: 3px 8px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-            flex-shrink: 0;
-        }
-        .edit-username-btn:hover { border-color: #C8E030; color: #C8E030; }
-        .edit-username-form {
-            display: none;
-            margin-top: 8px;
-        }
-        .edit-username-row {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-        .edit-username-input {
-            flex: 1;
-            background: rgba(255,255,255,0.05);
-            border: 1.5px solid #5A7A18;
-            border-radius: 7px;
-            color: #fff;
-            font-family: monospace;
-            font-size: 0.85rem;
-            padding: 7px 10px;
-            outline: none;
-            transition: border-color 0.2s;
-            min-width: 0;
-        }
-        .edit-username-input:focus { border-color: #C8E030; }
-        .btn-save-username {
-            background: rgba(20,28,12,0.92);
-            border: 1.5px solid #5A7A18;
-            color: #C8E030;
-            font-family: monospace;
-            font-size: 0.75rem;
-            padding: 7px 12px;
-            border-radius: 7px;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .btn-save-username:hover { border-color: #C8E030; box-shadow: 0 0 8px rgba(200,224,48,0.2); }
-        .btn-save-username:disabled { opacity: 0.35; cursor: not-allowed; }
-        .btn-cancel-username {
-            background: transparent;
-            border: 1.5px solid rgba(255,255,255,0.12);
-            color: rgba(255,255,255,0.3);
-            font-family: monospace;
-            font-size: 0.75rem;
-            padding: 7px 10px;
-            border-radius: 7px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-cancel-username:hover { border-color: #ff8080; color: #ff8080; }
-        .edit-msg {
-            font-size: 0.68rem;
-            margin-top: 6px;
-            min-height: 1em;
-        }
-        .edit-msg.error   { color: #ff8080; }
-        .edit-msg.success { color: #C8E030; }
+        .profile-info { flex: 1; min-width: 0; }
+        .profile-name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+        .profile-name { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.5rem; color: var(--text); }
+        .profile-badge { font-size: 0.68rem; font-weight: 700; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(200,224,48,0.2); border-radius: 20px; padding: 3px 10px; letter-spacing: 0.04em; white-space: nowrap; }
 
-        /* Section label */
-        .section-label {
-            font-size: 0.62rem;
-            color: #C8E030;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .refresh-btn {
-            background: transparent;
-            border: 1px solid #5A7A18;
-            color: rgba(255,255,255,0.4);
-            font-family: monospace;
-            font-size: 0.65rem;
-            padding: 3px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .refresh-btn:hover { border-color: #C8E030; color: #C8E030; }
-        .flex-btn {
-            background: transparent;
-            border: none;
-            color: #C8E030;
-            font-family: 'NftOpensea', monospace;
-            font-size: 1.6rem;
-            letter-spacing: 2px;
-            padding: 0;
-            cursor: pointer;
-            transition: color 0.2s, text-shadow 0.2s;
-        }
-        .flex-btn:hover { color: #fff; text-shadow: 0 0 12px rgba(200,224,48,0.6); }
+        .profile-meta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+        .profile-meta-item { font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+        .profile-meta-item svg { width: 13px; height: 13px; opacity: 0.5; }
 
-        /* Stats share modal */
-        .stats-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.82);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-        .stats-modal-overlay.hidden { display: none; }
-        .stats-modal-card {
-            background: rgba(10,15,5,0.97);
-            border: 2px solid #5A7A18;
-            border-radius: 16px;
-            padding: 28px 24px 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 18px;
-            position: relative;
-            box-shadow: 0 0 40px rgba(200,224,48,0.12), 0 8px 32px rgba(0,0,0,0.6);
-            max-width: 90vw;
-        }
-        .stats-modal-close {
-            position: absolute;
-            top: 10px;
-            right: 12px;
-            background: none;
-            border: 1px solid transparent;
-            color: rgba(255,255,255,0.45);
-            font-size: 1.1rem;
-            cursor: pointer;
-            padding: 2px 7px;
-            border-radius: 4px;
-            transition: all 0.2s;
-            line-height: 1.4;
-        }
-        .stats-modal-close:hover { color: #C8E030; border-color: #5A7A18; }
-        .stats-share-preview {
-            display: block;
-            border-radius: 10px;
-            border: 1px solid #5A7A18;
-            box-shadow: 0 0 16px rgba(200,224,48,0.15);
-            max-width: min(640px, 80vw);
-            width: 100%;
-            height: auto;
-        }
-        .stats-modal-actions {
-            display: flex;
-            gap: 10px;
-        }
-        .stats-modal-actions button {
-            background-color: rgba(20,28,12,0.92);
-            border: 2px solid #5A7A18;
-            color: #C8E030;
-            font-weight: bold;
-            font-family: monospace;
-            font-size: 0.88rem;
-            padding: 8px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .stats-modal-actions button:hover {
-            border-color: #C8E030;
-            box-shadow: 0 0 10px rgba(200,224,48,0.35);
-        }
+        .avatar-msg { font-size: 0.68rem; min-height: 1em; }
+        .avatar-msg.ok  { color: var(--accent); }
+        .avatar-msg.err { color: #ff8080; }
 
-        /* Lifetime stats — 4 boxes */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+        /* username edit inline */
+        .username-edit-form { display: none; margin-top: 10px; }
+        .username-edit-row { display: flex; gap: 6px; align-items: center; }
+        .input-inline {
+            background: var(--surface-2); border: 1px solid var(--border-hover);
+            border-radius: 8px; padding: 8px 12px; font-family: 'Inter';
+            font-size: 0.82rem; color: var(--text); outline: none; flex: 1; min-width: 0;
+            transition: border-color 0.15s;
         }
-        @media (max-width: 500px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-        .stat-box {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid #3d5510;
-            border-radius: 10px;
-            padding: 14px 8px;
-            text-align: center;
+        .input-inline:focus { border-color: var(--accent); }
+        .input-inline::placeholder { color: var(--text-dim); }
+        .btn-save {
+            font-family: 'Inter'; font-size: 0.78rem; font-weight: 600;
+            color: var(--accent); background: var(--accent-dim);
+            border: 1px solid rgba(200,224,48,0.25); border-radius: 8px;
+            padding: 8px 14px; cursor: pointer; white-space: nowrap; transition: background 0.15s;
         }
-        .stat-num {
-            font-family: 'NftOpensea', monospace;
-            font-size: 1.15rem;
-            color: #C8E030;
-            margin-bottom: 4px;
-            white-space: nowrap;
+        .btn-save:hover { background: rgba(200,224,48,0.18); }
+        .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-cancel {
+            font-family: 'Inter'; font-size: 0.78rem; color: var(--text-dim);
+            background: transparent; border: 1px solid var(--border); border-radius: 8px;
+            padding: 8px 12px; cursor: pointer; transition: all 0.15s;
         }
-        .stat-label {
-            font-size: 0.56rem;
-            color: rgba(255,255,255,0.35);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
+        .btn-cancel:hover { border-color: rgba(255,80,80,0.4); color: rgba(255,120,120,0.7); }
+        .form-msg { font-size: 0.7rem; margin-top: 6px; min-height: 1em; }
+        .form-msg.ok  { color: var(--accent); }
+        .form-msg.err { color: #ff8080; }
 
-        /* Wallet breakdown */
-        .breakdown-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 9px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.78rem;
-            gap: 8px;
+        .profile-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; }
+        .btn-outline {
+            font-family: 'Inter'; font-size: 0.8rem; font-weight: 500;
+            color: var(--text-muted); background: transparent;
+            border: 1px solid var(--border-hover); border-radius: 8px;
+            padding: 7px 16px; cursor: pointer; transition: all 0.15s; white-space: nowrap;
         }
-        .breakdown-row:last-child { border-bottom: none; }
-        .breakdown-addr { color: rgba(255,255,255,0.65); flex-shrink: 0; }
-        .breakdown-stats { color: rgba(255,255,255,0.4); font-size: 0.7rem; text-align: right; }
-        .breakdown-stats span { color: #C8E030; }
+        .btn-outline:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
+        .btn-accent {
+            font-family: 'NftOpensea'; font-size: 0.72rem; letter-spacing: 0.08em;
+            color: var(--accent); background: var(--accent-dim);
+            border: 1px solid rgba(200,224,48,0.25); border-radius: 8px;
+            padding: 7px 16px; cursor: pointer; transition: background 0.15s; white-space: nowrap;
+        }
+        .btn-accent:hover { background: rgba(200,224,48,0.18); }
 
-        /* Recent activity table */
+        /* ── Stats grid ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 18px; transition: border-color 0.15s; }
+        .stat-card:hover { border-color: var(--border-hover); }
+        .stat-label { font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 10px; }
+        .stat-value { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.6rem; color: var(--text); line-height: 1; margin-bottom: 4px; }
+        .stat-value.accent { color: var(--accent); }
+        .stat-sub { font-size: 0.72rem; color: var(--text-dim); }
+
+        /* ── Two-col ── */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+
+        /* ── Section card ── */
+        .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; margin-bottom: 18px; }
+        .section-title { font-family: 'NftOpensea'; font-size: 0.88rem; letter-spacing: 0.08em; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .section-title-action { font-family: 'Inter'; font-size: 0.72rem; font-weight: 500; color: var(--text-dim); letter-spacing: 0; cursor: pointer; background: none; border: none; transition: color 0.15s; }
+        .section-title-action:hover { color: var(--accent); }
+
+        /* ── Referral ── */
+        .referral-link-row { display: flex; gap: 8px; margin-bottom: 14px; }
+        .referral-input { flex: 1; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; font-family: 'Inter'; font-size: 0.78rem; color: var(--text-muted); outline: none; min-width: 0; }
+        .btn-copy { font-family: 'Inter'; font-size: 0.78rem; font-weight: 600; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(200,224,48,0.2); border-radius: 8px; padding: 9px 16px; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+        .btn-copy:hover { background: rgba(200,224,48,0.18); }
+        .referral-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .referral-stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 14px; }
+        .referral-stat-label { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px; }
+        .referral-stat-value { font-size: 1rem; font-weight: 700; color: var(--text); }
+        .referral-stat-value.accent { color: var(--accent); }
+
+        /* ── Wallets section ── */
+        .wallet-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; gap: 10px; }
+        .wallet-info { min-width: 0; }
+        .wallet-label { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 3px; }
+        .wallet-addr { font-size: 0.78rem; color: var(--text); font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .wallet-addr.unset { color: var(--text-dim); font-style: italic; font-family: 'Inter'; }
+        .wallet-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .btn-sm { font-size: 0.7rem; color: var(--text-dim); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+        .btn-sm:hover { color: var(--accent); border-color: rgba(200,224,48,0.3); }
+
+        /* payout edit form */
+        .payout-edit-form { display: none; margin-top: 8px; }
+        .payout-hint { font-size: 0.68rem; color: var(--text-dim); line-height: 1.55; margin-top: 8px; }
+
+        /* wallet breakdown sub-rows */
+        .breakdown-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.04); font-size: 0.78rem; gap: 8px; }
+        .breakdown-item:first-child { border-top: none; }
+        .breakdown-addr { color: var(--text-muted); font-family: monospace; }
+        .breakdown-stats { font-size: 0.72rem; color: var(--text-dim); text-align: right; }
+        .breakdown-stats span { color: var(--accent); }
+
+        /* ── Activity ── */
+        .filter-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+        .filter-label { font-size: 0.68rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+        .input-date {
+            background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: 7px; padding: 6px 10px; font-family: 'Inter';
+            font-size: 0.76rem; color: var(--text-muted); outline: none;
+            transition: border-color 0.15s; color-scheme: dark;
+        }
+        .input-date:focus { border-color: var(--accent); }
+        .btn-filter { font-family: 'Inter'; font-size: 0.76rem; font-weight: 600; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(200,224,48,0.2); border-radius: 7px; padding: 6px 14px; cursor: pointer; transition: background 0.15s; }
+        .btn-filter:hover { background: rgba(200,224,48,0.18); }
+        .btn-filter-clear { font-family: 'Inter'; font-size: 0.76rem; color: var(--text-dim); background: none; border: 1px solid var(--border); border-radius: 7px; padding: 6px 12px; cursor: pointer; transition: all 0.15s; }
+        .btn-filter-clear:hover { color: var(--text-muted); border-color: var(--border-hover); }
+
         .activity-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; min-width: 480px; }
-        thead th {
-            font-size: 0.56rem;
-            color: rgba(255,255,255,0.3);
-            letter-spacing: 2px;
-            text-align: left;
-            padding: 0 8px 8px;
-            border-bottom: 1px solid #3d5510;
-            white-space: nowrap;
-        }
-        tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
-        tbody tr:last-child { border-bottom: none; }
-        tbody td {
-            padding: 8px 8px;
-            color: rgba(255,255,255,0.55);
-            vertical-align: middle;
-        }
-        td.highlight { color: #C8E030; }
-        td.sig a {
-            color: rgba(255,255,255,0.3);
-            text-decoration: none;
-            font-size: 0.68rem;
-            border-bottom: 1px dotted rgba(255,255,255,0.15);
-            transition: color 0.15s;
-        }
-        td.sig a:hover { color: #C8E030; }
-        .no-data {
-            text-align: center;
-            color: rgba(255,255,255,0.2);
-            font-size: 0.75rem;
-            padding: 20px 0;
-            font-style: italic;
-        }
-        .activity-filter-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 14px;
-        }
-        .activity-filter-row input[type="date"] {
-            background: rgba(12,17,6,0.8);
-            border: 1.5px solid #5A7A18;
-            color: rgba(255,255,255,0.7);
-            border-radius: 6px;
-            padding: 5px 10px;
-            font-family: monospace;
-            font-size: 0.72rem;
-            outline: none;
-            transition: border-color 0.2s;
-            color-scheme: dark;
-        }
-        .activity-filter-row input[type="date"]:focus { border-color: #C8E030; }
-        .activity-filter-row label {
-            font-size: 0.65rem;
-            color: rgba(255,255,255,0.3);
-            letter-spacing: 1px;
-        }
-        .btn-filter-apply {
-            background: rgba(200,224,48,0.1);
-            border: 1.5px solid #5A7A18;
-            color: #C8E030;
-            font-family: monospace;
-            font-size: 0.72rem;
-            font-weight: bold;
-            padding: 5px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-        }
-        .btn-filter-apply:hover { border-color: #C8E030; background: rgba(200,224,48,0.18); }
-        .btn-filter-clear {
-            background: transparent;
-            border: 1.5px solid rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.3);
-            font-family: monospace;
-            font-size: 0.72rem;
-            padding: 5px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-filter-clear:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.5); }
-        .btn-load-more {
-            display: block;
-            width: 100%;
-            margin-top: 14px;
-            background: rgba(20,28,12,0.9);
-            border: 1.5px solid #5A7A18;
-            color: #C8E030;
-            font-family: monospace;
-            font-size: 0.75rem;
-            font-weight: bold;
-            padding: 9px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-        }
-        .btn-load-more:hover { border-color: #C8E030; box-shadow: 0 0 8px rgba(200,224,48,0.2); }
+        .activity-table { width: 100%; border-collapse: collapse; min-width: 520px; }
+        .activity-table th { font-size: 0.65rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding: 0 0 11px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        .activity-table td { font-size: 0.8rem; color: var(--text-muted); padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+        .activity-table tr:last-child td { border-bottom: none; }
+        .activity-table td:first-child { color: var(--text); }
+        .td-accent { color: var(--accent); font-weight: 600; }
+        .tx-link { color: var(--text-dim); text-decoration: none; font-size: 0.74rem; transition: color 0.15s; }
+        .tx-link:hover { color: var(--accent); }
+        .no-data { text-align: center; color: var(--text-dim); font-size: 0.78rem; padding: 28px 0; }
+
+        .btn-load-more { display: block; width: 100%; margin-top: 12px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); font-family: 'Inter'; font-size: 0.78rem; font-weight: 500; padding: 10px; cursor: pointer; transition: all 0.15s; }
+        .btn-load-more:hover { border-color: var(--border-hover); color: var(--text); }
         .btn-load-more:disabled { opacity: 0.35; pointer-events: none; }
 
-        /* Referral box */
-        .referral-box {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(12,17,6,0.7);
-            border: 1px solid #5A7A18;
-            border-radius: 8px;
-            padding: 9px 12px;
-            font-family: monospace;
-            margin-top: 12px;
-        }
-        .referral-label {
-            color: #C8E030;
-            font-weight: bold;
-            font-size: 0.75rem;
-            white-space: nowrap;
-        }
-        .referral-link-text {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.72rem;
-            word-break: break-all;
-            flex: 1;
-        }
-        .copy-ref-btn {
-            background: transparent;
-            border: 1px solid #5A7A18;
-            color: #C8E030;
-            border-radius: 5px;
-            padding: 3px 10px;
-            font-family: monospace;
-            font-size: 0.75rem;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-        .copy-ref-btn:hover { border-color: #C8E030; box-shadow: 0 0 8px rgba(200,224,48,0.3); }
-        .referral-count {
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.4);
-            margin-top: 8px;
-            letter-spacing: 0.5px;
-        }
-        .referral-count span { color: #C8E030; font-weight: bold; }
-        .referral-stats {
-            display: flex;
-            gap: 10px;
-            margin-top: 14px;
-        }
-        .referral-stat-box {
-            flex: 1;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid #3d5510;
-            border-radius: 10px;
-            padding: 12px 8px;
-            text-align: center;
-        }
-        .referral-stat-num {
-            font-family: 'NftOpensea', monospace;
-            font-size: 1.1rem;
-            color: #C8E030;
-            margin-bottom: 4px;
-        }
-        .referral-stat-label {
-            font-size: 0.55rem;
-            color: rgba(255,255,255,0.35);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        /* Payout wallet */
-        .payout-display-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(12,17,6,0.7);
-            border: 1px solid #5A7A18;
-            border-radius: 8px;
-            padding: 9px 12px;
-            margin-bottom: 8px;
-        }
-        .payout-addr-text {
-            flex: 1;
-            font-family: monospace;
-            font-size: 0.78rem;
-            color: rgba(255,255,255,0.65);
-            word-break: break-all;
-        }
-        .payout-addr-text.unset {
-            color: rgba(255,255,255,0.25);
-            font-style: italic;
-        }
-        .btn-edit-payout, .btn-copy-payout {
-            background: transparent;
-            border: 1px solid #5A7A18;
-            color: #C8E030;
-            border-radius: 5px;
-            padding: 3px 10px;
-            font-family: monospace;
-            font-size: 0.75rem;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        .btn-edit-payout:hover, .btn-copy-payout:hover { border-color: #C8E030; box-shadow: 0 0 8px rgba(200,224,48,0.3); }
-        .payout-edit-form { display: none; margin-top: 4px; }
-        .payout-edit-row { display: flex; gap: 6px; align-items: center; }
-        .payout-input {
-            flex: 1;
-            background: rgba(255,255,255,0.05);
-            border: 1.5px solid #5A7A18;
-            border-radius: 7px;
-            color: #fff;
-            font-family: monospace;
-            font-size: 0.8rem;
-            padding: 7px 10px;
-            outline: none;
-            transition: border-color 0.2s;
-            min-width: 0;
-        }
-        .payout-input:focus { border-color: #C8E030; }
-        .payout-input::placeholder { color: rgba(255,255,255,0.2); }
-        .btn-save-payout {
-            background: rgba(20,28,12,0.92);
-            border: 1.5px solid #5A7A18;
-            color: #C8E030;
-            font-family: monospace;
-            font-size: 0.75rem;
-            padding: 7px 12px;
-            border-radius: 7px;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .btn-save-payout:hover { border-color: #C8E030; box-shadow: 0 0 8px rgba(200,224,48,0.2); }
-        .btn-save-payout:disabled { opacity: 0.35; cursor: not-allowed; }
-        .btn-cancel-payout {
-            background: transparent;
-            border: 1.5px solid rgba(255,255,255,0.12);
-            color: rgba(255,255,255,0.3);
-            font-family: monospace;
-            font-size: 0.75rem;
-            padding: 7px 10px;
-            border-radius: 7px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-cancel-payout:hover { border-color: #ff8080; color: #ff8080; }
-        .payout-msg { font-size: 0.68rem; margin-top: 6px; min-height: 1em; }
-        .payout-msg.error   { color: #ff8080; }
-        .payout-msg.success { color: #C8E030; }
-        .payout-hint {
-            font-size: 0.65rem;
-            color: rgba(255,255,255,0.25);
-            margin-top: 6px;
-            letter-spacing: 0.5px;
-        }
+        /* ── Share modal ── */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.82); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .modal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px; display: flex; flex-direction: column; align-items: center; gap: 18px; position: relative; box-shadow: 0 8px 40px rgba(0,0,0,0.6); max-width: 90vw; }
+        .modal-close { position: absolute; top: 10px; right: 12px; background: none; border: none; color: var(--text-dim); font-size: 1.1rem; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: color 0.15s; line-height: 1; }
+        .modal-close:hover { color: var(--text); }
+        .share-preview { display: block; border-radius: 10px; border: 1px solid var(--border); max-width: min(640px, 80vw); width: 100%; height: auto; }
+        .modal-actions { display: flex; gap: 10px; }
+        .modal-actions button { background: var(--surface-2); border: 1px solid var(--border-hover); color: var(--text-muted); font-family: 'Inter'; font-size: 0.82rem; font-weight: 500; padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+        .modal-actions button:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
 
-        .loading-text {
-            text-align: center;
-            color: rgba(255,255,255,0.3);
-            font-size: 0.8rem;
-            padding: 40px 0;
-            letter-spacing: 2px;
+        @media (max-width: 900px) {
+            .main { margin-left: 0; padding: 24px 16px 60px; }
+            .sidebar { transform: translateX(-100%); }
         }
-
+        @media (max-width: 700px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .two-col { grid-template-columns: 1fr; }
+            .profile-card { flex-direction: column; }
+            .profile-actions { flex-direction: row; align-items: flex-start; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
 
-        <!-- Loading state -->
-        <div class="card" id="loading-card">
-            <div class="loading-text">LOADING...</div>
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+        <a href="/" class="sidebar-brand">
+            <img src="images/branding/rat-republic-logo.svg" alt="">
+            <span>RAT REPUBLIC</span>
+        </a>
+        <nav class="sidebar-nav">
+            <a href="/">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Home
+            </a>
+            <button class="nav-group-toggle" id="utilities-toggle" onclick="toggleUtilities()">
+                <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
+                Utilities
+                <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="nav-sub" id="utilities-sub">
+                <a href="cleanup">Scavenger</a>
+                <a href="vanity">Vanity Addy</a>
+                <a href="airdrop">Airdrop</a>
+                <a href="generator">PFP Generator</a>
+            </div>
+            <a href="leaderboard">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Crowned Vermins
+            </a>
+            <a href="roadmap">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                Roadmap
+            </a>
+            <div class="sidebar-divider"></div>
+            <a href="profile" class="active">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Profile
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <div class="sidebar-socials">
+                <a href="https://x.com/rat_republicsol" target="_blank" rel="noopener" class="sidebar-social-btn" title="X">
+                    <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="https://github.com/RatRepublic" target="_blank" rel="noopener" class="sidebar-social-btn" title="GitHub">
+                    <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+                <a href="docs" class="sidebar-social-btn" title="Documentation">
+                    <svg viewBox="0 0 24 24"><path d="M12.513 1.097c-.645 0-1.233.34-2.407 1.017L3.675 5.82A7.233 7.233 0 0 0 0 12.063v.236a7.233 7.233 0 0 0 3.667 6.238L7.69 20.86c2.354 1.36 3.531 2.042 4.824 2.042 1.292.001 2.47-.678 4.825-2.038l4.251-2.453c1.177-.68 1.764-1.02 2.087-1.579.323-.56.324-1.24.323-2.6v-2.63a1.04 1.04 0 0 0-1.558-.903l-8.728 5.024c-.587.337-.88.507-1.201.507-.323 0-.616-.168-1.204-.506l-5.904-3.393c-.297-.171-.446-.256-.565-.271a.603.603 0 0 0-.634.368c-.045.111-.045.282-.043.625.002.252 0 .378.025.494.053.259.189.493.387.667.089.077.198.14.416.266l6.315 3.65c.589.34.884.51 1.207.51.324 0 .617-.17 1.206-.509l7.74-4.469c.202-.116.302-.172.377-.13.075.044.075.16.075.392v1.193c0 .34.001.51-.08.649-.08.14-.227.224-.522.394l-6.382 3.685c-1.178.68-1.767 1.02-2.413 1.02-.646 0-1.236-.34-2.412-1.022l-5.97-3.452-.043-.025a4.106 4.106 0 0 1-2.031-3.52V11.7c0-.801.427-1.541 1.12-1.944a1.979 1.979 0 0 1 1.982-.001l4.946 2.858c1.174.679 1.762 1.019 2.407 1.02.645 0 1.233-.34 2.41-1.017l7.482-4.306a1.091 1.091 0 0 0 0-1.891L14.92 2.11c-1.175-.675-1.762-1.013-2.406-1.013Z"/></svg>
+                </a>
+            </div>
+            <div style="height:1px;background:var(--border);margin:2px 2px 8px;"></div>
+            <div id="sidebar-user-widget">
+                <div class="sidebar-guest">
+                    <div class="sidebar-guest-note" style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;margin-bottom:8px;">Loading…</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ── Main ── -->
+    <main class="main">
+
+        <div class="page-heading">
+            <h1>PROFILE</h1>
+            <p>Your stats, referrals, and account settings.</p>
         </div>
 
-        <!-- Profile content -->
-        <div id="profile-content" style="display:none;">
+        <div class="loading-state" id="loading-state">LOADING…</div>
 
-            <!-- Identity card -->
-            <div class="card">
-                <div class="identity-row">
-                    <div class="avatar-wrap" id="avatar-wrap">
-                        <div class="avatar-placeholder" id="avatar-placeholder"></div>
-                        <img id="avatar-img" class="avatar-img" src="images/Default-Avatar.png" alt="avatar">
-                        <label class="avatar-upload-btn" title="Upload photo" for="avatar-file-input">+</label>
-                        <input type="file" id="avatar-file-input" accept="image/jpeg,image/png,image/gif,image/webp">
+        <div id="profile-content" class="hidden">
+
+            <!-- Profile card -->
+            <div class="profile-card">
+                <div class="profile-avatar-wrap">
+                    <div class="profile-avatar">
+                        <img id="avatar-img" src="images/Default-Avatar.png" alt="avatar" onerror="this.src='images/Default-Avatar.png'">
                     </div>
-                    <div class="identity-info">
-                        <div class="username-row">
-                            <div class="identity-username" id="disp-username"></div>
-                            <button class="edit-username-btn" id="edit-username-btn">Edit</button>
+                    <label class="profile-avatar-upload" title="Upload photo" for="avatar-file-input">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </label>
+                    <input type="file" id="avatar-file-input" accept="image/jpeg,image/png,image/gif,image/webp">
+                </div>
+
+                <div class="profile-info">
+                    <div class="profile-name-row">
+                        <div class="profile-name" id="disp-username"></div>
+                        <span class="profile-badge" id="disp-badge"></span>
+                    </div>
+                    <div class="profile-meta">
+                        <span class="profile-meta-item" id="disp-joined">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                            <span></span>
+                        </span>
+                        <span class="profile-meta-item" id="disp-email-meta">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <span></span>
+                        </span>
+                        <span class="profile-meta-item" id="disp-verified" style="display:none;">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Verified
+                        </span>
+                    </div>
+                    <div class="avatar-msg" id="avatar-msg"></div>
+
+                    <div class="username-edit-form" id="username-edit-form">
+                        <div class="username-edit-row">
+                            <input type="text" class="input-inline" id="username-input" maxlength="20" placeholder="New username" autocomplete="off">
+                            <button class="btn-save" id="save-username-btn">Save</button>
+                            <button class="btn-cancel" id="cancel-username-btn">✕</button>
                         </div>
-                        <div class="identity-email" id="disp-email"></div>
-                        <div id="disp-rank" class="identity-rank" style="display:none;"></div>
-                        <div id="avatar-msg" style="font-size:0.65rem;margin-top:6px;min-height:1em;"></div>
+                        <div class="form-msg" id="username-msg"></div>
+                    </div>
+                </div>
 
-                        <!-- Inline edit form -->
-                        <div class="edit-username-form" id="edit-username-form">
-                            <div class="edit-username-row">
-                                <input type="text" class="edit-username-input" id="edit-username-input" maxlength="20" placeholder="New username" autocomplete="off">
-                                <button class="btn-save-username" id="save-username-btn">Save</button>
-                                <button class="btn-cancel-username" id="cancel-username-btn">✕</button>
-                            </div>
-                            <div class="edit-msg" id="edit-msg"></div>
+                <div class="profile-actions">
+                    <button class="btn-outline" id="edit-username-btn">Edit Username</button>
+                    <button class="btn-accent" id="flex-btn">FLEX IT</button>
+                    <button class="btn-outline" id="logout-btn" style="color:rgba(255,100,100,0.6);border-color:rgba(255,100,100,0.2);">Log Out</button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">SOL Recovered</div>
+                    <div class="stat-value accent" id="stat-sol">—</div>
+                    <div class="stat-sub">all time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Accounts Closed</div>
+                    <div class="stat-value" id="stat-accounts">—</div>
+                    <div class="stat-sub">empty token accounts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Leaderboard Rank</div>
+                    <div class="stat-value" id="stat-rank">—</div>
+                    <div class="stat-sub">Crowned Vermins</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Referral Earnings</div>
+                    <div class="stat-value accent" id="stat-ref-sol">—</div>
+                    <div class="stat-sub">SOL earned</div>
+                </div>
+            </div>
+
+            <!-- Two column: Referral + Wallets -->
+            <div class="two-col">
+
+                <div class="section-card" id="referral-card" style="margin-bottom:0;">
+                    <div class="section-title">REFERRAL</div>
+                    <div class="referral-link-row">
+                        <input class="referral-input" id="referral-link-text" type="text" readonly>
+                        <button class="btn-copy" id="copy-ref-btn">Copy</button>
+                    </div>
+                    <div class="referral-stats-grid">
+                        <div class="referral-stat">
+                            <div class="referral-stat-label">Total Referrals</div>
+                            <div class="referral-stat-value" id="ref-count-stat">0</div>
+                        </div>
+                        <div class="referral-stat">
+                            <div class="referral-stat-label">SOL Earned</div>
+                            <div class="referral-stat-value accent" id="ref-sol-earned">0</div>
                         </div>
                     </div>
-                    <div class="identity-actions">
-                        <a href="generator" class="btn-pfp-gen">🐀 PFP Generator</a>
-                        <button class="btn-logout-card" id="logout-btn">Log Out</button>
-                    </div>
                 </div>
+
+                <div class="section-card" style="margin-bottom:0;">
+                    <div class="section-title">
+                        WALLETS
+                        <button class="section-title-action" id="refresh-btn">Refresh</button>
+                    </div>
+
+                    <!-- Primary connected wallet (from wallet breakdown) -->
+                    <div id="connected-wallet-row" class="wallet-row" style="display:none;">
+                        <div class="wallet-info">
+                            <div class="wallet-label">Connected Wallet</div>
+                            <div class="wallet-addr" id="connected-wallet-addr"></div>
+                        </div>
+                    </div>
+
+                    <!-- Payout wallet -->
+                    <div class="wallet-row">
+                        <div class="wallet-info" style="flex:1;min-width:0;">
+                            <div class="wallet-label">Payout Wallet</div>
+                            <div class="wallet-addr unset" id="payout-addr-text">Not set</div>
+                        </div>
+                        <div class="wallet-actions">
+                            <button class="btn-sm" id="copy-payout-btn" style="display:none;" onclick="copyPayout()">Copy</button>
+                            <button class="btn-sm" id="edit-payout-btn">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="payout-edit-form" id="payout-edit-form">
+                        <div class="username-edit-row">
+                            <input type="text" class="input-inline" id="payout-input" maxlength="44" placeholder="Solana wallet address" autocomplete="off">
+                            <button class="btn-save" id="save-payout-btn">Save</button>
+                            <button class="btn-cancel" id="cancel-payout-btn">✕</button>
+                        </div>
+                        <div class="form-msg" id="payout-msg"></div>
+                    </div>
+                    <div class="payout-hint">Referral payouts go to this address. Must be rent-exempt (~0.00089 SOL minimum balance).</div>
+                </div>
+
             </div>
 
-            <!-- Lifetime stats -->
-            <div class="card">
-                <div class="section-label">
-                    Lifetime Stats
-                    <button class="refresh-btn" id="refresh-btn">Refresh</button>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-num" id="disp-sol">—</div>
-                        <div class="stat-label">SOL Recovered</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-num" id="disp-accounts">—</div>
-                        <div class="stat-label">Accounts Closed</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-num" id="disp-txns">—</div>
-                        <div class="stat-label">Transactions</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-num" id="disp-wallets">—</div>
-                        <div class="stat-label">Wallets Used</div>
-                    </div>
-                </div>
-                <div style="display:flex;justify-content:center;margin-top:12px;">
-                    <button class="flex-btn" id="flex-btn">FLEX IT</button>
-                </div>
-            </div>
-
-            <!-- Referral -->
-            <div class="card" id="referral-card">
-                <div class="section-label">Referral</div>
-                <div class="referral-box">
-                    <span class="referral-label">LINK</span>
-                    <span class="referral-link-text" id="referral-link-text">—</span>
-                    <button class="copy-ref-btn" id="copy-ref-btn" onclick="copyReferral()">Copy</button>
-                </div>
-                <div class="referral-count" id="referral-count"></div>
-                <div class="referral-stats">
-                    <div class="referral-stat-box">
-                        <div class="referral-stat-num" id="ref-sol-earned">0 SOL</div>
-                        <div class="referral-stat-label">SOL Earned</div>
-                    </div>
-                    <div class="referral-stat-box">
-                        <div class="referral-stat-num" id="ref-count-stat">0</div>
-                        <div class="referral-stat-label">Referrals</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Payout Wallet -->
-            <div class="card" id="payout-card">
-                <div class="section-label">Payout Wallet</div>
-                <div class="payout-display-row">
-                    <span class="payout-addr-text unset" id="payout-addr-text">Not set</span>
-                    <button class="btn-copy-payout" id="copy-payout-btn" style="display:none;" onclick="copyPayout()">Copy</button>
-                    <button class="btn-edit-payout" id="edit-payout-btn">Edit</button>
-                </div>
-                <div class="payout-hint">SOL rewards will be sent to this address. Must be a valid Solana wallet.<br><em>Payout wallet needs at least ~0.00089 SOL to receive referral payments. This is a Solana network requirement for sending amounts below the rent-exempt minimum — fund it once and all future referral fees will be delivered automatically.</em></div>
-                <div class="payout-edit-form" id="payout-edit-form">
-                    <div class="payout-edit-row">
-                        <input type="text" class="payout-input" id="payout-input" maxlength="44" placeholder="Solana wallet address" autocomplete="off">
-                        <button class="btn-save-payout" id="save-payout-btn">Save</button>
-                        <button class="btn-cancel-payout" id="cancel-payout-btn">✕</button>
-                    </div>
-                    <div class="payout-msg" id="payout-msg"></div>
-                </div>
-            </div>
-
-            <!-- Wallet breakdown -->
-            <div class="card" id="breakdown-card">
-                <div class="section-label">Wallet Breakdown</div>
+            <!-- Wallet breakdown (if multiple wallets) -->
+            <div class="section-card" id="breakdown-card">
+                <div class="section-title">WALLET BREAKDOWN</div>
                 <div id="breakdown-inner"><div class="no-data">No wallets linked yet.</div></div>
             </div>
 
             <!-- Recent activity -->
-            <div class="card">
-                <div class="section-label">Recent Activity</div>
-                <div class="activity-filter-row">
-                    <label>FROM</label>
-                    <input type="date" id="filter-date-from">
-                    <label>TO</label>
-                    <input type="date" id="filter-date-to">
-                    <button class="btn-filter-apply" id="filter-apply-btn">Apply</button>
+            <div class="section-card">
+                <div class="section-title">RECENT ACTIVITY</div>
+                <div class="filter-row">
+                    <span class="filter-label">From</span>
+                    <input type="date" class="input-date" id="filter-date-from">
+                    <span class="filter-label">To</span>
+                    <input type="date" class="input-date" id="filter-date-to">
+                    <button class="btn-filter" id="filter-apply-btn">Apply</button>
                     <button class="btn-filter-clear" id="filter-clear-btn">Clear</button>
                 </div>
                 <div class="activity-wrap">
@@ -828,14 +489,14 @@
             </div>
 
         </div>
-    </div>
+    </main>
 
-    <!-- Stats Share Modal -->
-    <div class="stats-modal-overlay hidden" id="share-modal">
-        <div class="stats-modal-card">
-            <button class="stats-modal-close" id="share-modal-close">✕</button>
-            <img id="share-preview-img" class="stats-share-preview" src="" alt="Stats Card">
-            <div class="stats-modal-actions">
+    <!-- Share modal -->
+    <div class="modal-overlay hidden" id="share-modal">
+        <div class="modal-card">
+            <button class="modal-close" id="share-modal-close">✕</button>
+            <img id="share-preview-img" class="share-preview" src="" alt="Stats Card">
+            <div class="modal-actions">
                 <button id="share-download-btn">Download</button>
                 <button id="share-tweet-btn">Tweet 𝕏</button>
             </div>
@@ -846,23 +507,36 @@
         var token = localStorage.getItem('rr_token');
         if (!token) { window.location.href = 'login.html'; }
 
+        function toggleUtilities() {
+            var toggle = document.getElementById('utilities-toggle');
+            var sub    = document.getElementById('utilities-sub');
+            toggle.classList.toggle('open');
+            sub.classList.toggle('open');
+        }
+
+        // Sidebar widget (own profile page — show after load)
+        function updateSidebarWidget(data) {
+            var widget = document.getElementById('sidebar-user-widget');
+            if (!widget) return;
+            var safeUser = (data.username || '').length > 16 ? data.username.slice(0, 16) + '…' : (data.username || '');
+            widget.innerHTML =
+                '<div class="sidebar-user">' +
+                  '<div class="sidebar-avatar"><img src="' + (data.avatar || 'images/Default-Avatar.png') + '" onerror="this.src=\'images/Default-Avatar.png\'" alt=""></div>' +
+                  '<div style="flex:1;min-width:0;">' +
+                    '<div class="sidebar-username">' + safeUser + '</div>' +
+                    '<div class="sidebar-rank">' + (data.rank_position ? 'Rank #' + data.rank_position : '') + '</div>' +
+                  '</div>' +
+                '</div>';
+        }
 
         function maskEmail(email) {
             var at = email.indexOf('@');
             if (at < 0) return email;
-            var local  = email.slice(0, at);
-            var domain = email.slice(at); // includes @
+            var local = email.slice(0, at), domain = email.slice(at);
             var start, end;
-            if (local.length <= 3) {
-                start = local.slice(0, 1);
-                end   = '';
-            } else if (local.length <= 6) {
-                start = local.slice(0, 2);
-                end   = local.slice(-1);
-            } else {
-                start = local.slice(0, 3);
-                end   = local.slice(-3);
-            }
+            if (local.length <= 3)      { start = local.slice(0, 1); end = ''; }
+            else if (local.length <= 6) { start = local.slice(0, 2); end = local.slice(-1); }
+            else                        { start = local.slice(0, 3); end = local.slice(-3); }
             return start + '******' + end + domain;
         }
 
@@ -880,148 +554,219 @@
         }
 
         function shortSig(sig) {
-            if (!sig) return null;
-            return sig.slice(0, 8) + '...';
+            return sig ? sig.slice(0, 8) + '...' : null;
         }
 
         function formatDateTime(ts) {
             if (!ts) return '—';
-            var d = new Date(ts.replace ? ts.replace(' ', 'T') : ts);
-            return d.toLocaleString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' }).replace(',', '');
+            var d = new Date((ts + '').replace(' ', 'T'));
+            return d.toLocaleString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }).replace(',', '');
         }
 
         var shareSol = '0', shareAccounts = '0', shareTxs = '0', shareRefLink = 'https://ratrepublic.art', shareUsername = '';
         var shareImageUrl = '', shareTweetUrl = '';
 
+        // ── FLEX IT ──
+
+        function buildFlexCard(imgSrc, sol, username, callback) {
+            var img = new Image();
+            img.onload = function () {
+                var w = img.naturalWidth;
+                var h = img.naturalHeight;
+                var canvas = document.createElement('canvas');
+                canvas.width  = w;
+                canvas.height = h;
+                var ctx = canvas.getContext('2d');
+
+                function draw() {
+                    ctx.drawImage(img, 0, 0);
+
+                    var rx  = w * 0.93;
+                    var lw  = Math.round(h * 0.014);
+
+                    ctx.textAlign    = 'right';
+                    ctx.textBaseline = 'alphabetic';
+                    ctx.strokeStyle  = '#281632';
+                    ctx.fillStyle    = '#ffffff';
+                    ctx.lineJoin     = 'round';
+
+                    // SOL amount
+                    ctx.font      = Math.round(h * 0.17) + 'px Arial Black';
+                    ctx.lineWidth = lw * 2;
+                    ctx.strokeText(sol + ' SOL', rx, h * 0.53);
+                    ctx.fillText(sol + ' SOL',   rx, h * 0.53);
+
+                    // "claimed"
+                    ctx.font      = Math.round(h * 0.12) + 'px Arial Black';
+                    ctx.lineWidth = lw * 1.6;
+                    ctx.strokeText('claimed', rx, h * 0.675);
+                    ctx.fillText('claimed',   rx, h * 0.675);
+
+                    // @username
+                    ctx.font      = Math.round(h * 0.075) + 'px Arial Black';
+                    ctx.lineWidth = lw;
+                    ctx.strokeText('@' + username, rx, h * 0.795);
+                    ctx.fillText('@' + username,   rx, h * 0.795);
+
+                    callback(canvas.toDataURL('image/jpeg', 0.93));
+                }
+
+                draw();
+            };
+            img.src = imgSrc;
+        }
+
         document.getElementById('flex-btn').addEventListener('click', function () {
-            var imageUrl = 'https://ratrepublic.art/api/share-image.php?type=stats'
-                + '&sol='      + encodeURIComponent(shareSol)
-                + '&accounts=' + encodeURIComponent(shareAccounts)
-                + '&txs='      + encodeURIComponent(shareTxs)
-                + '&username=' + encodeURIComponent(shareUsername)
-                + '&r='        + Date.now();
-            var text = 'I claimed a total of ' + shareSol + ' $SOL using Scavenger!\n'
-                + 'Join Rat Republic to claim your 10% Discount - Forever!\n'
+            var n        = Math.floor(Math.random() * 10) + 1;
+            var tweetText = 'I claimed a total of ' + shareSol + ' $SOL using Scavenger!\n'
+                + 'Join Rat Republic to claim your 10% Discount — Forever!\n'
                 + shareRefLink;
-            shareImageUrl = imageUrl;
-            shareTweetUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
-            document.getElementById('share-preview-img').src = imageUrl;
+            shareTweetUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText);
+
+            var previewImg = document.getElementById('share-preview-img');
+            previewImg.src = '';
             document.getElementById('share-modal').classList.remove('hidden');
+
+            buildFlexCard('images/flex-' + n + '.jpg', shareSol, shareUsername, function (dataUrl) {
+                shareImageUrl  = dataUrl;
+                previewImg.src = dataUrl;
+            });
         });
 
         document.getElementById('share-modal-close').addEventListener('click', function () {
             document.getElementById('share-modal').classList.add('hidden');
         });
-
         document.getElementById('share-modal').addEventListener('click', function (e) {
             if (e.target === this) this.classList.add('hidden');
         });
-
         document.getElementById('share-download-btn').addEventListener('click', function () {
-            fetch(shareImageUrl)
-                .then(function (r) { return r.blob(); })
-                .then(function (blob) {
-                    var link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = 'rat-republic-stats.png';
-                    link.click();
-                    URL.revokeObjectURL(link.href);
-                });
+            if (!shareImageUrl) return;
+            var link = document.createElement('a');
+            link.href     = shareImageUrl;
+            link.download = 'rat-republic-flex.jpg';
+            link.click();
         });
-
         document.getElementById('share-tweet-btn').addEventListener('click', function () {
             window.open(shareTweetUrl, '_blank');
         });
 
+        // ── RENDER PROFILE ──
         function renderProfile(data) {
             // Identity
-            document.getElementById('disp-username').textContent = data.username || data.email;
-            document.getElementById('disp-email').textContent = maskEmail(data.email);
-            var rankEl = document.getElementById('disp-rank');
-            var rankPos = data.rank_position || 1;
-            rankEl.textContent = 'Rank #' + rankPos + ' [' + getRankTier(rankPos) + ']';
-            rankEl.style.display = 'inline-block';
+            var username = data.username || data.email || '';
+            document.getElementById('disp-username').textContent = username;
+            var rankPos = data.rank_position || 0;
+            if (rankPos) {
+                document.getElementById('disp-badge').textContent = getRankTier(rankPos);
+                document.getElementById('disp-badge').style.display = '';
+            } else {
+                document.getElementById('disp-badge').style.display = 'none';
+            }
+
+            // Meta
+            if (data.created_at) {
+                var d = new Date(data.created_at.replace(' ', 'T'));
+                document.getElementById('disp-joined').querySelector('span').textContent =
+                    'Joined ' + d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            }
+            if (data.email) {
+                document.getElementById('disp-email-meta').querySelector('span').textContent = maskEmail(data.email);
+            }
+            if (data.email_verified) {
+                document.getElementById('disp-verified').style.display = 'flex';
+            }
 
             // Avatar
-            var img = document.getElementById('avatar-img');
-            img.src = data.avatar ? data.avatar + '?t=' + Date.now() : 'images/Default-Avatar.png';
-            document.getElementById('avatar-placeholder').style.display = 'none';
+            if (data.avatar) {
+                document.getElementById('avatar-img').src = data.avatar + '?t=' + Date.now();
+            }
 
             // Stats
-            var s = data.stats;
-            document.getElementById('disp-sol').textContent =
-                s.total_sol ? parseFloat(s.total_sol).toFixed(4) + ' SOL' : '0 SOL';
-            document.getElementById('disp-accounts').textContent = s.total_accounts || '0';
-            document.getElementById('disp-txns').textContent     = s.total_reclaims  || '0';
-            document.getElementById('disp-wallets').textContent  = s.wallets_used    || '0';
+            var s = data.stats || {};
+            document.getElementById('stat-sol').textContent      = s.total_sol      ? parseFloat(s.total_sol).toFixed(4)      : '0';
+            document.getElementById('stat-accounts').textContent = s.total_accounts || '0';
+            document.getElementById('stat-rank').textContent     = rankPos ? '#' + rankPos : '—';
+            document.getElementById('stat-ref-sol').textContent  = parseFloat(data.referral_sol_earned || 0).toFixed(4);
 
-            shareSol      = s.total_sol ? parseFloat(s.total_sol).toFixed(4) : '0';
+            shareSol      = s.total_sol      ? parseFloat(s.total_sol).toFixed(4) : '0';
             shareAccounts = String(s.total_accounts || '0');
             shareTxs      = String(s.total_reclaims  || '0');
             shareRefLink  = data.referral_link || 'https://ratrepublic.art';
-            shareUsername = data.username || '';
+            shareUsername = username;
+
+            // Referral
+            if (data.referral_link) {
+                document.getElementById('referral-link-text').value = data.referral_link;
+                document.getElementById('ref-count-stat').textContent = data.referral_count || '0';
+                document.getElementById('ref-sol-earned').textContent = parseFloat(data.referral_sol_earned || 0).toFixed(4) + ' SOL';
+            } else {
+                document.getElementById('referral-card').style.display = 'none';
+            }
+
+            // Connected wallet (first from breakdown)
+            if (data.wallet_breakdown && data.wallet_breakdown.length > 0) {
+                var primary = data.wallet_breakdown[0];
+                document.getElementById('connected-wallet-addr').textContent = shortAddr(primary.wallet_address);
+                document.getElementById('connected-wallet-row').style.display = 'flex';
+            }
 
             // Wallet breakdown
             var bdEl = document.getElementById('breakdown-inner');
             if (data.wallet_breakdown && data.wallet_breakdown.length > 0) {
                 bdEl.innerHTML = data.wallet_breakdown.map(function (w) {
-                    return '<div class="breakdown-row">' +
+                    return '<div class="breakdown-item">' +
                         '<span class="breakdown-addr">' + shortAddr(w.wallet_address) + '</span>' +
                         '<span class="breakdown-stats">' +
-                            '<span>' + w.accounts + '</span> closed &nbsp;|&nbsp; ' +
+                            '<span>' + w.accounts + '</span> accts &nbsp;·&nbsp; ' +
                             '<span>' + parseFloat(w.sol).toFixed(4) + ' SOL</span>' +
-                            ' &nbsp;|&nbsp; ' + w.tx_count + ' tx' + (w.tx_count != 1 ? 's' : '') +
+                            ' &nbsp;·&nbsp; ' + w.tx_count + ' tx' + (w.tx_count != 1 ? 's' : '') +
                         '</span>' +
                         '</div>';
                 }).join('');
             } else {
-                bdEl.innerHTML = '<div class="no-data">No wallets linked yet. Do a reclaim while logged in to auto-link your wallet.</div>';
+                bdEl.innerHTML = '<div class="no-data">No wallets linked yet. Run a reclaim while logged in to auto-link your wallet.</div>';
             }
 
             // Payout wallet
             renderPayoutWallet(data.payout_wallet || null);
 
-            // Referral
-            if (data.referral_link) {
-                document.getElementById('referral-link-text').textContent = data.referral_link;
-                var count = data.referral_count || 0;
-                document.getElementById('referral-count').innerHTML =
-                    'You have referred <span>' + count + '</span> verified user' + (count !== 1 ? 's' : '') + '.';
-                document.getElementById('ref-sol-earned').textContent =
-                    parseFloat(data.referral_sol_earned || 0).toFixed(4) + ' SOL';
-                document.getElementById('ref-count-stat').textContent = count;
-            } else {
-                document.getElementById('referral-card').style.display = 'none';
-            }
+            // Sidebar widget
+            updateSidebarWidget(data);
 
-            // Recent activity — initial page from me.php
-            var activityOffset   = 0;
-            var activityHasMore  = data.history && data.history.length === 25;
-            var activityFiltered = false;
+            // Activity
+            setupActivity(data);
+
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('profile-content').classList.remove('hidden');
+        }
+
+        // ── ACTIVITY ──
+        function setupActivity(data) {
+            var activityOffset  = 0;
+            var activityHasMore = data.history && data.history.length === 25;
+            var hEl  = document.getElementById('history-inner');
+            var lmBtn = document.getElementById('load-more-btn');
 
             function rowsHtml(rows) {
                 return rows.map(function (h) {
                     var sigHtml = h.tx_signature
-                        ? '<a href="https://solscan.io/tx/' + h.tx_signature + '" target="_blank" rel="noopener" title="' + h.tx_signature + '">' + shortSig(h.tx_signature) + '</a>'
-                        : '<span style="color:rgba(255,255,255,0.15)">—</span>';
+                        ? '<a class="tx-link" href="https://solscan.io/tx/' + h.tx_signature + '" target="_blank" rel="noopener">' + shortSig(h.tx_signature) + ' ↗</a>'
+                        : '<span style="color:var(--text-dim)">—</span>';
                     return '<tr>' +
                         '<td>' + formatDateTime(h.claimed_at) + '</td>' +
                         '<td>' + shortAddr(h.wallet_address) + '</td>' +
-                        '<td class="highlight">' + h.accounts_closed + ' closed</td>' +
-                        '<td class="highlight">' + parseFloat(h.sol_amount).toFixed(4) + ' SOL</td>' +
-                        '<td class="sig">' + sigHtml + '</td>' +
+                        '<td>' + h.accounts_closed + '</td>' +
+                        '<td class="td-accent">+' + parseFloat(h.sol_amount).toFixed(4) + ' SOL</td>' +
+                        '<td>' + sigHtml + '</td>' +
                         '</tr>';
                 }).join('');
             }
 
             function tableWrap(bodyHtml) {
-                return '<table><thead><tr>' +
-                    '<th>DATE / TIME</th><th>WALLET</th><th>CLOSED</th><th>SOL</th><th>TX</th>' +
-                    '</tr></thead><tbody>' + bodyHtml + '</tbody></table>';
+                return '<table class="activity-table">' +
+                    '<thead><tr><th>Date</th><th>Wallet</th><th>Closed</th><th>SOL</th><th>TX</th></tr></thead>' +
+                    '<tbody>' + bodyHtml + '</tbody></table>';
             }
-
-            var hEl      = document.getElementById('history-inner');
-            var lmBtn    = document.getElementById('load-more-btn');
 
             function renderInitial(rows, hasMore) {
                 activityOffset  = rows.length;
@@ -1054,141 +799,99 @@
                     activityOffset  += d.rows.length;
                     activityHasMore  = d.has_more;
                     lmBtn.style.display = d.has_more ? 'block' : 'none';
-                } catch(e) {
+                } catch (e) {
                     if (replace) hEl.innerHTML = '<div class="no-data">Failed to load: ' + e.message + '</div>';
                 }
                 lmBtn.disabled = false;
             }
 
-            lmBtn.addEventListener('click', function () {
-                fetchActivity(activityOffset, false);
-            });
-
-            document.getElementById('filter-apply-btn').addEventListener('click', function () {
-                activityFiltered = true;
-                fetchActivity(0, true);
-            });
-
+            lmBtn.addEventListener('click', function () { fetchActivity(activityOffset, false); });
+            document.getElementById('filter-apply-btn').addEventListener('click', function () { fetchActivity(0, true); });
             document.getElementById('filter-clear-btn').addEventListener('click', function () {
                 document.getElementById('filter-date-from').value = '';
                 document.getElementById('filter-date-to').value   = '';
-                activityFiltered = false;
                 renderInitial(data.history || [], data.history && data.history.length === 25);
             });
-
-            document.getElementById('loading-card').style.display = 'none';
-            document.getElementById('profile-content').style.display = 'block';
         }
 
+        // ── LOAD PROFILE ──
         async function loadProfile() {
             try {
-                var resp = await fetch('api/me.php', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
+                var resp = await fetch('api/me.php', { headers: { 'Authorization': 'Bearer ' + token } });
                 if (resp.status === 401) {
                     localStorage.removeItem('rr_token');
                     localStorage.removeItem('rr_username');
-                    window.location.href = 'login.html';
+                    localStorage.removeItem('rr_avatar');
+                    window.location.href = '/';
                     return;
                 }
                 var data = await resp.json();
                 if (!resp.ok) throw new Error(data.error || 'Failed to load');
                 renderProfile(data);
             } catch (e) {
-                document.querySelector('#loading-card .loading-text').textContent = 'Failed to load profile. Please try again.';
+                document.getElementById('loading-state').textContent = 'Failed to load profile. Please try again.';
             }
         }
 
-        // Logout
+        // ── LOGOUT ──
         document.getElementById('logout-btn').addEventListener('click', async function () {
-            try {
-                await fetch('api/auth.php?action=logout', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-            } catch (e) {}
+            try { await fetch('api/auth.php?action=logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } }); } catch (e) {}
             localStorage.removeItem('rr_token');
             localStorage.removeItem('rr_username');
-            window.location.href = 'login.html';
+            localStorage.removeItem('rr_avatar');
+            window.location.href = '/';
         });
 
-        // Edit username
+        // ── EDIT USERNAME ──
         document.getElementById('edit-username-btn').addEventListener('click', function () {
-            var form  = document.getElementById('edit-username-form');
-            var input = document.getElementById('edit-username-input');
+            var form = document.getElementById('username-edit-form');
+            var input = document.getElementById('username-input');
             form.style.display = 'block';
             input.value = document.getElementById('disp-username').textContent;
-            input.focus();
-            input.select();
-            this.style.display = 'none';
+            input.focus(); input.select();
         });
-
         document.getElementById('cancel-username-btn').addEventListener('click', function () {
-            document.getElementById('edit-username-form').style.display = 'none';
-            document.getElementById('edit-username-btn').style.display = '';
-            document.getElementById('edit-msg').textContent = '';
-            document.getElementById('edit-msg').className = 'edit-msg';
+            document.getElementById('username-edit-form').style.display = 'none';
+            document.getElementById('username-msg').textContent = '';
+            document.getElementById('username-msg').className = 'form-msg';
         });
-
-        document.getElementById('edit-username-input').addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') document.getElementById('save-username-btn').click();
+        document.getElementById('username-input').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter')  document.getElementById('save-username-btn').click();
             if (e.key === 'Escape') document.getElementById('cancel-username-btn').click();
         });
-
         document.getElementById('save-username-btn').addEventListener('click', async function () {
-            var input   = document.getElementById('edit-username-input');
-            var editMsg = document.getElementById('edit-msg');
+            var input  = document.getElementById('username-input');
+            var msgEl  = document.getElementById('username-msg');
             var newName = input.value.trim();
-
-            editMsg.className = 'edit-msg';
-            editMsg.textContent = '';
-
-            if (!newName) {
-                editMsg.className = 'edit-msg error';
-                editMsg.textContent = 'Username cannot be empty.';
-                return;
-            }
-
-            this.disabled = true;
-            this.textContent = 'Saving...';
-
+            msgEl.className = 'form-msg'; msgEl.textContent = '';
+            if (!newName) { msgEl.className = 'form-msg err'; msgEl.textContent = 'Username cannot be empty.'; return; }
+            this.disabled = true; this.textContent = 'Saving…';
             try {
                 var resp = await fetch('api/auth.php?action=update-profile', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                     body: JSON.stringify({ username: newName })
                 });
                 var data = await resp.json();
-
                 if (data.ok) {
                     document.getElementById('disp-username').textContent = data.username;
                     localStorage.setItem('rr_username', data.username);
-                    document.getElementById('edit-username-form').style.display = 'none';
-                    document.getElementById('edit-username-btn').style.display = '';
-                    editMsg.textContent = '';
+                    document.getElementById('username-edit-form').style.display = 'none';
+                    msgEl.textContent = '';
                 } else {
-                    editMsg.className = 'edit-msg error';
-                    editMsg.textContent = data.error || 'Could not update username.';
+                    msgEl.className = 'form-msg err';
+                    msgEl.textContent = data.error || 'Could not update username.';
                 }
-            } catch (e) {
-                editMsg.className = 'edit-msg error';
-                editMsg.textContent = 'Network error. Try again.';
-            }
-
-            this.disabled = false;
-            this.textContent = 'Save';
+            } catch (e) { msgEl.className = 'form-msg err'; msgEl.textContent = 'Network error. Try again.'; }
+            this.disabled = false; this.textContent = 'Save';
         });
 
-        // Payout wallet
+        // ── PAYOUT WALLET ──
         var currentPayoutWallet = '';
-
         function renderPayoutWallet(wallet) {
             currentPayoutWallet = wallet || '';
-            var addrEl   = document.getElementById('payout-addr-text');
-            var copyBtn  = document.getElementById('copy-payout-btn');
+            var addrEl  = document.getElementById('payout-addr-text');
+            var copyBtn = document.getElementById('copy-payout-btn');
             if (wallet) {
                 addrEl.textContent = wallet;
                 addrEl.classList.remove('unset');
@@ -1199,50 +902,37 @@
                 copyBtn.style.display = 'none';
             }
         }
-
         function copyPayout() {
             var btn = document.getElementById('copy-payout-btn');
             navigator.clipboard.writeText(currentPayoutWallet).then(function () {
-                btn.textContent = 'Copied!';
-                setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
+                btn.textContent = 'Copied!'; setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
             }).catch(function () {
                 var ta = document.createElement('textarea');
-                ta.value = currentPayoutWallet;
-                ta.style.position = 'fixed'; ta.style.opacity = '0';
-                document.body.appendChild(ta); ta.select();
-                document.execCommand('copy'); document.body.removeChild(ta);
-                btn.textContent = 'Copied!';
-                setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
+                ta.value = currentPayoutWallet; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+                btn.textContent = 'Copied!'; setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
             });
         }
-
         document.getElementById('edit-payout-btn').addEventListener('click', function () {
-            var form  = document.getElementById('payout-edit-form');
+            var form = document.getElementById('payout-edit-form');
             var input = document.getElementById('payout-input');
-            form.style.display = 'block';
-            input.value = currentPayoutWallet;
-            input.focus(); input.select();
+            form.style.display = 'block'; input.value = currentPayoutWallet; input.focus(); input.select();
         });
-
         document.getElementById('cancel-payout-btn').addEventListener('click', function () {
             document.getElementById('payout-edit-form').style.display = 'none';
             document.getElementById('payout-msg').textContent = '';
-            document.getElementById('payout-msg').className = 'payout-msg';
+            document.getElementById('payout-msg').className = 'form-msg';
         });
-
         document.getElementById('payout-input').addEventListener('keydown', function (e) {
             if (e.key === 'Enter')  document.getElementById('save-payout-btn').click();
             if (e.key === 'Escape') document.getElementById('cancel-payout-btn').click();
         });
-
         document.getElementById('save-payout-btn').addEventListener('click', async function () {
-            var input    = document.getElementById('payout-input');
-            var msgEl    = document.getElementById('payout-msg');
-            var wallet   = input.value.trim();
-
-            msgEl.className = 'payout-msg'; msgEl.textContent = '';
-            this.disabled = true; this.textContent = 'Saving...';
-
+            var input = document.getElementById('payout-input');
+            var msgEl = document.getElementById('payout-msg');
+            var wallet = input.value.trim();
+            msgEl.className = 'form-msg'; msgEl.textContent = '';
+            this.disabled = true; this.textContent = 'Saving…';
             try {
                 var resp = await fetch('api/auth.php?action=update-payout-wallet', {
                     method: 'POST',
@@ -1253,63 +943,49 @@
                 if (data.ok) {
                     renderPayoutWallet(data.payout_wallet);
                     document.getElementById('payout-edit-form').style.display = 'none';
-                    msgEl.textContent = '';
                 } else {
-                    msgEl.className = 'payout-msg error';
+                    msgEl.className = 'form-msg err';
                     msgEl.textContent = data.error || 'Could not save wallet.';
                 }
-            } catch (e) {
-                msgEl.className = 'payout-msg error';
-                msgEl.textContent = 'Network error. Try again.';
-            }
-
+            } catch (e) { msgEl.className = 'form-msg err'; msgEl.textContent = 'Network error. Try again.'; }
             this.disabled = false; this.textContent = 'Save';
         });
 
-        // Copy referral link
-        function copyReferral() {
-            var text = document.getElementById('referral-link-text').textContent;
-            var btn  = document.getElementById('copy-ref-btn');
+        // ── COPY REFERRAL ──
+        document.getElementById('copy-ref-btn').addEventListener('click', function () {
+            var text = document.getElementById('referral-link-text').value;
+            var btn  = this;
             navigator.clipboard.writeText(text).then(function () {
-                btn.textContent = 'Copied!';
-                setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
+                btn.textContent = 'Copied!'; setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
             }).catch(function () {
-                // Fallback for older browsers
                 var ta = document.createElement('textarea');
-                ta.value = text;
-                ta.style.position = 'fixed';
-                ta.style.opacity  = '0';
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                btn.textContent = 'Copied!';
-                setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
+                ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+                btn.textContent = 'Copied!'; setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
             });
-        }
+        });
 
-        // Refresh
+        // ── REFRESH ──
         document.getElementById('refresh-btn').addEventListener('click', function () {
-            document.getElementById('profile-content').style.display = 'none';
-            document.getElementById('loading-card').style.display = 'block';
-            document.querySelector('#loading-card .loading-text').textContent = 'LOADING...';
+            document.getElementById('profile-content').classList.add('hidden');
+            document.getElementById('loading-state').classList.remove('hidden');
+            document.getElementById('loading-state').textContent = 'LOADING…';
             loadProfile();
         });
 
-        // Avatar upload — limits: 500 KB, 500×500 px
+        // ── AVATAR UPLOAD ──
         var AVATAR_MAX_BYTES = 500 * 1024;
         var AVATAR_MAX_PX    = 500;
 
         function setAvatarMsg(text, isError) {
             var el = document.getElementById('avatar-msg');
             el.textContent = text;
-            el.style.color = isError ? '#ff8080' : '#C8E030';
+            el.className   = 'avatar-msg ' + (isError ? 'err' : (text ? 'ok' : ''));
         }
 
         function doAvatarUpload(file) {
-            var wrap = document.getElementById('avatar-wrap');
-            wrap.classList.add('avatar-uploading');
-            setAvatarMsg('Uploading...', false);
+            var avatarEl = document.getElementById('profile-avatar-wrap') || document.querySelector('.profile-avatar-wrap');
+            setAvatarMsg('Uploading…', false);
             var formData = new FormData();
             formData.append('avatar', file);
             fetch('api/upload-avatar.php', {
@@ -1320,53 +996,36 @@
             .then(function (resp) { return resp.json().then(function (d) { return { ok: resp.ok, d: d }; }); })
             .then(function (r) {
                 if (r.d.url) {
-                    var img = document.getElementById('avatar-img');
-                    img.src = r.d.url;
-                    img.style.display = 'block';
-                    document.getElementById('avatar-placeholder').style.display = 'none';
+                    document.getElementById('avatar-img').src = r.d.url;
                     localStorage.setItem('rr_avatar', r.d.url);
                     setAvatarMsg('Saved!', false);
-                    setTimeout(function () { setAvatarMsg(''); }, 3000);
+                    setTimeout(function () { setAvatarMsg('', false); }, 3000);
                 } else {
                     setAvatarMsg(r.d.error || 'Upload failed.', true);
                 }
             })
-            .catch(function () { setAvatarMsg('Network error. Try again.', true); })
-            .finally(function () { wrap.classList.remove('avatar-uploading'); });
+            .catch(function () { setAvatarMsg('Network error. Try again.', true); });
         }
 
         document.getElementById('avatar-file-input').addEventListener('change', function () {
             var file = this.files[0];
             this.value = '';
             if (!file) return;
-
-            // Instant file-size check
-            if (file.size > AVATAR_MAX_BYTES) {
-                setAvatarMsg('Too large — max 500 KB. Please resize and try again.', true);
-                return;
-            }
-
-            // Instant dimension check via in-browser Image decode
+            if (file.size > AVATAR_MAX_BYTES) { setAvatarMsg('Too large — max 500 KB.', true); return; }
             var blobUrl = URL.createObjectURL(file);
             var checker = new Image();
             checker.onload = function () {
                 URL.revokeObjectURL(blobUrl);
                 if (checker.width > AVATAR_MAX_PX || checker.height > AVATAR_MAX_PX) {
-                    setAvatarMsg('Too large — max ' + AVATAR_MAX_PX + '×' + AVATAR_MAX_PX + ' px. Please crop and try again.', true);
-                    return;
+                    setAvatarMsg('Too large — max ' + AVATAR_MAX_PX + '×' + AVATAR_MAX_PX + ' px.', true); return;
                 }
                 doAvatarUpload(file);
             };
-            checker.onerror = function () {
-                URL.revokeObjectURL(blobUrl);
-                setAvatarMsg('Could not read image. Try a different file.', true);
-            };
+            checker.onerror = function () { URL.revokeObjectURL(blobUrl); setAvatarMsg('Could not read image.', true); };
             checker.src = blobUrl;
         });
 
         loadProfile();
     </script>
-    <script src="js/header.js"></script>
-    <script src="js/footer.js"></script>
 </body>
 </html>

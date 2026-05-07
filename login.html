@@ -4,250 +4,107 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rat Republic — Login</title>
-    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: #1a1f0f;
-            background-image: url('images/Background.png');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            color: #fff;
-            font-family: monospace, 'Courier New', sans-serif;
-            min-height: 100vh;
-            padding: 30px 20px 60px;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
+        @font-face { font-family: 'Inter'; src: url('fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype'); font-weight: 100 900; font-style: normal; }
+        @font-face { font-family: 'NftOpensea'; src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype'); }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #080808; --surface: #111111; --surface-2: #161616;
+            --border: rgba(255,255,255,0.07); --border-hover: rgba(255,255,255,0.15);
+            --text: #ffffff; --text-muted: rgba(255,255,255,0.45); --text-dim: rgba(255,255,255,0.22);
+            --accent: #C8E030; --accent-dim: rgba(200,224,48,0.1);
         }
-        .container { width: 100%; max-width: 420px; }
-        @font-face {
-            font-family: 'NftOpensea';
-            src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
-        }
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 24px;
-            background-color: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            color: #C8E030;
-            text-decoration: none;
-            font-weight: bold;
-            padding: 8px 20px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            font-size: 0.85rem;
-        }
-        .back-btn:hover { border-color: #C8E030; box-shadow: 0 0 10px rgba(200,224,48,0.3); }
-        .main-card {
-            background: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            border-radius: 16px;
-            padding: 32px 28px;
-        }
-        .page-title {
-            text-align: center;
-            font-family: 'NftOpensea', monospace;
-            color: #fff;
-            font-size: 1.8rem;
-            letter-spacing: 3px;
-            margin-bottom: 6px;
-        }
-        .page-sub {
-            text-align: center;
-            color: rgba(255,255,255,0.35);
-            font-size: 0.68rem;
-            letter-spacing: 2px;
-            margin-bottom: 28px;
-        }
-        .field { margin-bottom: 18px; }
-        .field label {
-            display: block;
-            font-size: 0.65rem;
-            color: rgba(255,255,255,0.4);
-            letter-spacing: 2px;
-            margin-bottom: 6px;
-        }
-        .field input {
-            width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 1.5px solid #5A7A18;
-            border-radius: 8px;
-            color: #fff;
-            font-family: monospace;
-            font-size: 0.9rem;
-            padding: 11px 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .field input:focus { border-color: #C8E030; }
-        .field input::placeholder { color: rgba(255,255,255,0.2); }
-        .btn-submit {
-            width: 100%;
-            background-color: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            color: #C8E030;
-            font-weight: bold;
-            font-family: 'NftOpensea', monospace;
-            font-size: 0.95rem;
-            padding: 13px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-            margin-top: 4px;
-        }
-        .btn-submit:hover {
-            border-color: #C8E030;
-            box-shadow: 0 0 14px rgba(200,224,48,0.35);
-            background-color: rgba(40,60,15,0.98);
-        }
-        .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
-        .msg {
-            margin-top: 14px;
-            font-size: 0.78rem;
-            text-align: center;
-            min-height: 1.2em;
-        }
+        html, body { min-height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+        body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 20px 60px; min-height: 100vh; }
+
+        .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 32px; }
+        .brand img { width: 28px; height: 28px; object-fit: contain; }
+        .brand span { font-family: 'NftOpensea'; font-size: 0.88rem; letter-spacing: 0.12em; color: var(--text); }
+
+        .auth-card { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px 32px; }
+
+        .card-title { font-family: 'NftOpensea'; font-size: 1.5rem; letter-spacing: 0.08em; color: var(--text); margin-bottom: 4px; text-align: center; }
+        .card-sub { font-size: 0.72rem; color: var(--text-dim); text-align: center; letter-spacing: 0.06em; margin-bottom: 28px; }
+
+        .field { margin-bottom: 16px; }
+        .field label { display: block; font-size: 0.62rem; font-weight: 600; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 7px; }
+        .field input { width: 100%; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.9rem; padding: 11px 14px; outline: none; transition: border-color 0.15s; }
+        .field input:focus { border-color: rgba(200,224,48,0.4); }
+        .field input::placeholder { color: var(--text-dim); }
+
+        .btn-submit { width: 100%; font-family: 'NftOpensea'; font-size: 0.88rem; letter-spacing: 0.08em; color: #0a0a0a; background: var(--accent); border: none; border-radius: 10px; padding: 14px; cursor: pointer; transition: opacity 0.15s; margin-top: 6px; }
+        .btn-submit:hover { opacity: 0.9; }
+        .btn-submit:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        .msg { margin-top: 12px; font-size: 0.78rem; text-align: center; min-height: 1.2em; }
         .msg.error { color: #ff8080; }
-        .msg.success { color: #C8E030; }
-        .register-link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.74rem;
-            color: rgba(255,255,255,0.35);
-        }
-        .register-link a { color: #C8E030; text-decoration: none; }
-        .register-link a:hover { text-decoration: underline; }
-        .forgot-link {
-            text-align: right;
-            margin-top: -10px;
-            margin-bottom: 16px;
-            font-size: 0.7rem;
-        }
-        .forgot-link a {
-            color: rgba(255,255,255,0.3);
-            text-decoration: none;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .forgot-link a:hover { color: #C8E030; }
-        .forgot-panel {
-            display: none;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid #3d5510;
-            border-radius: 10px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        .forgot-panel label {
-            display: block;
-            font-size: 0.62rem;
-            color: rgba(255,255,255,0.4);
-            letter-spacing: 2px;
-            margin-bottom: 6px;
-        }
-        .forgot-panel input {
-            width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 1.5px solid #5A7A18;
-            border-radius: 8px;
-            color: #fff;
-            font-family: monospace;
-            font-size: 0.88rem;
-            padding: 10px 12px;
-            outline: none;
-            transition: border-color 0.2s;
-            margin-bottom: 10px;
-        }
-        .forgot-panel input:focus { border-color: #C8E030; }
-        .forgot-panel input::placeholder { color: rgba(255,255,255,0.2); }
-        .btn-forgot-send {
-            width: 100%;
-            background: transparent;
-            border: 1.5px solid #5A7A18;
-            color: #C8E030;
-            font-family: monospace;
-            font-size: 0.82rem;
-            padding: 9px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-        }
-        .btn-forgot-send:hover { border-color: #C8E030; box-shadow: 0 0 10px rgba(200,224,48,0.2); }
+        .msg.success { color: var(--accent); }
+
+        .footer-link { text-align: center; margin-top: 20px; font-size: 0.74rem; color: var(--text-dim); }
+        .footer-link a { color: var(--accent); text-decoration: none; }
+        .footer-link a:hover { text-decoration: underline; }
+
+        .forgot-link { text-align: right; margin-top: -8px; margin-bottom: 14px; font-size: 0.7rem; }
+        .forgot-link a { color: var(--text-dim); text-decoration: none; cursor: pointer; transition: color 0.15s; }
+        .forgot-link a:hover { color: var(--accent); }
+
+        .forgot-panel { display: none; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+        .forgot-panel label { display: block; font-size: 0.62rem; font-weight: 600; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+        .forgot-panel input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.85rem; padding: 9px 12px; outline: none; transition: border-color 0.15s; margin-bottom: 10px; }
+        .forgot-panel input:focus { border-color: rgba(200,224,48,0.4); }
+        .forgot-panel input::placeholder { color: var(--text-dim); }
+        .btn-forgot-send { width: 100%; font-family: 'Inter'; font-size: 0.8rem; font-weight: 600; padding: 9px; border-radius: 8px; border: 1px solid rgba(200,224,48,0.25); background: var(--accent-dim); color: var(--accent); cursor: pointer; transition: all 0.15s; }
+        .btn-forgot-send:hover { background: rgba(200,224,48,0.18); }
         .btn-forgot-send:disabled { opacity: 0.35; cursor: not-allowed; }
-        .resend-bar {
-            display: none;
-            margin-top: 12px;
-            padding: 12px 14px;
-            background: rgba(255,200,0,0.06);
-            border: 1px solid rgba(255,200,0,0.2);
-            border-radius: 8px;
-            font-size: 0.74rem;
-            color: rgba(255,255,255,0.5);
-            text-align: center;
-            line-height: 1.6;
-        }
-        .btn-resend {
-            background: transparent;
-            border: 1.5px solid #5A7A18;
-            color: rgba(255,255,255,0.5);
-            font-family: monospace;
-            font-size: 0.72rem;
-            padding: 5px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 8px;
-        }
-        .btn-resend:hover { border-color: #C8E030; color: #C8E030; }
+
+        .resend-bar { display: none; margin-top: 12px; padding: 12px 14px; background: rgba(255,200,0,0.04); border: 1px solid rgba(255,200,0,0.14); border-radius: 8px; font-size: 0.74rem; color: var(--text-muted); text-align: center; line-height: 1.6; }
+        .btn-resend { background: transparent; border: 1px solid var(--border-hover); color: var(--text-dim); font-family: 'Inter'; font-size: 0.72rem; padding: 5px 14px; border-radius: 6px; cursor: pointer; transition: all 0.15s; margin-top: 8px; }
+        .btn-resend:hover { border-color: var(--accent); color: var(--accent); }
         .btn-resend:disabled { opacity: 0.3; cursor: not-allowed; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="tools" class="back-btn">← Back to Utilities</a>
-        <div class="main-card">
-            <div class="page-title">LOGIN</div>
-            <div class="page-sub">WELCOME BACK, RAT</div>
+    <a href="/" class="brand">
+        <img src="images/branding/rat-republic-logo.svg" alt="">
+        <span>RAT REPUBLIC</span>
+    </a>
 
-            <div class="field">
-                <label>EMAIL OR USERNAME</label>
-                <input type="text" id="email" placeholder="you@example.com or RatKing" autocomplete="username">
-            </div>
-            <div class="field">
-                <label>PASSWORD</label>
-                <input type="password" id="password" placeholder="Your password" autocomplete="current-password">
-            </div>
+    <div class="auth-card">
+        <div class="card-title">LOGIN</div>
+        <div class="card-sub">WELCOME BACK, RAT</div>
 
-            <div class="forgot-link"><a id="forgot-toggle">Forgot password?</a></div>
-
-            <!-- Forgot password panel -->
-            <div class="forgot-panel" id="forgot-panel">
-                <label>ENTER YOUR EMAIL</label>
-                <input type="email" id="forgot-email" placeholder="you@example.com" autocomplete="email">
-                <button class="btn-forgot-send" id="forgot-send-btn">Send Reset Link</button>
-                <div class="msg" id="forgot-msg" style="margin-top:8px;"></div>
-            </div>
-
-            <button class="btn-submit" id="login-btn">Log In</button>
-            <div class="msg" id="msg"></div>
-
-            <!-- Shown when account exists but email not verified -->
-            <div class="resend-bar" id="resend-bar">
-                Your email address hasn't been verified yet.<br>
-                <button class="btn-resend" id="resend-btn">Resend Verification Email</button>
-                <div class="msg" id="resend-msg" style="margin-top:6px;font-size:0.72rem;"></div>
-            </div>
-
-            <div class="register-link">Don't have an account? <a href="register">Register</a></div>
+        <div class="field">
+            <label>Email or Username</label>
+            <input type="text" id="email" placeholder="you@example.com or RatKing" autocomplete="username">
         </div>
+        <div class="field">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Your password" autocomplete="current-password">
+        </div>
+
+        <div class="forgot-link"><a id="forgot-toggle">Forgot password?</a></div>
+
+        <div class="forgot-panel" id="forgot-panel">
+            <label>Enter your email</label>
+            <input type="email" id="forgot-email" placeholder="you@example.com" autocomplete="email">
+            <button class="btn-forgot-send" id="forgot-send-btn">Send Reset Link</button>
+            <div class="msg" id="forgot-msg" style="margin-top:8px;"></div>
+        </div>
+
+        <button class="btn-submit" id="login-btn">Log In</button>
+        <div class="msg" id="msg"></div>
+
+        <div class="resend-bar" id="resend-bar">
+            Your email address hasn't been verified yet.<br>
+            <button class="btn-resend" id="resend-btn">Resend Verification Email</button>
+            <div class="msg" id="resend-msg" style="margin-top:6px;font-size:0.72rem;"></div>
+        </div>
+
+        <div class="footer-link">Don't have an account? <a href="register">Register</a></div>
     </div>
 
     <script>
-        // If already logged in, skip to profile
         if (localStorage.getItem('rr_token')) {
             window.location.href = 'profile.html';
         }
@@ -255,7 +112,6 @@
         var btn = document.getElementById('login-btn');
         var msg = document.getElementById('msg');
 
-        // Allow Enter key to submit
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Enter' && !btn.disabled) btn.click();
         });
@@ -310,7 +166,6 @@
             }
         });
 
-        // Forgot password toggle
         document.getElementById('forgot-toggle').addEventListener('click', function () {
             var panel = document.getElementById('forgot-panel');
             var isOpen = panel.style.display === 'block';
@@ -319,11 +174,10 @@
             if (!isOpen) document.getElementById('forgot-email').focus();
         });
 
-        // Send reset link
         var forgotCooldown = false;
         document.getElementById('forgot-send-btn').addEventListener('click', async function () {
             if (forgotCooldown) return;
-            var email    = document.getElementById('forgot-email').value.trim();
+            var email     = document.getElementById('forgot-email').value.trim();
             var forgotMsg = document.getElementById('forgot-msg');
 
             forgotMsg.className = 'msg';
@@ -356,16 +210,14 @@
                 forgotCooldown = false;
             }
 
-            // Re-enable after 60 seconds
             setTimeout(function () {
-                var btn = document.getElementById('forgot-send-btn');
-                btn.disabled = false;
-                btn.textContent = 'Send Reset Link';
+                var b = document.getElementById('forgot-send-btn');
+                b.disabled = false;
+                b.textContent = 'Send Reset Link';
                 forgotCooldown = false;
             }, 60000);
         });
 
-        // Resend verification from login page
         var resendCooldown = false;
         document.getElementById('resend-btn').addEventListener('click', async function () {
             if (resendCooldown || !lastEmail) return;
@@ -395,7 +247,5 @@
             }, 60000);
         });
     </script>
-    <script src="js/header.js"></script>
-    <script src="js/footer.js"></script>
 </body>
 </html>

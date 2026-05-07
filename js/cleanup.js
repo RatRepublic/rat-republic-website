@@ -17,10 +17,14 @@
     const RENT_PER_ACCOUNT = 0.00203928;
     const RENT_LAMPORTS    = 2039280; // RENT_PER_ACCOUNT * 1e9, exact integer
     const MAX_PER_TX = 22; // reduced from 25 to leave room for fee transfer instructions
+    const METADATA_PROG_ID = new solanaWeb3.PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
+    const BURN_MAX_PER_TX  = 10; // burn + close = 2 instructions per token
 
     let wallet = null;
     let walletPublicKey = null;
     let closableAccounts = [];
+    let burnableTokens = [];
+    let nftItems = [];
     let feeInfo = null;
     let userRefLink = 'https://ratrepublic.art/register';
 
@@ -114,6 +118,8 @@
         document.querySelectorAll('.tab-content').forEach(function (c) { c.classList.remove('active'); });
         document.getElementById('tab-' + tab + '-btn').classList.add('active');
         document.getElementById('tab-' + tab).classList.add('active');
+        if (tab === 'nft') updateNftWalletState();
+        if (tab === 'tokens') updateBurnWalletState();
     };
 
     window.switchMode = function (mode) {
@@ -204,7 +210,7 @@
 
     // --- Stats ---
     function loadStats() {
-        fetch('stats.php')
+        fetch('api/public-stats.php')
             .then(function (r) { return r.json(); })
             .then(function (s) {
                 document.getElementById('stat-users').textContent    = Number(s.users_served).toLocaleString();
@@ -236,7 +242,7 @@
 
     // --- Wallet detection ---
     function getProvider(name) {
-        if (name === 'phantom')  return (phantomSDK && window.phantom?.solana) ? phantomSDK.solana : (window.phantom?.solana || null);
+        if (name === 'phantom')  return window.phantom?.solana || null;
         if (name === 'solflare') return window.solflare || null;
         return null;
     }
@@ -290,6 +296,8 @@
                 scanSection.classList.remove('hidden');
                 fetchFeeInfo();
                 triggerScan();
+                updateBurnWalletState();
+                updateNftWalletState();
                 return true;
             }
         }
@@ -316,19 +324,16 @@
         if (!provider) return;
         closeModal();
         try {
-            if (name === 'phantom' && phantomSDK) {
-                await phantomSDK.connect({ provider: 'injected' });
-                wallet = phantomSDK.solana;
-            } else {
-                const resp = await provider.connect();
-                wallet = provider;
-            }
+            await provider.connect();
+            wallet = provider;
             walletPublicKey = wallet.publicKey.toString();
             walletDisplay.textContent = trunc(walletPublicKey);
             connectSection.classList.add('hidden');
             scanSection.classList.remove('hidden');
             fetchFeeInfo();
             triggerScan();
+            updateBurnWalletState();
+            updateNftWalletState();
         } catch (e) {
             setStatus('Connection rejected.', 'error');
         }
@@ -343,12 +348,22 @@
         wallet = null;
         walletPublicKey = null;
         closableAccounts = [];
+        burnableTokens = [];
+        nftItems = [];
         feeInfo = null;
         scanSection.classList.add('hidden');
         resultsSection.classList.add('hidden');
         connectSection.classList.remove('hidden');
+        document.getElementById('burn-results').classList.add('hidden');
+        document.getElementById('burn-token-list').innerHTML = '';
+        document.getElementById('nft-results').classList.add('hidden');
+        document.getElementById('nft-token-list').innerHTML = '';
+        clearBurnStatus();
+        clearNftStatus();
         setUnclaimedDisplay(null);
         clearStatus();
+        updateBurnWalletState();
+        updateNftWalletState();
     });
 
     // --- Scan ---
@@ -617,4 +632,821 @@
         switchTab('claim');
         if (!walletPublicKey) document.getElementById('connect-btn').click();
     });
+
+    // ── Token Burn Tab ─────────────────────────────────────────────────────────
+
+    function updateBurnWalletState() {
+        var noWalletEl  = document.getElementById('burn-no-wallet');
+        var walletEl    = document.getElementById('burn-wallet-section');
+        var addrEl      = document.getElementById('burn-wallet-addr');
+        if (!noWalletEl || !walletEl) return;
+        if (walletPublicKey) {
+            if (addrEl) addrEl.textContent = trunc(walletPublicKey);
+            noWalletEl.classList.add('hidden');
+            walletEl.classList.remove('hidden');
+        } else {
+            noWalletEl.classList.remove('hidden');
+            walletEl.classList.add('hidden');
+        }
+    }
+
+    function setBurnStatus(msg, type) {
+        var el = document.getElementById('burn-status');
+        if (!el) return;
+        el.className = 'status-area ' + (type || '');
+        if (type === 'success' || type === 'info') el.innerHTML = msg;
+        else el.textContent = msg;
+    }
+
+    function clearBurnStatus() {
+        var el = document.getElementById('burn-status');
+        if (el) { el.className = 'status-area'; el.textContent = ''; }
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function findMetadataPDA(mintPubkey) {
+        return solanaWeb3.PublicKey.findProgramAddressSync(
+            [
+                new TextEncoder().encode('metadata'),
+                METADATA_PROG_ID.toBytes(),
+                mintPubkey.toBytes()
+            ],
+            METADATA_PROG_ID
+        )[0];
+    }
+
+    function decodeMetadata(data) {
+        try {
+            var offset = 1 + 32 + 32; // key + update_authority + mint
+            if (offset + 4 > data.length) return null;
+            // name
+            var nameLen = data[offset] | (data[offset+1]<<8) | (data[offset+2]<<16) | (data[offset+3]<<24);
+            offset += 4;
+            if (nameLen < 0 || nameLen > 200 || offset + nameLen > data.length) return null;
+            var name = new TextDecoder().decode(data.slice(offset, offset + nameLen)).replace(/\0/g, '').trim();
+            offset += nameLen;
+            // symbol
+            if (offset + 4 > data.length) return { name: name, symbol: '', uri: '', tokenStandard: null };
+            var symLen = data[offset] | (data[offset+1]<<8) | (data[offset+2]<<16) | (data[offset+3]<<24);
+            offset += 4;
+            if (symLen < 0 || symLen > 50 || offset + symLen > data.length) return { name: name, symbol: '', uri: '', tokenStandard: null };
+            var symbol = new TextDecoder().decode(data.slice(offset, offset + symLen)).replace(/\0/g, '').trim();
+            offset += symLen;
+            // uri
+            if (offset + 4 > data.length) return { name: name, symbol: symbol, uri: '', tokenStandard: null };
+            var uriLen = data[offset] | (data[offset+1]<<8) | (data[offset+2]<<16) | (data[offset+3]<<24);
+            offset += 4;
+            if (uriLen < 0 || uriLen > 500 || offset + uriLen > data.length) return { name: name, symbol: symbol, uri: '', tokenStandard: null };
+            var uri = new TextDecoder().decode(data.slice(offset, offset + uriLen)).replace(/\0/g, '').trim();
+            offset += uriLen;
+            // seller_fee_basis_points: u16
+            offset += 2;
+            // creators: Option<Vec<Creator>> — each creator = 32+1+1 bytes
+            if (offset >= data.length) return { name: name, symbol: symbol, uri: uri, tokenStandard: null };
+            var hasCreators = data[offset++];
+            if (hasCreators) {
+                if (offset + 4 > data.length) return { name: name, symbol: symbol, uri: uri, tokenStandard: null };
+                var numCreators = data[offset] | (data[offset+1]<<8) | (data[offset+2]<<16) | (data[offset+3]<<24);
+                offset += 4 + numCreators * 34;
+            }
+            // primary_sale_happened (1) + is_mutable (1)
+            offset += 2;
+            // edition_nonce: Option<u8>
+            if (offset >= data.length) return { name: name, symbol: symbol, uri: uri, tokenStandard: null };
+            var hasNonce = data[offset++];
+            if (hasNonce) offset += 1;
+            // token_standard: Option<TokenStandard> — 4 = ProgrammableNonFungible (pNFT)
+            if (offset >= data.length) return { name: name, symbol: symbol, uri: uri, tokenStandard: null };
+            var hasStd = data[offset++];
+            var tokenStandard = null;
+            if (hasStd && offset < data.length) tokenStandard = data[offset++];
+            return { name: name, symbol: symbol, uri: uri, tokenStandard: tokenStandard };
+        } catch(e) { return null; }
+    }
+
+    function updateBurnSummary() {
+        var checked = document.querySelectorAll('.burn-cb:checked').length;
+        var fi = getActiveFeeInfo();
+        var netSol = (checked * RENT_PER_ACCOUNT) * (1 - fi.total_bps / 10000);
+        var el = document.getElementById('burn-summary');
+        if (el) el.textContent = checked + ' selected · ~' + netSol.toFixed(4) + ' SOL rent back';
+        var burnBtn = document.getElementById('burn-btn');
+        if (burnBtn) burnBtn.disabled = (checked === 0);
+    }
+
+    function getBurnSelected() {
+        return Array.from(document.querySelectorAll('.burn-cb:checked')).map(function(cb) {
+            return burnableTokens[parseInt(cb.dataset.idx)];
+        });
+    }
+
+    function renderBurnResults() {
+        var list = document.getElementById('burn-token-list');
+        var selectAll = document.getElementById('burn-select-all');
+        if (!list) return;
+        list.innerHTML = '';
+
+        burnableTokens.forEach(function(t, i) {
+            var displayName = t.name ? (t.symbol ? t.name + ' (' + t.symbol + ')' : t.name) : trunc(t.mint);
+            var row = document.createElement('div');
+            row.className = 'token-row';
+            row.innerHTML =
+                '<input type="checkbox" class="burn-cb" data-idx="' + i + '" checked>' +
+                '<div style="width:32px;height:32px;border-radius:6px;overflow:hidden;background:var(--surface-2);flex-shrink:0;">' +
+                    '<img class="burn-img" data-idx="' + i + '" src="" onerror="this.style.display=\'none\'" alt="" style="width:32px;height:32px;object-fit:cover;">' +
+                '</div>' +
+                '<div style="flex:1;min-width:0;">' +
+                    '<div style="font-size:0.8rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(displayName) + '</div>' +
+                    '<div style="font-size:0.68rem;color:var(--text-dim);font-family:monospace;">' + trunc(t.mint) + '</div>' +
+                '</div>' +
+                '<div style="font-size:0.74rem;color:var(--text-muted);white-space:nowrap;margin-right:6px;">' + escapeHtml(String(t.uiAmount)) + '</div>' +
+                '<span class="token-sol">~' + RENT_PER_ACCOUNT.toFixed(6) + ' SOL</span>';
+            list.appendChild(row);
+        });
+
+        if (selectAll) selectAll.checked = true;
+        updateBurnSummary();
+        document.getElementById('burn-results').classList.remove('hidden');
+    }
+
+    async function scanBurnableTokens() {
+        if (!walletPublicKey) return;
+        var scanBtn = document.getElementById('burn-scan-btn');
+        if (scanBtn) scanBtn.disabled = true;
+        document.getElementById('burn-results').classList.add('hidden');
+        document.getElementById('burn-token-list').innerHTML = '';
+        burnableTokens = [];
+        setBurnStatus('Scanning wallet for tokens...', 'loading');
+
+        try {
+            var connection = new solanaWeb3.Connection(RPC_URL, 'confirmed');
+            var owner = new solanaWeb3.PublicKey(walletPublicKey);
+
+            var results = await Promise.all([
+                connection.getParsedTokenAccountsByOwner(owner, { programId: new solanaWeb3.PublicKey(TOKEN_PROGRAM_ID) }),
+                connection.getParsedTokenAccountsByOwner(owner, { programId: new solanaWeb3.PublicKey(TOKEN_2022_PROGRAM_ID) })
+            ]);
+
+            var all = [
+                ...(results[0].value || []).map(function(a) { return Object.assign({}, a, { programId: TOKEN_PROGRAM_ID }); }),
+                ...(results[1].value || []).map(function(a) { return Object.assign({}, a, { programId: TOKEN_2022_PROGRAM_ID }); })
+            ];
+
+            var withBalance = all.filter(function(a) {
+                var info = a.account.data.parsed && a.account.data.parsed.info;
+                return info && info.tokenAmount && BigInt(info.tokenAmount.amount) > BigInt(0);
+            });
+
+            if (withBalance.length === 0) {
+                clearBurnStatus();
+                setBurnStatus('No tokens with balance found in this wallet.', 'info');
+                if (scanBtn) scanBtn.disabled = false;
+                return;
+            }
+
+            setBurnStatus('Found ' + withBalance.length + ' token(s). Fetching metadata...', 'loading');
+
+            burnableTokens = withBalance.map(function(a) {
+                var info = a.account.data.parsed.info;
+                return {
+                    pubkey:    a.pubkey.toString(),
+                    mint:      info.mint,
+                    amount:    info.tokenAmount.amount,
+                    uiAmount:  info.tokenAmount.uiAmountString || String(info.tokenAmount.uiAmount || '?'),
+                    decimals:  info.tokenAmount.decimals,
+                    programId: a.programId,
+                    name: '',
+                    symbol: '',
+                    uri: ''
+                };
+            });
+
+            // Batch-fetch Metaplex metadata PDAs
+            try {
+                var pdas = burnableTokens.map(function(t) {
+                    return findMetadataPDA(new solanaWeb3.PublicKey(t.mint));
+                });
+                var metaAccounts = await connection.getMultipleAccountsInfo(pdas);
+                metaAccounts.forEach(function(acct, i) {
+                    if (!acct || !acct.data) return;
+                    var decoded = decodeMetadata(new Uint8Array(acct.data));
+                    if (decoded) {
+                        burnableTokens[i].name   = decoded.name;
+                        burnableTokens[i].symbol = decoded.symbol;
+                        burnableTokens[i].uri    = decoded.uri;
+                    }
+                });
+            } catch(e) { /* metadata fetch failed — show truncated mints */ }
+
+            clearBurnStatus();
+            renderBurnResults();
+
+            // Lazy-load token images from URI JSON
+            burnableTokens.forEach(function(t, i) {
+                if (!t.uri) return;
+                fetch(t.uri)
+                    .then(function(r) { return r.ok ? r.json() : null; })
+                    .then(function(meta) {
+                        if (!meta || !meta.image) return;
+                        var imgEl = document.querySelector('.burn-img[data-idx="' + i + '"]');
+                        if (imgEl) { imgEl.style.display = ''; imgEl.src = meta.image; }
+                    })
+                    .catch(function() {});
+            });
+
+        } catch(e) {
+            setBurnStatus('Scan failed: ' + (e.message || String(e)), 'error');
+        }
+
+        if (scanBtn) scanBtn.disabled = false;
+    }
+
+    async function executeBurn(selected) {
+        if (!selected || selected.length === 0) return;
+        var burnBtn  = document.getElementById('burn-btn');
+        var scanBtn  = document.getElementById('burn-scan-btn');
+        if (burnBtn) burnBtn.disabled = true;
+        if (scanBtn) scanBtn.disabled = true;
+
+        var connection   = new solanaWeb3.Connection(RPC_URL, 'confirmed');
+        var walletPubkey = new solanaWeb3.PublicKey(walletPublicKey);
+        var tokenProgPk  = new solanaWeb3.PublicKey(TOKEN_PROGRAM_ID);
+        var t22ProgPk    = new solanaWeb3.PublicKey(TOKEN_2022_PROGRAM_ID);
+
+        var chunks = [];
+        for (var i = 0; i < selected.length; i += BURN_MAX_PER_TX) {
+            chunks.push(selected.slice(i, i + BURN_MAX_PER_TX));
+        }
+
+        var fi = getActiveFeeInfo();
+        var treasuryPubkey = new solanaWeb3.PublicKey(fi.treasury);
+        var RENT_EXEMPT_MIN = 890880;
+
+        var referrerPubkey = fi.referrer_wallet ? new solanaWeb3.PublicKey(fi.referrer_wallet) : null;
+        if (referrerPubkey) {
+            try {
+                var refBal = await connection.getBalance(referrerPubkey);
+                var refFirst = Math.round(chunks[0].length * RENT_LAMPORTS * fi.referrer_bps / 10000);
+                if (refBal + refFirst < RENT_EXEMPT_MIN) referrerPubkey = null;
+            } catch(e) {}
+        }
+
+        var totalNetLamports = 0;
+        var signatures = [];
+
+        try {
+            for (var ci = 0; ci < chunks.length; ci++) {
+                setBurnStatus('Sending transaction ' + (ci + 1) + ' of ' + chunks.length + '...', 'loading');
+
+                var latestBlockhash = await connection.getLatestBlockhash('finalized');
+                var tx = new solanaWeb3.Transaction();
+                tx.recentBlockhash = latestBlockhash.blockhash;
+                tx.feePayer = walletPubkey;
+
+                tx.add(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 }));
+                tx.add(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1000 }));
+
+                chunks[ci].forEach(function(t) {
+                    var progPk      = t.programId === TOKEN_2022_PROGRAM_ID ? t22ProgPk : tokenProgPk;
+                    var tokenAccPk  = new solanaWeb3.PublicKey(t.pubkey);
+                    var mintPk      = new solanaWeb3.PublicKey(t.mint);
+                    var bigAmt      = BigInt(t.amount);
+
+                    // Burn instruction (index 8): [8, u64LE(amount)]
+                    var burnData = new Uint8Array(9);
+                    burnData[0] = 8;
+                    var rem = bigAmt;
+                    for (var bi = 0; bi < 8; bi++) {
+                        burnData[1 + bi] = Number(rem & BigInt(0xff));
+                        rem >>= BigInt(8);
+                    }
+                    tx.add(new solanaWeb3.TransactionInstruction({
+                        keys: [
+                            { pubkey: tokenAccPk, isSigner: false, isWritable: true },
+                            { pubkey: mintPk,     isSigner: false, isWritable: true },
+                            { pubkey: walletPubkey, isSigner: true, isWritable: false }
+                        ],
+                        programId: progPk,
+                        data: burnData
+                    }));
+
+                    // CloseAccount instruction (index 9)
+                    tx.add(new solanaWeb3.TransactionInstruction({
+                        keys: [
+                            { pubkey: tokenAccPk,  isSigner: false, isWritable: true },
+                            { pubkey: walletPubkey, isSigner: false, isWritable: true },
+                            { pubkey: walletPubkey, isSigner: true,  isWritable: false }
+                        ],
+                        programId: progPk,
+                        data: new Uint8Array([9])
+                    }));
+                });
+
+                // Fee transfers (same as reclaim)
+                var grossLamports    = chunks[ci].length * RENT_LAMPORTS;
+                var referrerLamports = referrerPubkey ? Math.round(grossLamports * fi.referrer_bps / 10000) : 0;
+                var netBps           = 10000 - fi.treasury_bps - (referrerPubkey ? fi.referrer_bps : 0);
+                var treasuryLamports = grossLamports - Math.round(grossLamports * netBps / 10000) - referrerLamports;
+                var netLamports      = grossLamports - treasuryLamports - referrerLamports;
+
+                tx.add(makeSolTransfer(walletPubkey, treasuryPubkey, treasuryLamports));
+                if (referrerPubkey && referrerLamports > 0) {
+                    tx.add(makeSolTransfer(walletPubkey, referrerPubkey, referrerLamports));
+                }
+
+                var signed = await wallet.signTransaction(tx);
+                var sig;
+                try {
+                    sig = await connection.sendRawTransaction(signed.serialize(), {
+                        skipPreflight: false,
+                        preflightCommitment: 'confirmed'
+                    });
+                } catch(sendErr) {
+                    var sendMsg = sendErr.message || String(sendErr);
+                    if (sendMsg.toLowerCase().includes('simulation') || sendMsg.toLowerCase().includes('preflight')) {
+                        sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: true });
+                    } else { throw sendErr; }
+                }
+
+                signatures.push(sig);
+                totalNetLamports += netLamports;
+
+                connection.confirmTransaction({
+                    signature: sig,
+                    blockhash: latestBlockhash.blockhash,
+                    lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+                }, 'confirmed').catch(function(){});
+            }
+
+            var totalNetSol = (totalNetLamports / 1e9).toFixed(4);
+            var burnedSet = new Set(selected.map(function(t) { return t.pubkey; }));
+            burnableTokens = burnableTokens.filter(function(t) { return !burnedSet.has(t.pubkey); });
+
+            var lastSig = signatures[signatures.length - 1];
+            clearBurnStatus();
+            setBurnStatus(
+                selected.length + ' token(s) burned · ' + totalNetSol + ' SOL reclaimed · ' +
+                '<a href="https://solscan.io/tx/' + lastSig + '" target="_blank" rel="noopener">View TX ↗</a>',
+                'success'
+            );
+
+            if (burnableTokens.length > 0) {
+                renderBurnResults();
+            } else {
+                document.getElementById('burn-results').classList.add('hidden');
+            }
+
+        } catch(e) {
+            var msg = e.message || String(e);
+            if (msg.includes('rejected') || msg.includes('cancelled') || e.code === 4001) {
+                setBurnStatus('Transaction cancelled.', 'error');
+            } else {
+                setBurnStatus('Error: ' + msg, 'error');
+            }
+            if (burnBtn) burnBtn.disabled = false;
+        }
+
+        if (scanBtn) scanBtn.disabled = false;
+    }
+
+    // Burn tab event listeners
+    document.getElementById('burn-scan-btn').addEventListener('click', scanBurnableTokens);
+
+    document.getElementById('burn-select-all').addEventListener('change', function() {
+        var checked = this.checked;
+        document.querySelectorAll('.burn-cb').forEach(function(cb) { cb.checked = checked; });
+        updateBurnSummary();
+    });
+
+    document.getElementById('burn-token-list').addEventListener('change', function(e) {
+        if (e.target.classList.contains('burn-cb')) updateBurnSummary();
+    });
+
+    document.getElementById('burn-btn').addEventListener('click', function() {
+        var selected = getBurnSelected();
+        if (selected.length === 0) return;
+        document.getElementById('burn-warn-count').textContent = selected.length;
+        document.getElementById('burn-warning-overlay').classList.remove('hidden');
+    });
+
+    document.getElementById('burn-confirm-btn').addEventListener('click', function() {
+        document.getElementById('burn-warning-overlay').classList.add('hidden');
+        executeBurn(getBurnSelected());
+    });
+
+    document.getElementById('burn-warning-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.add('hidden');
+    });
+
+    // ── NFT Burn Tab ───────────────────────────────────────────────────────────
+
+    const NFT_BATCH_SIZE = 5; // BurnNft uses 6 accounts per NFT
+
+    function updateNftWalletState() {
+        var noWalletEl = document.getElementById('nft-no-wallet');
+        var walletEl   = document.getElementById('nft-wallet-section');
+        var addrEl     = document.getElementById('nft-wallet-addr');
+        if (!noWalletEl || !walletEl) return;
+        if (walletPublicKey) {
+            if (addrEl) addrEl.textContent = trunc(walletPublicKey);
+            noWalletEl.classList.add('hidden');
+            walletEl.classList.remove('hidden');
+        } else {
+            noWalletEl.classList.remove('hidden');
+            walletEl.classList.add('hidden');
+        }
+    }
+
+    function setNftStatus(msg, type) {
+        var el = document.getElementById('nft-status');
+        if (!el) return;
+        el.className = 'status-area ' + (type || '');
+        if (type === 'success' || type === 'info') el.innerHTML = msg;
+        else el.textContent = msg;
+    }
+
+    function clearNftStatus() {
+        var el = document.getElementById('nft-status');
+        if (el) { el.className = 'status-area'; el.textContent = ''; }
+    }
+
+    function findMasterEditionPDA(mintPubkey) {
+        return solanaWeb3.PublicKey.findProgramAddressSync(
+            [
+                new TextEncoder().encode('metadata'),
+                METADATA_PROG_ID.toBytes(),
+                mintPubkey.toBytes(),
+                new TextEncoder().encode('edition')
+            ],
+            METADATA_PROG_ID
+        )[0];
+    }
+
+    function updateNftSummary() {
+        var checked = 0;
+        var totalLamports = 0;
+        document.querySelectorAll('.nft-cb:checked').forEach(function(cb) {
+            var idx = parseInt(cb.dataset.idx);
+            if (nftItems[idx] && !nftItems[idx].isPNFT) {
+                checked++;
+                totalLamports += nftItems[idx].grossLamports;
+            }
+        });
+        var fi = getActiveFeeInfo();
+        var netSol = (totalLamports / 1e9) * (1 - fi.total_bps / 10000);
+        var el = document.getElementById('nft-summary');
+        if (el) el.textContent = checked + ' selected · ~' + netSol.toFixed(4) + ' SOL rent back';
+        var burnBtn = document.getElementById('nft-burn-btn');
+        if (burnBtn) burnBtn.disabled = (checked === 0);
+    }
+
+    function getNftSelected() {
+        return Array.from(document.querySelectorAll('.nft-cb:checked'))
+            .map(function(cb) { return nftItems[parseInt(cb.dataset.idx)]; })
+            .filter(function(nft) { return nft && !nft.isPNFT; });
+    }
+
+    function renderNftResults() {
+        var list = document.getElementById('nft-token-list');
+        var selectAll = document.getElementById('nft-select-all');
+        if (!list) return;
+        list.innerHTML = '';
+
+        nftItems.forEach(function(nft, i) {
+            var displayName = nft.name || trunc(nft.mint);
+            var rentEst = nft.hasEdition
+                ? (nft.grossLamports / 1e9).toFixed(4) + ' SOL'
+                : '~' + RENT_PER_ACCOUNT.toFixed(6) + ' SOL';
+            var row = document.createElement('div');
+            row.className = 'token-row';
+            if (nft.isPNFT) row.style.opacity = '0.55';
+            var pNFTBadge = nft.isPNFT
+                ? '<span title="Programmable NFTs require a dedicated marketplace to burn" style="font-size:0.6rem;background:rgba(255,140,0,0.15);color:#FF8C00;border:1px solid rgba(255,140,0,0.3);border-radius:4px;padding:1px 5px;margin-left:5px;vertical-align:middle;">pNFT</span>'
+                : '';
+            row.innerHTML =
+                '<input type="checkbox" class="nft-cb" data-idx="' + i + '"' + (nft.isPNFT ? ' disabled' : ' checked') + '>' +
+                '<div style="width:40px;height:40px;border-radius:8px;overflow:hidden;background:var(--surface-2);flex-shrink:0;">' +
+                    '<img class="nft-img" data-idx="' + i + '" src="" onerror="this.style.display=\'none\'" alt="" style="width:40px;height:40px;object-fit:cover;">' +
+                '</div>' +
+                '<div style="flex:1;min-width:0;">' +
+                    '<div style="font-size:0.8rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(displayName) + pNFTBadge + '</div>' +
+                    '<div style="font-size:0.68rem;color:var(--text-dim);font-family:monospace;">' + trunc(nft.mint) + '</div>' +
+                '</div>' +
+                '<span class="token-sol">' + (nft.isPNFT ? '—' : rentEst) + '</span>';
+            list.appendChild(row);
+        });
+
+        if (selectAll) selectAll.checked = true;
+        updateNftSummary();
+        document.getElementById('nft-results').classList.remove('hidden');
+    }
+
+    async function batchGetAccounts(connection, pubkeys) {
+        var results = [];
+        var CHUNK = 100;
+        for (var i = 0; i < pubkeys.length; i += CHUNK) {
+            var batch = await connection.getMultipleAccountsInfo(pubkeys.slice(i, i + CHUNK));
+            results = results.concat(batch);
+        }
+        return results;
+    }
+
+    async function scanNftItems() {
+        if (!walletPublicKey) return;
+        var scanBtn = document.getElementById('nft-scan-btn');
+        if (scanBtn) scanBtn.disabled = true;
+        document.getElementById('nft-results').classList.add('hidden');
+        document.getElementById('nft-token-list').innerHTML = '';
+        nftItems = [];
+        setNftStatus('Scanning wallet for NFTs...', 'loading');
+
+        try {
+            var connection = new solanaWeb3.Connection(RPC_URL, 'confirmed');
+            var owner = new solanaWeb3.PublicKey(walletPublicKey);
+
+            var results = await Promise.all([
+                connection.getParsedTokenAccountsByOwner(owner, { programId: new solanaWeb3.PublicKey(TOKEN_PROGRAM_ID) }),
+                connection.getParsedTokenAccountsByOwner(owner, { programId: new solanaWeb3.PublicKey(TOKEN_2022_PROGRAM_ID) })
+            ]);
+
+            var all = [
+                ...(results[0].value || []).map(function(a) { return Object.assign({}, a, { programId: TOKEN_PROGRAM_ID }); }),
+                ...(results[1].value || []).map(function(a) { return Object.assign({}, a, { programId: TOKEN_2022_PROGRAM_ID }); })
+            ];
+
+            // NFTs: decimals = 0, amount = 1
+            var nftAccounts = all.filter(function(a) {
+                var info = a.account.data.parsed && a.account.data.parsed.info;
+                return info && info.tokenAmount &&
+                    info.tokenAmount.decimals === 0 &&
+                    info.tokenAmount.amount === '1';
+            });
+
+            if (nftAccounts.length === 0) {
+                clearNftStatus();
+                setNftStatus('No NFTs found in this wallet.', 'info');
+                if (scanBtn) scanBtn.disabled = false;
+                return;
+            }
+
+            setNftStatus('Found ' + nftAccounts.length + ' NFT(s). Fetching metadata...', 'loading');
+
+            // Build initial nftItems
+            var mints = nftAccounts.map(function(a) {
+                return new solanaWeb3.PublicKey(a.account.data.parsed.info.mint);
+            });
+
+            var metadataPDAs   = mints.map(findMetadataPDA);
+            var editionPDAs    = mints.map(findMasterEditionPDA);
+
+            // Batch-fetch metadata and edition accounts
+            var metaAccounts    = await batchGetAccounts(connection, metadataPDAs);
+            var editionAccounts = await batchGetAccounts(connection, editionPDAs);
+
+            nftAccounts.forEach(function(a, i) {
+                var info = a.account.data.parsed.info;
+                var hasMetadata = !!(metaAccounts[i] && metaAccounts[i].data);
+                var hasEdition  = !!(editionAccounts[i] && editionAccounts[i].lamports > 0);
+                var metaLam     = hasMetadata ? (metaAccounts[i].lamports || 0) : 0;
+                var editionLam  = hasEdition  ? (editionAccounts[i].lamports || 0) : 0;
+                var grossLam    = RENT_LAMPORTS + metaLam + editionLam;
+
+                var decoded = hasMetadata ? decodeMetadata(new Uint8Array(metaAccounts[i].data)) : null;
+
+                nftItems.push({
+                    pubkey:          a.pubkey.toString(),
+                    mint:            info.mint,
+                    programId:       a.programId,
+                    metadataPDA:     metadataPDAs[i],
+                    editionPDA:      editionPDAs[i],
+                    hasMetadata:     hasMetadata,
+                    hasEdition:      hasEdition,
+                    isPNFT:          !!(decoded && decoded.tokenStandard === 4),
+                    metadataLamports: metaLam,
+                    editionLamports:  editionLam,
+                    grossLamports:   grossLam,
+                    name:    decoded ? decoded.name   : '',
+                    symbol:  decoded ? decoded.symbol : '',
+                    uri:     decoded ? decoded.uri    : ''
+                });
+            });
+
+            clearNftStatus();
+            renderNftResults();
+
+            // Lazy-load images
+            nftItems.forEach(function(nft, i) {
+                if (!nft.uri) return;
+                fetch(nft.uri)
+                    .then(function(r) { return r.ok ? r.json() : null; })
+                    .then(function(meta) {
+                        if (!meta || !meta.image) return;
+                        var imgEl = document.querySelector('.nft-img[data-idx="' + i + '"]');
+                        if (imgEl) { imgEl.style.display = ''; imgEl.src = meta.image; }
+                    })
+                    .catch(function() {});
+            });
+
+        } catch(e) {
+            setNftStatus('Scan failed: ' + (e.message || String(e)), 'error');
+        }
+
+        if (scanBtn) scanBtn.disabled = false;
+    }
+
+    async function executeNftBurn(selected) {
+        if (!selected || selected.length === 0) return;
+        var burnBtn = document.getElementById('nft-burn-btn');
+        var scanBtn = document.getElementById('nft-scan-btn');
+        if (burnBtn) burnBtn.disabled = true;
+        if (scanBtn) scanBtn.disabled = true;
+
+        var connection   = new solanaWeb3.Connection(RPC_URL, 'confirmed');
+        var walletPubkey = new solanaWeb3.PublicKey(walletPublicKey);
+        var tokenProgPk  = new solanaWeb3.PublicKey(TOKEN_PROGRAM_ID);
+        var t22ProgPk    = new solanaWeb3.PublicKey(TOKEN_2022_PROGRAM_ID);
+
+        var chunks = [];
+        for (var i = 0; i < selected.length; i += NFT_BATCH_SIZE) {
+            chunks.push(selected.slice(i, i + NFT_BATCH_SIZE));
+        }
+
+        var fi = getActiveFeeInfo();
+        var treasuryPubkey = new solanaWeb3.PublicKey(fi.treasury);
+        var RENT_EXEMPT_MIN = 890880;
+
+        var referrerPubkey = fi.referrer_wallet ? new solanaWeb3.PublicKey(fi.referrer_wallet) : null;
+        if (referrerPubkey) {
+            try {
+                var refBal = await connection.getBalance(referrerPubkey);
+                var refFirst = Math.round(chunks[0].reduce(function(s, n) { return s + n.grossLamports; }, 0) * fi.referrer_bps / 10000);
+                if (refBal + refFirst < RENT_EXEMPT_MIN) referrerPubkey = null;
+            } catch(e) {}
+        }
+
+        var totalNetLamports = 0;
+        var signatures = [];
+
+        try {
+            for (var ci = 0; ci < chunks.length; ci++) {
+                setNftStatus('Sending transaction ' + (ci + 1) + ' of ' + chunks.length + '...', 'loading');
+
+                var latestBlockhash = await connection.getLatestBlockhash('finalized');
+                var tx = new solanaWeb3.Transaction();
+                tx.recentBlockhash = latestBlockhash.blockhash;
+                tx.feePayer = walletPubkey;
+
+                tx.add(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 }));
+                tx.add(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1000 }));
+
+                chunks[ci].forEach(function(nft) {
+                    var tokenAccPk = new solanaWeb3.PublicKey(nft.pubkey);
+                    var mintPk     = new solanaWeb3.PublicKey(nft.mint);
+                    var progPk     = nft.programId === TOKEN_2022_PROGRAM_ID ? t22ProgPk : tokenProgPk;
+
+                    if (nft.hasEdition && nft.programId === TOKEN_PROGRAM_ID) {
+                        // Metaplex BurnNft (index 29) — burns metadata + edition + token account
+                        tx.add(new solanaWeb3.TransactionInstruction({
+                            programId: METADATA_PROG_ID,
+                            keys: [
+                                { pubkey: nft.metadataPDA,     isSigner: false, isWritable: true  },
+                                { pubkey: walletPubkey,         isSigner: true,  isWritable: true  },
+                                { pubkey: mintPk,               isSigner: false, isWritable: true  },
+                                { pubkey: tokenAccPk,           isSigner: false, isWritable: true  },
+                                { pubkey: nft.editionPDA,       isSigner: false, isWritable: true  },
+                                { pubkey: tokenProgPk,          isSigner: false, isWritable: false }
+                            ],
+                            data: new Uint8Array([29])
+                        }));
+                    } else {
+                        // Fallback: SPL burn + close (non-Metaplex or Token 2022)
+                        var burnData = new Uint8Array(9);
+                        burnData[0] = 8;
+                        var rem = BigInt(1);
+                        for (var bi = 0; bi < 8; bi++) {
+                            burnData[1 + bi] = Number(rem & BigInt(0xff));
+                            rem >>= BigInt(8);
+                        }
+                        tx.add(new solanaWeb3.TransactionInstruction({
+                            keys: [
+                                { pubkey: tokenAccPk,   isSigner: false, isWritable: true  },
+                                { pubkey: mintPk,        isSigner: false, isWritable: true  },
+                                { pubkey: walletPubkey,  isSigner: true,  isWritable: false }
+                            ],
+                            programId: progPk,
+                            data: burnData
+                        }));
+                        tx.add(new solanaWeb3.TransactionInstruction({
+                            keys: [
+                                { pubkey: tokenAccPk,   isSigner: false, isWritable: true },
+                                { pubkey: walletPubkey,  isSigner: false, isWritable: true },
+                                { pubkey: walletPubkey,  isSigner: true,  isWritable: false }
+                            ],
+                            programId: progPk,
+                            data: new Uint8Array([9])
+                        }));
+                    }
+                });
+
+                // Fee based on total gross lamports for this chunk
+                var grossLamports    = chunks[ci].reduce(function(s, n) { return s + n.grossLamports; }, 0);
+                var referrerLamports = referrerPubkey ? Math.round(grossLamports * fi.referrer_bps / 10000) : 0;
+                var netBps           = 10000 - fi.treasury_bps - (referrerPubkey ? fi.referrer_bps : 0);
+                var treasuryLamports = grossLamports - Math.round(grossLamports * netBps / 10000) - referrerLamports;
+                var netLamports      = grossLamports - treasuryLamports - referrerLamports;
+
+                tx.add(makeSolTransfer(walletPubkey, treasuryPubkey, treasuryLamports));
+                if (referrerPubkey && referrerLamports > 0) {
+                    tx.add(makeSolTransfer(walletPubkey, referrerPubkey, referrerLamports));
+                }
+
+                var signed = await wallet.signTransaction(tx);
+                var sig;
+                try {
+                    sig = await connection.sendRawTransaction(signed.serialize(), {
+                        skipPreflight: false,
+                        preflightCommitment: 'confirmed'
+                    });
+                } catch(sendErr) {
+                    var sendMsg = sendErr.message || String(sendErr);
+                    if (sendMsg.toLowerCase().includes('simulation') || sendMsg.toLowerCase().includes('preflight')) {
+                        sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: true });
+                    } else { throw sendErr; }
+                }
+
+                signatures.push(sig);
+                totalNetLamports += netLamports;
+
+                connection.confirmTransaction({
+                    signature: sig,
+                    blockhash: latestBlockhash.blockhash,
+                    lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+                }, 'confirmed').catch(function(){});
+            }
+
+            var totalNetSol = (totalNetLamports / 1e9).toFixed(4);
+            var burnedSet = new Set(selected.map(function(n) { return n.pubkey; }));
+            nftItems = nftItems.filter(function(n) { return !burnedSet.has(n.pubkey); });
+
+            var lastSig = signatures[signatures.length - 1];
+            clearNftStatus();
+            setNftStatus(
+                selected.length + ' NFT(s) burned · ' + totalNetSol + ' SOL reclaimed · ' +
+                '<a href="https://solscan.io/tx/' + lastSig + '" target="_blank" rel="noopener">View TX ↗</a>',
+                'success'
+            );
+
+            if (nftItems.length > 0) {
+                renderNftResults();
+            } else {
+                document.getElementById('nft-results').classList.add('hidden');
+            }
+
+        } catch(e) {
+            var msg = e.message || String(e);
+            if (msg.includes('rejected') || msg.includes('cancelled') || e.code === 4001) {
+                setNftStatus('Transaction cancelled.', 'error');
+            } else {
+                setNftStatus('Error: ' + msg, 'error');
+            }
+            if (burnBtn) burnBtn.disabled = false;
+        }
+
+        if (scanBtn) scanBtn.disabled = false;
+    }
+
+    // NFT tab event listeners
+    document.getElementById('nft-scan-btn').addEventListener('click', scanNftItems);
+
+    document.getElementById('nft-select-all').addEventListener('change', function() {
+        var checked = this.checked;
+        document.querySelectorAll('.nft-cb').forEach(function(cb) { cb.checked = checked; });
+        updateNftSummary();
+    });
+
+    document.getElementById('nft-token-list').addEventListener('change', function(e) {
+        if (e.target.classList.contains('nft-cb')) updateNftSummary();
+    });
+
+    document.getElementById('nft-burn-btn').addEventListener('click', function() {
+        var selected = getNftSelected();
+        if (selected.length === 0) return;
+        document.getElementById('nft-warn-count').textContent = selected.length;
+        document.getElementById('nft-warning-overlay').classList.remove('hidden');
+    });
+
+    document.getElementById('nft-confirm-btn').addEventListener('click', function() {
+        document.getElementById('nft-warning-overlay').classList.add('hidden');
+        executeNftBurn(getNftSelected());
+    });
+
+    document.getElementById('nft-warning-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.add('hidden');
+    });
+
 })();

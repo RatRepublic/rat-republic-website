@@ -4,127 +4,573 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rat Republic - A Solana Revolution</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="icon" type="image/png" href="images/favicon.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" integrity="sha384-kcNNzf7wI8//ZkNUaDd5JwxLoFaBgkj9Z4O4NwtuX9Lkmsz0HoITOxJsGkYxDuyG" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" integrity="sha384-8/AzSKHReNfZT4HGFTyRyJ1jXhhx/ZMnmX08Cy6TeaKWj0Vzho0AabG06C8mh02i" crossorigin="anonymous">
-    
-    <link rel="stylesheet" href="css/styles.css">
+    <meta name="description" content="Building tools and a reward ecosystem for the underground Solana community.">
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
     <style>
-        .beta-banner {
-            font-family: 'NftOpensea', monospace;
-            font-size: 1.4rem;
-            color: #ff4444;
-            letter-spacing: 4px;
-            text-align: center;
-            text-shadow: 0 0 16px rgba(255,68,68,0.7), 0 0 32px rgba(255,68,68,0.4);
-            padding: 14px 0 4px;
-            animation: betapulse 2.5s ease-in-out infinite;
+        @font-face { font-family: 'Inter'; src: url('fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype'); font-weight: 100 900; font-style: normal; }
+        @font-face { font-family: 'Inter-Italic'; src: url('fonts/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype'); font-weight: 100 900; font-style: italic; }
+        @font-face { font-family: 'NftOpensea'; src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype'); }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:         #080808;
+            --surface:    #111111;
+            --border:     rgba(255,255,255,0.07);
+            --text:       #ffffff;
+            --text-muted: rgba(255,255,255,0.5);
+            --text-dim:   rgba(255,255,255,0.25);
+            --accent:     #C8E030;
+            --accent-dark: #9eb024;
         }
-        @keyframes betapulse {
-            0%, 100% { text-shadow: 0 0 12px rgba(255,68,68,0.6), 0 0 28px rgba(255,68,68,0.3); }
-            50%       { text-shadow: 0 0 22px rgba(255,68,68,0.9), 0 0 44px rgba(255,68,68,0.5); }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+        /* ── Header ── */
+        .header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+            height: 72px;
+            background: rgba(8,8,8,0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center;
+            padding: 0 48px;
+        }
+        .header-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+        .header-brand img { width: 28px; height: 28px; object-fit: contain; }
+        .header-brand span { font-family: 'NftOpensea'; font-size: 0.9rem; letter-spacing: 0.12em; color: var(--text); }
+        .header-nav { flex: 1; display: flex; justify-content: center; }
+        .nav-pill { display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 24px; padding: 4px; }
+        .nav-pill a {
+            font-size: 0.82rem; font-weight: 500; color: var(--text-muted);
+            text-decoration: none; padding: 7px 18px; border-radius: 20px;
+            transition: color 0.15s, background 0.15s;
+            white-space: nowrap;
+        }
+        .nav-pill a:hover { color: var(--text); background: rgba(255,255,255,0.07); }
+        .nav-pill a.active { background: rgba(255,255,255,0.12); color: var(--text); font-weight: 600; }
+        .header-actions { flex-shrink: 0; }
+        .btn-login {
+            font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 500;
+            color: var(--text-muted); background: transparent;
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;
+            padding: 8px 20px; cursor: pointer; transition: all 0.15s;
+            display: flex; align-items: center; gap: 7px; text-decoration: none;
+        }
+        .btn-login:hover { color: var(--text); border-color: rgba(255,255,255,0.35); }
+        .btn-login svg { width: 13px; height: 13px; opacity: 0.7; }
+        .btn-profile { display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 4px 12px 4px 4px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.12); transition: border-color 0.15s; }
+        .btn-profile:hover { border-color: rgba(255,255,255,0.3); }
+        .btn-profile-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #1a1a1a; }
+        .btn-profile-name { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); transition: color 0.15s; }
+        .btn-profile:hover .btn-profile-name { color: var(--text); }
+
+        /* ── Hero ── */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex; align-items: flex-end;
+            padding: 0 80px 100px;
+            background: #050505;
+            overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute; inset: 0;
+            background-image: url('images/hero_desktop_3.webp');
+            background-size: cover;
+            background-position: center top;
+            opacity: 0.75;
+        }
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(5,5,5,0.95) 0%, rgba(5,5,5,0.4) 45%, rgba(5,5,5,0.1) 100%);
+        }
+        .hero-overlay-left {
+            position: absolute; inset: 0;
+            background: linear-gradient(to right, rgba(5,5,5,0.6) 0%, transparent 60%);
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 1000px; }
+        .hero-heading {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-style: italic;
+            font-size: clamp(3rem, 6.5vw, 5.8rem);
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-bottom: 20px;
+        }
+        .hero-sub {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.6;
+            margin-bottom: 36px;
+            white-space: nowrap;
+        }
+        .btn-hero {
+            display: inline-block;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0a0a0a;
+            background: var(--accent);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 36px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity 0.15s;
+            letter-spacing: 0.01em;
+        }
+        .btn-hero:hover { opacity: 0.9; }
+
+        /* ── Stats Strip ── */
+        .stats-strip {
+            background: #ffffff;
+            padding: 32px 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            padding: 0 32px;
+        }
+        .stat-item + .stat-item { border-left: 1px solid rgba(0,0,0,0.18); }
+        .stat-item-num {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 2rem;
+            color: #0a0a0a;
+            line-height: 1;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+        .stat-item-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: rgba(0,0,0,0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* ── Utilities Section ── */
+        .section-utilities {
+            background: var(--bg);
+            padding: 90px 80px 100px;
+        }
+        .section-heading {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-style: italic;
+            font-size: clamp(2.2rem, 4vw, 3rem);
+            letter-spacing: -0.02em;
+            color: var(--text);
+            text-align: center;
+            margin-bottom: 36px;
+        }
+        .util-tab-bar {
+            display: flex;
+            background: var(--accent);
+            border-radius: 12px;
+            padding: 5px;
+            gap: 3px;
+            margin: 0 auto 44px;
+            max-width: 580px;
+        }
+        .util-tab-btn {
+            flex: 1;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 0.78rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.5);
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .util-tab-btn:hover { color: rgba(0,0,0,0.75); background: rgba(255,255,255,0.25); }
+        .util-tab-btn.active { background: #ffffff; color: #0a0a0a; }
+        .util-panels { max-width: 1100px; margin: 0 auto; }
+        .util-panel { display: none; align-items: center; gap: 48px; }
+        .util-panel.active { display: flex; animation: panelFadeIn 0.28s ease; }
+        @keyframes panelFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ── Scroll fade-in ── */
+        .fade-in-el { opacity: 0; transform: translateY(22px); transition: opacity 0.65s ease, transform 0.65s ease; }
+        .fade-in-el.visible { opacity: 1; transform: translateY(0); }
+        .util-panel-info { flex: 1; padding: 8px 0 8px 8px; }
+        .util-panel-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+        .util-panel-name { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.4rem; letter-spacing: -0.01em; color: var(--text); }
+        .tool-badge {
+            font-size: 0.62rem; font-weight: 700;
+            padding: 4px 12px; border-radius: 20px;
+            letter-spacing: 0.06em; text-transform: uppercase;
+        }
+        .tool-badge.free { background: rgba(200,224,48,0.1); color: var(--accent); border: 1px solid rgba(200,224,48,0.2); }
+        .tool-badge.paid { background: rgba(255,140,0,0.1); color: #FF8C00; border: 1px solid rgba(255,140,0,0.2); }
+        .util-panel-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 28px; }
+        .btn-launch {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600;
+            color: #0a0a0a; background: var(--accent);
+            border: none; border-radius: 8px;
+            padding: 11px 24px; cursor: pointer; text-decoration: none;
+            transition: opacity 0.15s;
+        }
+        .btn-launch:hover { opacity: 0.88; }
+        .util-panel-icon {
+            width: 260px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .util-panel-icon img { width: 220px; height: 220px; object-fit: contain; }
+
+        /* ── CTA ── */
+        .section-cta {
+            background: #ffffff;
+            padding: 80px 48px;
+            text-align: center;
+        }
+        .cta-heading {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-style: italic;
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: #0a0a0a;
+            letter-spacing: -0.02em;
+            margin-bottom: 14px;
+        }
+        .cta-sub { font-size: 1rem; color: rgba(0,0,0,0.55); margin-bottom: 36px; }
+        .btn-cta {
+            display: inline-block;
+            font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 700;
+            color: var(--accent); background: #0a0a0a;
+            border: none; border-radius: 10px;
+            padding: 15px 40px; cursor: pointer; text-decoration: none;
+            transition: opacity 0.15s;
+        }
+        .btn-cta:hover { opacity: 0.88; }
+
+        /* ── Footer ── */
+        .footer {
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            padding: 22px 48px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .footer-left { display: flex; align-items: center; gap: 16px; }
+        .footer-copy { font-size: 0.75rem; color: var(--text-dim); }
+        .footer-legal-links { display: flex; gap: 12px; }
+        .footer-legal-links a { font-size: 0.72rem; color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+        .footer-legal-links a:hover { color: var(--text-muted); }
+        .footer-right { display: flex; align-items: center; gap: 16px; }
+        .footer-social { display: flex; align-items: center; gap: 10px; }
+        .footer-social a { color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+        .footer-social a:hover { color: var(--text-muted); }
+        .footer-social svg { width: 14px; height: 14px; fill: currentColor; display: block; }
+        .footer-fee { font-size: 0.72rem; color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+        .footer-fee:hover { color: var(--text-muted); }
+        .footer-divider { width: 1px; height: 14px; background: var(--border); }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .header { padding: 0 20px; }
+            .nav-pill a { padding: 7px 12px; }
+            .hero { padding: 0 28px 80px; }
+            .hero-sub { white-space: normal; }
+            .stats-strip { padding: 24px 20px; flex-wrap: wrap; gap: 16px; }
+            .stat-item { flex: 0 0 40%; padding: 0 8px; }
+            .stat-item + .stat-item { border-left: none; }
+            .section-utilities { padding: 60px 20px 70px; }
+            .util-panels { padding: 0; }
+            .util-panel.active { flex-direction: column; }
+            .util-panel-icon { width: 100%; }
+            .util-panel-icon img { width: 160px; height: 160px; }
+            .section-cta { padding: 60px 24px; }
+            .footer { padding: 20px 24px; }
+        }
+
+        @media (max-width: 600px) {
+            .header { justify-content: space-between; }
+            .header-nav { display: none; }
+            .hero-heading { font-size: clamp(2.4rem, 10vw, 3.6rem); }
         }
     </style>
 </head>
-<body id="top">
+<body>
 
-<section class="hero-section">
-    <div class="container-fluid">
-        <div class="row align-items-center">
+    <!-- ── Header ── -->
+    <header class="header">
+        <a href="/" class="header-brand">
+            <img src="images/branding/rat-republic-logo.svg" alt="">
+            <span>RAT REPUBLIC</span>
+        </a>
+        <nav class="header-nav">
+            <div class="nav-pill">
+                <a href="/" class="active">Home</a>
+                <a href="#utilities">Utilities</a>
+                <a href="leaderboard">Crowned Vermins</a>
+                <a href="docs">Documentation</a>
+            </div>
+        </nav>
+        <div class="header-actions" id="header-actions">
+            <a href="profile" class="btn-login">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                Login
+            </a>
+        </div>
+    </header>
 
-            <div class="col-lg-6">
-                <div class="hero-content">
-                    <div class="beta-banner">BETA TESTING</div>
-                    <h1 class="display-rat">Rat Republic</h1>
-                    <p class="lead">Building tools and a reward ecosystem for the underground community. Empowering the unseen with tech and incentives to modernize and dignify subterranean life.</p>
-                    
-                    <div class="mt-4">
-                        <div class="row g-2 mb-2">
-                            <div class="col-6">
-                                <a href="https://x.com/rat_republicsol" target="_blank" class="btn btn-green-custom btn-lg rounded-3 w-100">X</a>
-                            </div>
-                            <div class="col-6">
-                                <a href="https://x.com/i/communities/1991029179991859265" target="_blank" class="btn btn-green-custom btn-lg rounded-3 w-100">Community</a>
-                            </div>
-                        </div>
-                        <div class="row g-2 mb-2">
-                            <div class="col-6">
-                                <a href="https://dexscreener.com/solana/" target="_blank" class="btn btn-green-custom btn-lg rounded-3 w-100">Dexscreener</a>
-                            </div>
-                            <div class="col-6">
-                                <a href="tools" class="btn btn-green-custom btn-lg rounded-3 w-100">Utilities</a>
-                            </div>
-                        </div>
-                        <div class="row g-2 mb-2">
-                            <div class="col-6">
-                                <a href="https://pump.fun/" target="_blank" class="btn btn-green-custom btn-lg rounded-3 w-100">Pumpfun</a>
-                            </div>
-                            <div class="col-6">
-                                <a href="https://rat-republic.gitbook.io/rat-republic-docs" target="_blank" class="btn btn-green-custom btn-lg rounded-3 w-100">Documentation</a>
-                            </div>
-                        </div>
-                        <div class="row g-2 mb-2">
-                            <div class="col-12">
-                                <a href="generator" class="btn btn-green-custom btn-lg rounded-3 w-100">Rat Republic PFP Generator</a>
-                            </div>
-                        </div>
-                        <div class="row g-2 mb-2">
-                            <div class="col-12">
-                                <a href="branding.zip" download class="btn btn-green-custom btn-lg rounded-3 w-100">Brand Vector File</a>
-                            </div>
-                        </div>
-                        <div class="ca-box mt-3">
-                            <span class="ca-label">CA</span>
-                            <span class="ca-address" id="ca-address">TBA</span>
-                            <button id="copy-ca-btn" onclick="copyCA()">Copy</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-6 text-center">
-                <img src="main.png" alt="Rat Republic Character Artwork" class="img-fluid rat-main-image">
-            </div>
-            
+    <!-- ── Hero ── -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-overlay-left"></div>
+        <div class="hero-content fade-in-el">
+            <h1 class="hero-heading">Earn SOL doing<br>what you already do</h1>
+            <p class="hero-sub">Building tools and a reward ecosystem for the underground Solana community.</p>
+            <a href="#utilities" class="btn-hero">Get Started</a>
+        </div>
+    </section>
+
+    <!-- ── Stats Strip ── -->
+    <div class="stats-strip fade-in-el">
+        <div class="stat-item">
+            <div class="stat-item-num" id="stat-users">—</div>
+            <div class="stat-item-label">Users Served</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-item-num" id="stat-accounts">—</div>
+            <div class="stat-item-label">Accounts Closed</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-item-num" id="stat-sol">—</div>
+            <div class="stat-item-label">SOL Recovered</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-item-num">99.9%</div>
+            <div class="stat-item-label">Platform Uptime</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-item-num">24/7</div>
+            <div class="stat-item-label">Automated Operation</div>
         </div>
     </div>
-</section>
 
+    <!-- ── Utilities ── -->
+    <section class="section-utilities" id="utilities">
+        <h2 class="section-heading fade-in-el">Utilities</h2>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" crossorigin="anonymous"></script>
+        <div class="util-tab-bar fade-in-el">
+            <button class="util-tab-btn active" onclick="switchUtil(this,'scavenger')">SCAVENGER</button>
+            <button class="util-tab-btn" onclick="switchUtil(this,'vanity')">VANITY</button>
+            <button class="util-tab-btn" onclick="switchUtil(this,'airdrop')">AIRDROP</button>
+            <button class="util-tab-btn" onclick="switchUtil(this,'pfp')">PFP GEN</button>
+        </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" integrity="sha384-l/y5WJTphApmSlx76Ev6k4G3zxu/+19CVvn9OTKI7gs4Yu5Hm8mjpdtdr5oyhnNo" crossorigin="anonymous"></script>
+        <div class="util-panels">
 
-<script src="js/ticker.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+            <div class="util-panel active" id="util-scavenger">
+                <div class="util-panel-info">
+                    <div class="util-panel-top">
+                        <span class="util-panel-name">SCAVENGER</span>
+                        <span class="tool-badge free">1.8% Fee</span>
+                    </div>
+                    <p class="util-panel-desc">Scan your wallet for empty SPL token accounts and reclaim the locked SOL rent. Every dead token account holds ~0.00204 SOL — close hundreds in a single click and get it all back.</p>
+                    <a href="cleanup" class="btn-launch">Launch →</a>
+                </div>
+                <div class="util-panel-icon">
+                    <img src="images/utilities/cleanup.svg" alt="Scavenger">
+                </div>
+            </div>
 
-<script>
-    $(document).ready(function(){
-        $(".owl-carousel").owlCarousel({
-            loop:true,
-            margin:30,
-            nav:true,
-            dots:false,
-            autoplay:true,
-            autoplayTimeout:5000,
-            responsive:{
-                0:{
-                    items:1
-                },
-                768:{
-                    items:2
-                },
-                1200:{
-                    items:3
-                }
+            <div class="util-panel" id="util-vanity">
+                <div class="util-panel-info">
+                    <div class="util-panel-top">
+                        <span class="util-panel-name">VANITY ADDY</span>
+                        <span class="tool-badge free">Free</span>
+                    </div>
+                    <p class="util-panel-desc">Generate a custom Solana wallet address that starts or ends with your chosen text. Your browser does all the computation locally — no keys ever leave your device.</p>
+                    <a href="vanity" class="btn-launch">Launch →</a>
+                </div>
+                <div class="util-panel-icon">
+                    <img src="images/utilities/vanity.svg" alt="Vanity Addy">
+                </div>
+            </div>
+
+            <div class="util-panel" id="util-airdrop">
+                <div class="util-panel-info">
+                    <div class="util-panel-top">
+                        <span class="util-panel-name">AIRDROP</span>
+                        <span class="tool-badge paid">0.008 SOL / tx</span>
+                    </div>
+                    <p class="util-panel-desc">Send SOL or tokens to hundreds of wallets in seconds. Paste a custom list or auto-fetch all holders of any token — filter by balance, exclude LP pools, and distribute evenly, proportionally, or with a custom amount per wallet.</p>
+                    <a href="airdrop" class="btn-launch">Launch →</a>
+                </div>
+                <div class="util-panel-icon">
+                    <img src="images/utilities/airdrop.svg" alt="Airdrop">
+                </div>
+            </div>
+
+            <div class="util-panel" id="util-pfp">
+                <div class="util-panel-info">
+                    <div class="util-panel-top">
+                        <span class="util-panel-name">PFP GENERATOR</span>
+                        <span class="tool-badge free">Free</span>
+                    </div>
+                    <p class="util-panel-desc">Build your Rat Republic profile picture. Mix and match outfits, accessories, and backgrounds to create a unique identity for the community.</p>
+                    <a href="generator" class="btn-launch">Launch →</a>
+                </div>
+                <div class="util-panel-icon">
+                    <img src="images/utilities/pfp.svg" alt="PFP Generator">
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ── CTA ── -->
+    <section class="section-cta fade-in-el">
+        <h2 class="cta-heading">Ready to Start?</h2>
+        <p class="cta-sub" id="cta-sub">Register to climb up the leaderboard and earn rewards.</p>
+        <a href="register" class="btn-cta" id="cta-btn">Get Started</a>
+    </section>
+
+    <!-- ── Footer ── -->
+    <footer class="footer">
+        <div class="footer-left">
+            <span class="footer-copy">© 2026 Rat Republic. All rights reserved.</span>
+            <div class="footer-legal-links">
+                <a href="legal#terms">Terms</a>
+                <a href="legal#privacy">Privacy</a>
+            </div>
+        </div>
+        <div class="footer-right">
+            <div class="footer-social">
+                <a href="https://x.com/rat_republicsol" target="_blank" title="X">
+                    <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="https://github.com/RatRepublic" target="_blank" title="GitHub">
+                    <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+                <a href="docs" title="Documentation">
+                    <svg viewBox="0 0 24 24"><path d="M12.513 1.097c-.645 0-1.233.34-2.407 1.017L3.675 5.82A7.233 7.233 0 0 0 0 12.063v.236a7.233 7.233 0 0 0 3.667 6.238L7.69 20.86c2.354 1.36 3.531 2.042 4.824 2.042 1.292.001 2.47-.678 4.825-2.038l4.251-2.453c1.177-.68 1.764-1.02 2.087-1.579.323-.56.324-1.24.323-2.6v-2.63a1.04 1.04 0 0 0-1.558-.903l-8.728 5.024c-.587.337-.88.507-1.201.507-.323 0-.616-.168-1.204-.506l-5.904-3.393c-.297-.171-.446-.256-.565-.271a.603.603 0 0 0-.634.368c-.045.111-.045.282-.043.625.002.252 0 .378.025.494.053.259.189.493.387.667.089.077.198.14.416.266l6.315 3.65c.589.34.884.51 1.207.51.324 0 .617-.17 1.206-.509l7.74-4.469c.202-.116.302-.172.377-.13.075.044.075.16.075.392v1.193c0 .34.001.51-.08.649-.08.14-.227.224-.522.394l-6.382 3.685c-1.178.68-1.767 1.02-2.413 1.02-.646 0-1.236-.34-2.412-1.022l-5.97-3.452-.043-.025a4.106 4.106 0 0 1-2.031-3.52V11.7c0-.801.427-1.541 1.12-1.944a1.979 1.979 0 0 1 1.982-.001l4.946 2.858c1.174.679 1.762 1.019 2.407 1.02.645 0 1.233-.34 2.41-1.017l7.482-4.306a1.091 1.091 0 0 0 0-1.891L14.92 2.11c-1.175-.675-1.762-1.013-2.406-1.013Z"/></svg>
+                </a>
+            </div>
+            <div class="footer-divider"></div>
+            <a href="https://solscan.io/account/ratU71Bedbf7196sexgCyBoRxM2Zjb7vBxJ5MJeBYGb" target="_blank" class="footer-fee">Fee Wallet</a>
+        </div>
+    </footer>
+
+    <script>
+        // ── Utility tab switch with fade ──
+        function switchUtil(btn, id) {
+            document.querySelectorAll('.util-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.util-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('util-' + id).classList.add('active');
+        }
+
+        // ── Nav active state ──
+        (function () {
+            const links       = document.querySelectorAll('.nav-pill a');
+            const utilSection = document.getElementById('utilities');
+            function setActive(href) {
+                links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === href));
             }
-        });
-    });
-</script>
+            function onScroll() {
+                const top = utilSection.getBoundingClientRect().top;
+                setActive(top <= 80 ? '#utilities' : '/');
+            }
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        })();
 
-<script src="js/header.js"></script>
-<script src="js/footer.js"></script>
+        // ── Count-up animation ──
+        function countUp(el, target, isFloat) {
+            const duration = 1600;
+            const start = performance.now();
+            (function step(now) {
+                const p = Math.min((now - start) / duration, 1);
+                const ease = 1 - Math.pow(1 - p, 3);
+                const val = target * ease;
+                el.textContent = isFloat
+                    ? val.toLocaleString(undefined, { maximumFractionDigits: 2 })
+                    : Math.floor(val).toLocaleString();
+                if (p < 1) requestAnimationFrame(step);
+            })(start);
+        }
+
+        // ── Stats from API ──
+        fetch('api/public-stats.php')
+            .then(r => r.json())
+            .then(d => {
+                if (d.users_served)    countUp(document.getElementById('stat-users'),    Number(d.users_served),                        false);
+                if (d.accounts_closed) countUp(document.getElementById('stat-accounts'), Number(d.accounts_closed),                     false);
+                if (d.sol_recovered)   countUp(document.getElementById('stat-sol'),      parseFloat(d.sol_recovered),                   true);
+            })
+            .catch(() => {});
+
+        // ── Scroll fade-in ──
+        (function () {
+            const io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('visible');
+                        io.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.12 });
+            document.querySelectorAll('.fade-in-el').forEach(function (el) { io.observe(el); });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var token    = localStorage.getItem('rr_token');
+            var username = localStorage.getItem('rr_username');
+            if (!token || !username) return;
+
+            var el = document.getElementById('header-actions');
+            var safeName = username.length > 16 ? username.slice(0, 16) + '…' : username;
+
+            function renderBtn(avatarSrc) {
+                el.innerHTML =
+                    '<a href="profile" class="btn-profile">' +
+                      '<img class="btn-profile-avatar" src="' + avatarSrc + '" onerror="this.onerror=null;this.src=\'images/Default-Avatar.png\'" alt="">' +
+                      '<span class="btn-profile-name">' + safeName + '</span>' +
+                    '</a>';
+            }
+
+            // Update CTA for logged-in users
+            var ctaBtn = document.getElementById('cta-btn');
+            var ctaSub = document.getElementById('cta-sub');
+            if (ctaBtn) { ctaBtn.href = 'cleanup'; ctaBtn.textContent = 'Launch App'; }
+            if (ctaSub) ctaSub.textContent = 'Reclaim SOL from empty accounts and grow your rewards.';
+
+            // Show immediately with cached avatar, then refresh from API
+            var cached = localStorage.getItem('rr_avatar');
+            renderBtn(cached || 'images/Default-Avatar.png');
+
+            fetch('api/me.php', { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (d) {
+                    if (!d) return;
+                    var fresh = d.avatar || 'images/Default-Avatar.png';
+                    if (d.avatar) localStorage.setItem('rr_avatar', d.avatar);
+                    renderBtn(fresh);
+                }).catch(function () {});
+        })();
+    </script>
 </body>
 </html>

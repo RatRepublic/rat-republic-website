@@ -82,26 +82,6 @@ document.addEventListener('DOMContentLoaded', function () {
             context.drawImage(headOverlay, 0, 0, canvas.width, canvas.height);
         }
 
-        // Meme text overlay
-        const memeText = document.getElementById('meme-text');
-        if (memeText && memeText.value.trim()) {
-            const text = memeText.value.trim();
-            const fontSize = parseInt(document.getElementById('meme-size').value) || 30;
-            const color = document.getElementById('meme-color').value || '#ffffff';
-            const pos = document.getElementById('meme-pos').value;
-
-            context.font = `bold ${fontSize}px Impact, Arial Black, sans-serif`;
-            context.textAlign = 'center';
-            context.lineWidth = fontSize / 8;
-            context.strokeStyle = 'rgba(0,0,0,0.9)';
-            context.fillStyle = color;
-
-            const x = canvas.width / 2;
-            const y = pos === 'top' ? fontSize + 10 : canvas.height - 14;
-
-            context.strokeText(text, x, y);
-            context.fillText(text, x, y);
-        }
     }
 
     function addClickListener(elements, overlay) {
@@ -289,71 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
         drawImageOnCanvas();
     }
 
-    // --- 6. DAILY RAT ---
-    function seededRand(seed) {
-        var s = seed;
-        return function() {
-            s = (s * 1664525 + 1013904223) & 0xffffffff;
-            return (s >>> 0) / 4294967296;
-        };
-    }
-
-    const dailyButton = document.getElementById('daily-button');
-    if (dailyButton) dailyButton.addEventListener('click', function () {
-        const d = new Date();
-        const dateStr = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-        const rand = seededRand(dateStr);
-
-        function pickRequired(elements, overlay) {
-            if (!elements.length) return;
-            const idx = Math.floor(rand() * elements.length);
-            const el = elements[idx];
-            overlay.src = el.src;
-            overlay.onload = function() { overlay.classList.remove('hidden'); drawImageOnCanvas(); };
-            if (overlay.complete) { overlay.classList.remove('hidden'); drawImageOnCanvas(); }
-        }
-
-        pickRequired(backgrounds, backgroundOverlay);
-        pickRequired(skins, outfitOverlay);
-        pickRequired(outfits, handOverlay);
-        pickRequired(mouths, mouthOverlay);
-        pickRequired(eyes, eyesOverlay);
-        pickRequired(heads, headOverlay);
-        drawImageOnCanvas();
-    });
-
-    // --- 7. SHARE TO X ---
-    const shareButton = document.getElementById('share-button');
-    if (shareButton) shareButton.addEventListener('click', function () {
-        drawImageOnCanvas();
-        canvas.toBlob(function(blob) {
-            const file = new File([blob], 'rat-pfp.png', { type: 'image/png' });
-            const tweetText = encodeURIComponent('Just built my Rat Republic PFP! 🐀🔥 #RatRepublic #Solana');
-            const tweetUrl = 'https://twitter.com/intent/tweet?text=' + tweetText;
-
-            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                navigator.share({ title: 'My Rat Republic PFP', files: [file] });
-            } else {
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = 'rat-pfp.png';
-                link.click();
-                URL.revokeObjectURL(link.href);
-                setTimeout(function() { window.open(tweetUrl, '_blank'); }, 500);
-            }
-        });
-    });
-
-    // --- 8. MEME TEXT LIVE PREVIEW ---
-    const memeTextInput = document.getElementById('meme-text');
-    const memeSizeInput = document.getElementById('meme-size');
-    const memeColorInput = document.getElementById('meme-color');
-    const memePosInput = document.getElementById('meme-pos');
-    [memeTextInput, memeSizeInput, memeColorInput, memePosInput].forEach(function(el) {
-        if (el) el.addEventListener('input', drawImageOnCanvas);
-    });
-
-    // --- 9. ITEM PREVIEW TOOLTIP ---
+    // --- 6. ITEM PREVIEW TOOLTIP ---
     const preview = document.getElementById('item-preview');
     const previewImg = preview.querySelector('img');
 

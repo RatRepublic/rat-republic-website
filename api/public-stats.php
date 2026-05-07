@@ -1,28 +1,56 @@
 <?php
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
-header('Cache-Control: public, max-age=300'); // cache 5 min
+header('Cache-Control: public, max-age=300');
 
-require_once __DIR__ . '/db.php';
+$statsFile = dirname(__DIR__) . '/stats.json';
+$cacheTtl  = 300; // 5 minutes
 
+// Serve cache if fresh
+if (file_exists($statsFile) && (time() - filemtime($statsFile)) < $cacheTtl) {
+    $cached = json_decode(file_get_contents($statsFile), true);
+    if (!empty($cached) && ($cached['users_served'] ?? 0) > 0) {
+        echo json_encode([
+            'users_served'    => (int)$cached['users_served'],
+            'accounts_closed' => (int)$cached['accounts_closed'],
+            'sol_recovered'   => round((float)$cached['sol_recovered'], 2),
+        ]);
+        exit;
+    }
+}
+
+// Rebuild from DB
 try {
+    require_once __DIR__ . '/db.php';
     $db = getDB();
 
     $row = $db->query(
-        "SELECT
-            COALESCE(SUM(sol_amount), 0)                                                        AS total_sol,
-            COALESCE(SUM(CASE WHEN claimed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)  THEN sol_amount END), 0) AS week_sol,
-            COALESCE(SUM(CASE WHEN claimed_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN sol_amount END), 0) AS month_sol,
-            COALESCE(SUM(accounts_closed), 0)                                                   AS total_accounts
-         FROM reclaim_history"
+        'SELECT COUNT(DISTINCT wallet_address) AS users_served,
+                COALESCE(SUM(accounts_closed), 0) AS accounts_closed,
+                COALESCE(SUM(sol_amount), 0)      AS sol_recovered
+         FROM reclaim_history'
     )->fetch(PDO::FETCH_ASSOC);
 
+    $stats = [
+        'users_served'    => (int)$row['users_served'],
+        'accounts_closed' => (int)$row['accounts_closed'],
+        'sol_recovered'   => round((float)$row['sol_recovered'], 9),
+    ];
+
+    // Write cache
+    file_put_contents($statsFile, json_encode($stats), LOCK_EX);
+
     echo json_encode([
-        'total_sol'      => round((float)$row['total_sol'],  2),
-        'week_sol'       => round((float)$row['week_sol'],   2),
-        'month_sol'      => round((float)$row['month_sol'],  2),
-        'total_accounts' => (int)$row['total_accounts'],
+        'users_served'    => $stats['users_served'],
+        'accounts_closed' => $stats['accounts_closed'],
+        'sol_recovered'   => round($stats['sol_recovered'], 2),
     ]);
 } catch (Exception $e) {
-    echo json_encode(['error' => 'unavailable']);
+    // Fall back to whatever is on disk
+    $fallback = file_exists($statsFile) ? json_decode(file_get_contents($statsFile), true) : [];
+    echo json_encode([
+        'users_served'    => (int)($fallback['users_served']    ?? 0),
+        'accounts_closed' => (int)($fallback['accounts_closed'] ?? 0),
+        'sol_recovered'   => round((float)($fallback['sol_recovered'] ?? 0), 2),
+    ]);
 }

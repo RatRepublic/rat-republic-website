@@ -4,212 +4,109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rat Republic — Register</title>
-    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: #1a1f0f;
-            background-image: url('images/Background.png');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            color: #fff;
-            font-family: monospace, 'Courier New', sans-serif;
-            min-height: 100vh;
-            padding: 30px 20px 60px;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
+        @font-face { font-family: 'Inter'; src: url('fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype'); font-weight: 100 900; font-style: normal; }
+        @font-face { font-family: 'NftOpensea'; src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype'); }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #080808; --surface: #111111; --surface-2: #161616;
+            --border: rgba(255,255,255,0.07); --border-hover: rgba(255,255,255,0.15);
+            --text: #ffffff; --text-muted: rgba(255,255,255,0.45); --text-dim: rgba(255,255,255,0.22);
+            --accent: #C8E030; --accent-dim: rgba(200,224,48,0.1);
         }
-        .container { width: 100%; max-width: 420px; }
-        @font-face {
-            font-family: 'NftOpensea';
-            src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
-        }
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 24px;
-            background-color: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            color: #C8E030;
-            text-decoration: none;
-            font-weight: bold;
-            padding: 8px 20px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            font-size: 0.85rem;
-        }
-        .back-btn:hover { border-color: #C8E030; box-shadow: 0 0 10px rgba(200,224,48,0.3); }
-        .main-card {
-            background: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            border-radius: 16px;
-            padding: 32px 28px;
-        }
-        .page-title {
-            text-align: center;
-            font-family: 'NftOpensea', monospace;
-            color: #fff;
-            font-size: 1.8rem;
-            letter-spacing: 3px;
-            margin-bottom: 6px;
-        }
-        .page-sub {
-            text-align: center;
-            color: rgba(255,255,255,0.35);
-            font-size: 0.68rem;
-            letter-spacing: 2px;
-            margin-bottom: 28px;
-        }
-        .field { margin-bottom: 18px; }
-        .field label {
-            display: block;
-            font-size: 0.65rem;
-            color: rgba(255,255,255,0.4);
-            letter-spacing: 2px;
-            margin-bottom: 6px;
-        }
-        .field input {
-            width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 1.5px solid #5A7A18;
-            border-radius: 8px;
-            color: #fff;
-            font-family: monospace;
-            font-size: 0.9rem;
-            padding: 11px 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .field input:focus { border-color: #C8E030; }
-        .field input::placeholder { color: rgba(255,255,255,0.2); }
-        .btn-submit {
-            width: 100%;
-            background-color: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            color: #C8E030;
-            font-weight: bold;
-            font-family: 'NftOpensea', monospace;
-            font-size: 0.95rem;
-            padding: 13px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-            margin-top: 4px;
-        }
-        .btn-submit:hover {
-            border-color: #C8E030;
-            box-shadow: 0 0 14px rgba(200,224,48,0.35);
-            background-color: rgba(40,60,15,0.98);
-        }
-        .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
-        .msg {
-            margin-top: 14px;
-            font-size: 0.78rem;
-            text-align: center;
-            min-height: 1.2em;
-        }
+        html, body { min-height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+        body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 20px 60px; min-height: 100vh; }
+
+        .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 32px; }
+        .brand img { width: 28px; height: 28px; object-fit: contain; }
+        .brand span { font-family: 'NftOpensea'; font-size: 0.88rem; letter-spacing: 0.12em; color: var(--text); }
+
+        .auth-card { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px 32px; }
+
+        .card-title { font-family: 'NftOpensea'; font-size: 1.5rem; letter-spacing: 0.08em; color: var(--text); margin-bottom: 4px; text-align: center; }
+        .card-sub { font-size: 0.72rem; color: var(--text-dim); text-align: center; letter-spacing: 0.06em; margin-bottom: 28px; }
+
+        .field { margin-bottom: 16px; }
+        .field label { display: block; font-size: 0.62rem; font-weight: 600; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 7px; }
+        .field input { width: 100%; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.9rem; padding: 11px 14px; outline: none; transition: border-color 0.15s; }
+        .field input:focus { border-color: rgba(200,224,48,0.4); }
+        .field input::placeholder { color: var(--text-dim); }
+
+        .btn-submit { width: 100%; font-family: 'NftOpensea'; font-size: 0.88rem; letter-spacing: 0.08em; color: #0a0a0a; background: var(--accent); border: none; border-radius: 10px; padding: 14px; cursor: pointer; transition: opacity 0.15s; margin-top: 6px; }
+        .btn-submit:hover { opacity: 0.9; }
+        .btn-submit:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        .msg { margin-top: 12px; font-size: 0.78rem; text-align: center; min-height: 1.2em; }
         .msg.error { color: #ff8080; }
-        .msg.success { color: #C8E030; }
-        .login-link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.74rem;
-            color: rgba(255,255,255,0.35);
-        }
-        .login-link a { color: #C8E030; text-decoration: none; }
-        .login-link a:hover { text-decoration: underline; }
-        .check-inbox {
-            text-align: center;
-            padding: 10px 0 6px;
-        }
-        .inbox-icon {
-            font-size: 2.8rem;
-            margin-bottom: 14px;
-        }
-        .inbox-title {
-            font-family: 'NftOpensea', monospace;
-            font-size: 1.3rem;
-            color: #C8E030;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
-        }
-        .inbox-body {
-            color: rgba(255,255,255,0.55);
-            font-size: 0.8rem;
-            line-height: 1.7;
-            margin-bottom: 20px;
-        }
-        .inbox-email {
-            color: #C8E030;
-        }
-        .btn-resend {
-            background: transparent;
-            border: 1.5px solid #5A7A18;
-            color: rgba(255,255,255,0.4);
-            font-family: monospace;
-            font-size: 0.75rem;
-            padding: 8px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-        }
-        .btn-resend:hover { border-color: #C8E030; color: #C8E030; }
+        .msg.success { color: var(--accent); }
+
+        .footer-link { text-align: center; margin-top: 20px; font-size: 0.74rem; color: var(--text-dim); }
+        .footer-link a { color: var(--accent); text-decoration: none; }
+        .footer-link a:hover { text-decoration: underline; }
+
+        /* Inbox screen */
+        .check-inbox { text-align: center; padding: 8px 0; }
+        .inbox-icon { font-size: 2.8rem; margin-bottom: 14px; }
+        .inbox-title { font-family: 'NftOpensea'; font-size: 1.2rem; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 12px; }
+        .inbox-body { color: var(--text-muted); font-size: 0.8rem; line-height: 1.7; margin-bottom: 20px; }
+        .inbox-email { color: var(--accent); }
+        .btn-resend { background: transparent; border: 1px solid var(--border-hover); color: var(--text-dim); font-family: 'Inter'; font-size: 0.75rem; padding: 8px 20px; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+        .btn-resend:hover { border-color: var(--accent); color: var(--accent); }
         .btn-resend:disabled { opacity: 0.3; cursor: not-allowed; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="tools" class="back-btn">← Back to Utilities</a>
-        <div class="main-card">
-            <div class="page-title">REGISTER</div>
-            <div class="page-sub">CREATE YOUR RAT REPUBLIC ACCOUNT</div>
+    <a href="/" class="brand">
+        <img src="images/branding/rat-republic-logo.svg" alt="">
+        <span>RAT REPUBLIC</span>
+    </a>
 
-            <div class="field">
-                <label>USERNAME</label>
-                <input type="text" id="username" placeholder="RatKing" maxlength="20" autocomplete="username">
-            </div>
-            <div class="field">
-                <label>EMAIL</label>
-                <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
-            </div>
-            <div class="field">
-                <label>PASSWORD</label>
-                <input type="password" id="password" placeholder="Min 8 characters" autocomplete="new-password">
-            </div>
-            <div class="field">
-                <label>CONFIRM PASSWORD</label>
-                <input type="password" id="confirm" placeholder="Repeat password" autocomplete="new-password">
-            </div>
+    <div class="auth-card">
+        <div class="card-title" id="card-title">REGISTER</div>
+        <div class="card-sub" id="card-sub">CREATE YOUR RAT REPUBLIC ACCOUNT</div>
 
-            <button class="btn-submit" id="register-btn">Create Account</button>
-            <div class="msg" id="msg"></div>
+        <div class="field">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="RatKing" maxlength="20" autocomplete="username">
+        </div>
+        <div class="field">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="field">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Min 8 characters" autocomplete="new-password">
+        </div>
+        <div class="field">
+            <label>Confirm Password</label>
+            <input type="password" id="confirm" placeholder="Repeat password" autocomplete="new-password">
+        </div>
 
-            <div class="login-link">Already have an account? <a href="login">Log in</a></div>
+        <button class="btn-submit" id="register-btn">Create Account</button>
+        <div class="msg" id="msg"></div>
 
-            <!-- Shown after successful registration -->
-            <div class="check-inbox" id="inbox-screen" style="display:none;">
-                <div class="inbox-icon">📬</div>
-                <div class="inbox-title">CHECK YOUR INBOX</div>
-                <div class="inbox-body">
-                    We sent a verification link to<br>
-                    <span class="inbox-email" id="inbox-email-display"></span><br><br>
-                    Click the link in the email to activate your account.<br>
-                    The link expires in <strong style="color:#C8E030;">24 hours</strong>.
-                </div>
-                <button class="btn-resend" id="resend-btn">Resend Email</button>
-                <div class="msg" id="resend-msg" style="margin-top:10px;"></div>
+        <div class="footer-link" id="login-link">Already have an account? <a href="login">Log in</a></div>
+
+        <div class="check-inbox" id="inbox-screen" style="display:none;">
+            <div class="inbox-icon">📬</div>
+            <div class="inbox-title">CHECK YOUR INBOX</div>
+            <div class="inbox-body">
+                We sent a verification link to<br>
+                <span class="inbox-email" id="inbox-email-display"></span><br><br>
+                Click the link in the email to activate your account.<br>
+                The link expires in <strong style="color:var(--accent);">24 hours</strong>.
             </div>
+            <button class="btn-resend" id="resend-btn">Resend Email</button>
+            <div class="msg" id="resend-msg" style="margin-top:10px;"></div>
         </div>
     </div>
 
     <script>
-        var btn        = document.getElementById('register-btn');
-        var msg        = document.getElementById('msg');
+        var btn = document.getElementById('register-btn');
+        var msg = document.getElementById('msg');
         var registeredEmail = '';
-        var refCode    = new URLSearchParams(window.location.search).get('ref') || '';
+        var refCode = new URLSearchParams(window.location.search).get('ref') || '';
 
         btn.addEventListener('click', async function () {
             var username = document.getElementById('username').value.trim();
@@ -255,15 +152,12 @@
                     return;
                 }
 
-                // Show the "check your inbox" screen
                 registeredEmail = email;
                 document.getElementById('inbox-email-display').textContent = email;
-                document.querySelector('.main-card').querySelectorAll('.field, .btn-submit, .msg, .login-link').forEach(function (el) {
-                    el.style.display = 'none';
-                });
+                document.querySelectorAll('.field, #register-btn, #msg, #login-link').forEach(function (el) { el.style.display = 'none'; });
                 document.getElementById('inbox-screen').style.display = 'block';
-                document.querySelector('.page-title').textContent = 'ALMOST THERE';
-                document.querySelector('.page-sub').textContent   = 'ONE LAST STEP';
+                document.getElementById('card-title').textContent = 'ALMOST THERE';
+                document.getElementById('card-sub').textContent   = 'ONE LAST STEP';
 
             } catch (e) {
                 msg.className = 'msg error';
@@ -273,7 +167,6 @@
             }
         });
 
-        // Resend button
         var resendBtn = document.getElementById('resend-btn');
         var resendMsg = document.getElementById('resend-msg');
         var resendCooldown = false;
@@ -298,17 +191,12 @@
                 resendMsg.textContent = 'Network error. Try again.';
             }
 
-            // 60-second cooldown to prevent spam
             setTimeout(function () {
                 resendBtn.disabled = false;
                 resendCooldown = false;
-                if (resendMsg.textContent === 'Email resent! Check your inbox.') {
-                    resendMsg.textContent = '';
-                }
+                if (resendMsg.textContent === 'Email resent! Check your inbox.') resendMsg.textContent = '';
             }, 60000);
         });
     </script>
-    <script src="js/header.js"></script>
-    <script src="js/footer.js"></script>
 </body>
 </html>

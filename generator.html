@@ -3,199 +3,494 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="Rat Republic">
-    <meta property="og:description" content="Rat Republic">
+    <meta property="og:title" content="Rat Republic — PFP Generator">
+    <meta property="og:description" content="Build your Rat Republic PFP">
     <meta property="og:image" content="images/meta-img3.png">
-    <meta property="og:url" content="">
-    <meta name="twitter:title" content="Rat Republic">
-    <meta name="twitter:description" content="">
-    <meta name="twitter:image" content="images/meta-img3.png">
     <meta name="twitter:card" content="summary_large_image">
+    <title>Rat Republic — PFP Generator</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <style>
+        @font-face { font-family: 'Inter'; src: url('fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype'); font-weight: 100 900; font-style: normal; }
+        @font-face { font-family: 'NftOpensea'; src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype'); }
 
-    <title>Rat Republic</title>
-    <link rel="icon" type="image/png" href="images/favicon.png">
-    <link rel="stylesheet" href="css/style5.css">
-    
-    <link rel="stylesheet" href="css/owl.carousel.min.css">
-    <link rel="stylesheet" href="css/owl.theme.default.min.css">
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #080808; --sidebar-bg: #0d0d0d; --surface: #111111; --surface-2: #161616;
+            --border: rgba(255,255,255,0.07); --border-hover: rgba(255,255,255,0.15);
+            --text: #ffffff; --text-muted: rgba(255,255,255,0.45); --text-dim: rgba(255,255,255,0.22);
+            --accent: #C8E030; --accent-dim: rgba(200,224,48,0.1); --sidebar-w: 220px;
+        }
+
+        html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+        /* ── Sidebar ── */
+        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 100; }
+        .sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 20px 16px; text-decoration: none; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+        .sidebar-brand img { width: 26px; height: 26px; object-fit: contain; flex-shrink: 0; }
+        .sidebar-brand span { font-family: 'NftOpensea'; font-size: 0.85rem; letter-spacing: 0.12em; color: var(--text); }
+        .sidebar-nav { flex: 1; padding: 4px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; text-decoration: none; font-size: 0.84rem; font-weight: 500; color: var(--text-muted); transition: background 0.15s, color 0.15s; }
+        .sidebar-nav a:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+        .sidebar-nav a.active { background: rgba(255,255,255,0.07); color: var(--text); }
+        .sidebar-nav a svg, .nav-group-toggle svg.nav-icon { width: 15px; height: 15px; opacity: 0.6; flex-shrink: 0; }
+        .sidebar-nav a.active svg, .sidebar-nav a:hover svg { opacity: 1; }
+        .sidebar-divider { height: 1px; background: var(--border); margin: 8px 10px; }
+        .nav-group-toggle { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border-radius: 8px; background: none; border: none; font-family: 'Inter'; font-size: 0.84rem; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: background 0.15s, color 0.15s; text-align: left; }
+        .nav-group-toggle:hover, .nav-group-toggle.open { background: rgba(255,255,255,0.05); color: var(--text); }
+        .nav-group-toggle.open svg.nav-icon { opacity: 1; }
+        .nav-group-toggle .chevron { margin-left: auto; width: 13px; height: 13px; opacity: 0.4; transition: transform 0.2s; flex-shrink: 0; }
+        .nav-group-toggle.open .chevron { transform: rotate(180deg); opacity: 0.7; }
+        .nav-sub { display: none; flex-direction: column; gap: 1px; padding-left: 14px; margin-top: 1px; }
+        .nav-sub.open { display: flex; }
+        .nav-sub a { font-size: 0.8rem; padding: 7px 12px; gap: 8px; }
+        .nav-sub a::before { content: ''; width: 1px; height: 14px; background: rgba(255,255,255,0.12); flex-shrink: 0; border-radius: 1px; }
+        .nav-sub a.active::before { background: var(--accent); }
+        .sidebar-bottom { padding: 10px; border-top: 1px solid var(--border); }
+        .sidebar-socials { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; }
+        .sidebar-social-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.08); color: var(--text-dim); text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+        .sidebar-social-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text-muted); }
+        .sidebar-social-btn svg { width: 12px; height: 12px; fill: currentColor; }
+
+        /* Logged-in user widget */
+        .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; margin-bottom: 4px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); }
+        .sidebar-avatar { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: #1a1a1a; }
+        .sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .sidebar-username { font-size: 0.82rem; font-weight: 600; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sidebar-rank { font-size: 0.65rem; color: var(--accent); font-weight: 600; }
+        .btn-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border-radius: 8px; font-family: 'Inter'; font-size: 0.82rem; font-weight: 500; color: rgba(255,100,100,0.6); background: transparent; border: none; cursor: pointer; transition: background 0.15s, color 0.15s; }
+        .btn-logout:hover { background: rgba(255,80,80,0.07); color: rgba(255,120,120,0.9); }
+        .btn-logout svg { width: 14px; height: 14px; opacity: 0.7; }
+
+        /* Guest widget */
+        .sidebar-guest { padding: 10px 12px; border-radius: 8px; margin-bottom: 4px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); }
+        .sidebar-guest-note { font-size: 0.7rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 8px; }
+        .btn-sidebar-login { display: flex; align-items: center; justify-content: center; width: 100%; padding: 7px 12px; border-radius: 7px; font-family: 'Inter'; font-size: 0.78rem; font-weight: 600; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(200,224,48,0.2); text-decoration: none; transition: background 0.15s; }
+        .btn-sidebar-login:hover { background: rgba(200,224,48,0.18); }
+
+        /* ── Main ── */
+        .main { margin-left: var(--sidebar-w); min-height: 100vh; padding: 36px 32px 80px; }
+
+        /* ── Title row ── */
+        .title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .page-title { font-family: 'NftOpensea'; font-size: 1.9rem; letter-spacing: 0.06em; color: var(--text); }
+        .page-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px; }
+
+        /* ── Generator layout ── */
+        .gen-layout { display: grid; grid-template-columns: 286px 1fr; gap: 20px; align-items: start; }
+
+        /* ── Preview panel (left, sticky) ── */
+        .gen-preview { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 10px; }
+
+        .preview-frame {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .preview-frame img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Layer z-index order */
+        #background-overlay { z-index: 1; }
+        #base               { z-index: 2; }
+        #outfit-overlay     { z-index: 3; }
+        #hand-overlay       { z-index: 4; }
+        #mouth-overlay      { z-index: 5; }
+        #eyes-overlay       { z-index: 6; }
+        #head-overlay       { z-index: 7; }
+
+        .hidden { display: none !important; }
+
+        /* ── Generator action buttons ── */
+        .gen-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+        #reset-button, #randomize-button, #download-button, #share-button {
+            font-family: 'Inter';
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 9px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+        }
+
+        #reset-button {
+            background: transparent;
+            border: 1px solid var(--border-hover);
+            color: var(--text-muted);
+        }
+        #reset-button:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
+
+        #randomize-button {
+            background: var(--accent-dim);
+            border: 1px solid rgba(200,224,48,0.3);
+            color: var(--accent);
+        }
+        #randomize-button:hover { background: rgba(200,224,48,0.18); }
+
+        #download-button {
+            background: var(--accent);
+            border: none;
+            color: #0a0a0a;
+            font-weight: 700;
+        }
+        #download-button:hover { opacity: 0.88; }
+
+        /* ── Traits panel (right) ── */
+        .gen-traits { display: flex; flex-direction: column; gap: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+
+        .trait-group { border-bottom: 1px solid var(--border); }
+        .trait-group:last-child { border-bottom: none; }
+
+        .trait-header { display: flex; align-items: center; gap: 8px; padding: 10px 16px 8px; }
+        .trait-label { font-size: 0.62rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; }
+        .trait-count { font-size: 0.6rem; color: var(--text-dim); margin-left: auto; }
+
+        .trait-strip { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 14px 12px; }
+
+        /* ── Trait image thumbnails ── */
+        .outfit {
+            width: 54px !important;
+            height: 54px !important;
+            object-fit: contain;
+            cursor: pointer;
+            background: var(--surface-2);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            transition: border-color 0.15s, transform 0.1s;
+            display: block;
+            flex-shrink: 0;
+        }
+        .outfit:hover { border-color: rgba(200,224,48,0.5); transform: scale(1.06); }
+        .outfit.selected { border-color: var(--accent); box-shadow: 0 0 8px rgba(200,224,48,0.25); }
+
+        /* ── Item hover preview tooltip ── */
+        #item-preview {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            background: var(--surface);
+            border: 1.5px solid var(--border-hover);
+            border-radius: 10px;
+            padding: 6px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            transform: translate(-50%, -110%);
+        }
+        #item-preview img { width: 130px; height: 130px; object-fit: contain; display: block; }
+
+        /* ── Download / Share modal ── */
+        .pfp-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.82); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+        .pfp-modal-overlay.hidden { display: none; }
+        .pfp-modal-card { background: var(--surface); border: 1px solid var(--border-hover); border-radius: 16px; padding: 28px 24px 22px; display: flex; flex-direction: column; align-items: center; gap: 18px; position: relative; max-width: 90vw; }
+        .pfp-modal-close { position: absolute; top: 10px; right: 12px; background: none; border: none; color: var(--text-muted); font-size: 1rem; cursor: pointer; padding: 2px 7px; border-radius: 4px; transition: color 0.15s; }
+        .pfp-modal-close:hover { color: var(--text); }
+        .pfp-share-preview { display: block; border-radius: 10px; border: 1px solid var(--border-hover); max-width: min(500px, 78vw); max-height: min(500px, 78vw); width: auto; height: auto; }
+        .pfp-modal-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .pfp-modal-actions button { font-family: 'Inter'; font-size: 0.8rem; font-weight: 600; padding: 9px 18px; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+        #pfp-download-pfp-btn { background: var(--accent); border: none; color: #0a0a0a; }
+        #pfp-download-pfp-btn:hover { opacity: 0.88; }
+        #pfp-download-card-btn { background: var(--accent-dim); border: 1px solid rgba(200,224,48,0.3); color: var(--accent); }
+        #pfp-download-card-btn:hover { background: rgba(200,224,48,0.18); }
+        #pfp-flaunt-btn { background: transparent; border: 1px solid var(--border-hover); color: var(--text-muted); }
+        #pfp-flaunt-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
+
+        @media (max-width: 960px) {
+            .main { margin-left: 0; padding: 20px 14px 60px; }
+            .sidebar { transform: translateX(-100%); }
+            .gen-layout { grid-template-columns: 1fr; }
+            .gen-preview { position: static; }
+            .preview-frame { max-width: 320px; margin: 0 auto; }
+        }
+    </style>
 </head>
 <body>
-    <div class="game-container" id="game-container">
-        <div class="base-and-options">
-            <div class="base-image">
-                <img id="background-overlay" src="" alt="Background Overlay" class="hidden">
-                <img id="base" src="images/blank.png" alt="Base Character">
-                
-                <img id="outfit-overlay" src="" alt="Outfit Overlay" class="hidden">
-                
-                <img id="hand-overlay" src="" alt="Hand Overlay" class="hidden">
-                <img id="mouth-overlay" src="" alt="Mouth Overlay" class="hidden">
-                
-                <img id="eyes-overlay" src="" alt="Eyes Overlay" class="hidden">
-                <img id="head-overlay" src="" alt="Head Overlay" class="hidden">
-                
-                <div class="button-container">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+        <a href="/" class="sidebar-brand">
+            <img src="images/branding/rat-republic-logo.svg" alt="">
+            <span>RAT REPUBLIC</span>
+        </a>
+        <nav class="sidebar-nav">
+            <a href="/">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Home
+            </a>
+            <button class="nav-group-toggle open" id="utilities-toggle" onclick="toggleUtilities()">
+                <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
+                Utilities
+                <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="nav-sub open" id="utilities-sub">
+                <a href="cleanup">Scavenger</a>
+                <a href="vanity">Vanity Addy</a>
+                <a href="airdrop">Airdrop</a>
+                <a href="generator" class="active">PFP Generator</a>
+            </div>
+            <a href="leaderboard">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Crowned Vermins
+            </a>
+            <a href="roadmap">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                Roadmap
+            </a>
+            <div class="sidebar-divider"></div>
+            <a href="profile">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Profile
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <div class="sidebar-socials">
+                <a href="https://x.com/rat_republicsol" target="_blank" rel="noopener" class="sidebar-social-btn" title="X">
+                    <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="https://github.com/RatRepublic" target="_blank" rel="noopener" class="sidebar-social-btn" title="GitHub">
+                    <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+                <a href="docs" class="sidebar-social-btn" title="Documentation">
+                    <svg viewBox="0 0 24 24"><path d="M12.513 1.097c-.645 0-1.233.34-2.407 1.017L3.675 5.82A7.233 7.233 0 0 0 0 12.063v.236a7.233 7.233 0 0 0 3.667 6.238L7.69 20.86c2.354 1.36 3.531 2.042 4.824 2.042 1.292.001 2.47-.678 4.825-2.038l4.251-2.453c1.177-.68 1.764-1.02 2.087-1.579.323-.56.324-1.24.323-2.6v-2.63a1.04 1.04 0 0 0-1.558-.903l-8.728 5.024c-.587.337-.88.507-1.201.507-.323 0-.616-.168-1.204-.506l-5.904-3.393c-.297-.171-.446-.256-.565-.271a.603.603 0 0 0-.634.368c-.045.111-.045.282-.043.625.002.252 0 .378.025.494.053.259.189.493.387.667.089.077.198.14.416.266l6.315 3.65c.589.34.884.51 1.207.51.324 0 .617-.17 1.206-.509l7.74-4.469c.202-.116.302-.172.377-.13.075.044.075.16.075.392v1.193c0 .34.001.51-.08.649-.08.14-.227.224-.522.394l-6.382 3.685c-1.178.68-1.767 1.02-2.413 1.02-.646 0-1.236-.34-2.412-1.022l-5.97-3.452-.043-.025a4.106 4.106 0 0 1-2.031-3.52V11.7c0-.801.427-1.541 1.12-1.944a1.979 1.979 0 0 1 1.982-.001l4.946 2.858c1.174.679 1.762 1.019 2.407 1.02.645 0 1.233-.34 2.41-1.017l7.482-4.306a1.091 1.091 0 0 0 0-1.891L14.92 2.11c-1.175-.675-1.762-1.013-2.406-1.013Z"/></svg>
+                </a>
+            </div>
+            <div style="height:1px;background:var(--border);margin:2px 2px 8px;"></div>
+            <div id="sidebar-user-widget"></div>
+        </div>
+    </aside>
+
+    <!-- ── Main ── -->
+    <main class="main">
+        <div class="title-row">
+            <h1 class="page-title">PFP GENERATOR</h1>
+        </div>
+        <p class="page-sub">Build your Rat Republic character. Mix and match traits, add a meme, then download or flaunt.</p>
+
+        <div class="gen-layout">
+
+            <!-- ── Left: Preview + controls ── -->
+            <div class="gen-preview">
+                <!-- Layered character preview -->
+                <div class="preview-frame">
+                    <img id="background-overlay" src="" alt="" class="hidden" crossorigin="anonymous">
+                    <img id="base" src="images/blank.png" alt="" crossorigin="anonymous">
+                    <img id="outfit-overlay" src="" alt="" class="hidden" crossorigin="anonymous">
+                    <img id="hand-overlay" src="" alt="" class="hidden" crossorigin="anonymous">
+                    <img id="mouth-overlay" src="" alt="" class="hidden" crossorigin="anonymous">
+                    <img id="eyes-overlay" src="" alt="" class="hidden" crossorigin="anonymous">
+                    <img id="head-overlay" src="" alt="" class="hidden" crossorigin="anonymous">
+                </div>
+
+                <!-- Action buttons -->
+                <div class="gen-actions">
                     <button id="reset-button">Reset</button>
-                    <button id="download-button">Download</button>
                     <button id="randomize-button">Randomize</button>
+                    <button id="download-button" style="grid-column:span 2">Download</button>
                 </div>
             </div>
-            
-            <div class="outfit-section">
-                
-                <p>Background</p>
-                <div class="outfit-options backgrounds owl-carousel owl-theme">
-                    <div class="item"><img class="outfit background" src="images/bg/bg1.png" alt="Background 1"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg2.png" alt="Background 2"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg3.png" alt="Background 3"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg4.png" alt="Background 4"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg5.png" alt="Background 5"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg6.png" alt="Background 6"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg7.png" alt="Background 7"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg8.png" alt="Background 8"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg9.png" alt="Background 9"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg10.png" alt="Background 10"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg11.png" alt="Background 11"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg12.png" alt="Background 12"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg13.png" alt="Background 13"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg14.png" alt="Background 14"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg15.png" alt="Background 15"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg16.png" alt="Background 16"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg17.png" alt="Background 17"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg18.png" alt="Background 18"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg19.png" alt="Background 19"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg20.png" alt="Background 20"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg21.png" alt="Background 21"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg22.png" alt="Background 22"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg23.png" alt="Background 23"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg24.png" alt="Background 24"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg25.png" alt="Background 25"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg26.png" alt="Background 26"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg27.png" alt="Background 27"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg28.png" alt="Background 28"></div>
-                    <div class="item"><img class="outfit background" src="images/bg/bg29.png" alt="Background 29"></div>
-                </div>
-                
-                
-                <p>Skin</p>
-                <div class="outfit-options skin-options owl-carousel owl-theme">
-                    <div class="item"><img class="outfit skin-item" src="images/skin/Taffy.png" alt="Skin 1"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/azure.png" alt="Skin 2"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/bumblebee.png" alt="Skin 3"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/carolina.png" alt="Skin 4"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/chili.png" alt="Skin 5"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/coffee.png" alt="Skin 6"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/honey.png" alt="Skin 7"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/jungle.png" alt="Skin 8"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/lemon.png" alt="Skin 9"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/lilac.png" alt="Skin 10"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/lollipop.png" alt="Skin 11"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/mint.png" alt="Skin 12"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/mulberry.png" alt="Skin 13"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/normal.png" alt="Skin 14"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/plum.png" alt="Skin 15"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/punch.png" alt="Skin 16"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/ruby.png" alt="Skin 17"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/sea.png" alt="Skin 18"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/space.png" alt="Skin 19"></div>
-                    <div class="item"><img class="outfit skin-item" src="images/skin/tiger.png" alt="Skin 20"></div>
+
+            <!-- ── Right: Trait selectors ── -->
+            <div class="gen-traits">
+
+                <div class="trait-group">
+                    <div class="trait-header">
+                        <span class="trait-label">Background</span>
+                        <span class="trait-count">29 options</span>
+                    </div>
+                    <div class="trait-strip">
+                        <img class="outfit background" src="images/bg/bg1.png" alt="Background 1" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg2.png" alt="Background 2" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg3.png" alt="Background 3" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg4.png" alt="Background 4" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg5.png" alt="Background 5" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg6.png" alt="Background 6" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg7.png" alt="Background 7" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg8.png" alt="Background 8" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg9.png" alt="Background 9" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg10.png" alt="Background 10" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg11.png" alt="Background 11" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg12.png" alt="Background 12" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg13.png" alt="Background 13" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg14.png" alt="Background 14" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg15.png" alt="Background 15" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg16.png" alt="Background 16" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg17.png" alt="Background 17" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg18.png" alt="Background 18" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg19.png" alt="Background 19" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg20.png" alt="Background 20" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg21.png" alt="Background 21" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg22.png" alt="Background 22" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg23.png" alt="Background 23" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg24.png" alt="Background 24" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg25.png" alt="Background 25" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg26.png" alt="Background 26" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg27.png" alt="Background 27" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg28.png" alt="Background 28" crossorigin="anonymous">
+                        <img class="outfit background" src="images/bg/bg29.png" alt="Background 29" crossorigin="anonymous">
+                    </div>
                 </div>
 
-                <p>Outfit</p>
-                <div class="outfit-options clothes owl-carousel owl-theme">
-                    <div class="item"><img class="outfit clothing" src="images/outfit/outfit1.png" alt="Outfit 1"></div>
-                    <div class="item"><img class="outfit clothing" src="images/outfit/outfit2.png" alt="Outfit 2"></div>
-                    <div class="item"><img class="outfit clothing" src="images/outfit/outfit3.png" alt="Outfit 3"></div>
-                    <div class="item"><img class="outfit clothing" src="images/outfit/outfit4.png" alt="Outfit 4"></div>
-                    <div class="item"><img class="outfit clothing" src="images/outfit/outfit5.png" alt="Outfit 5"></div>
-                    <div class="item"><img class="outfit clothing" src="images/outfit/outfit6.png" alt="Outfit 6"></div>
-                    <div class="item"><img class="outfit clothing" src="images/outfit/outfit7.png" alt="Outfit 7"></div>
-                    <div class="item"><img class="outfit clothing" src="images/outfit/outfit8.png" alt="Outfit 8"></div>
-                    <div class="item"><img class="outfit clothing" src="images/outfit/outfit9.png" alt="Outfit 9"></div>
-                    <div class="item"><img class="outfit clothing" src="images/outfit/outfit10.png" alt="Outfit 10"></div>
-                    <div class="item"><img class="outfit clothing" src="images/outfit/outfit11.png" alt="Outfit 11"></div>
-                    <div class="item"><img class="outfit clothing" src="images/outfit/outfit12.png" alt="Outfit 12"></div>
-                    <div class="item"><img class="outfit clothing" src="images/outfit/outfit13.png" alt="Outfit 13"></div>
+                <div class="trait-group">
+                    <div class="trait-header">
+                        <span class="trait-label">Skin</span>
+                        <span class="trait-count">20 options</span>
+                    </div>
+                    <div class="trait-strip">
+                        <img class="outfit skin-item" src="images/skin/Taffy.png" alt="Taffy" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/azure.png" alt="Azure" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/bumblebee.png" alt="Bumblebee" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/carolina.png" alt="Carolina" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/chili.png" alt="Chili" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/coffee.png" alt="Coffee" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/honey.png" alt="Honey" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/jungle.png" alt="Jungle" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/lemon.png" alt="Lemon" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/lilac.png" alt="Lilac" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/lollipop.png" alt="Lollipop" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/mint.png" alt="Mint" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/mulberry.png" alt="Mulberry" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/normal.png" alt="Normal" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/plum.png" alt="Plum" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/punch.png" alt="Punch" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/ruby.png" alt="Ruby" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/sea.png" alt="Sea" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/space.png" alt="Space" crossorigin="anonymous">
+                        <img class="outfit skin-item" src="images/skin/tiger.png" alt="Tiger" crossorigin="anonymous">
+                    </div>
                 </div>
 
-                <p>Mouth</p>
-                <div class="outfit-options mouth-options owl-carousel owl-theme">
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth1.png" alt="Mouth 1"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth2.png" alt="Mouth 2"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth3.png" alt="Mouth 3"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth4.png" alt="Mouth 4"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth5.png" alt="Mouth 5"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth6.png" alt="Mouth 6"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth7.png" alt="Mouth 7"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth8.png" alt="Mouth 8"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth9.png" alt="Mouth 9"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth10.png" alt="Mouth 10"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth11.png" alt="Mouth 11"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth12.png" alt="Mouth 12"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth13.png" alt="Mouth 13"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth14.png" alt="Mouth 14"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth15.png" alt="Mouth 15"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth16.png" alt="Mouth 16"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth17.png" alt="Mouth 17"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth18.png" alt="Mouth 18"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth19.png" alt="Mouth 19"></div>
-                    <div class="item"><img class="outfit mouth-item" src="images/mouth/mouth20.png" alt="Mouth 20"></div>
+                <div class="trait-group">
+                    <div class="trait-header">
+                        <span class="trait-label">Outfit</span>
+                        <span class="trait-count">13 options</span>
+                    </div>
+                    <div class="trait-strip">
+                        <img class="outfit clothing" src="images/outfit/outfit1.png" alt="Outfit 1" crossorigin="anonymous">
+                        <img class="outfit clothing" src="images/outfit/outfit2.png" alt="Outfit 2" crossorigin="anonymous">
+                        <img class="outfit clothing" src="images/outfit/outfit3.png" alt="Outfit 3" crossorigin="anonymous">
+                        <img class="outfit clothing" src="images/outfit/outfit4.png" alt="Outfit 4" crossorigin="anonymous">
+                        <img class="outfit clothing" src="images/outfit/outfit5.png" alt="Outfit 5" crossorigin="anonymous">
+                        <img class="outfit clothing" src="images/outfit/outfit6.png" alt="Outfit 6" crossorigin="anonymous">
+                        <img class="outfit clothing" src="images/outfit/outfit7.png" alt="Outfit 7" crossorigin="anonymous">
+                        <img class="outfit clothing" src="images/outfit/outfit8.png" alt="Outfit 8" crossorigin="anonymous">
+                        <img class="outfit clothing" src="images/outfit/outfit9.png" alt="Outfit 9" crossorigin="anonymous">
+                        <img class="outfit clothing" src="images/outfit/outfit10.png" alt="Outfit 10" crossorigin="anonymous">
+                        <img class="outfit clothing" src="images/outfit/outfit11.png" alt="Outfit 11" crossorigin="anonymous">
+                        <img class="outfit clothing" src="images/outfit/outfit12.png" alt="Outfit 12" crossorigin="anonymous">
+                        <img class="outfit clothing" src="images/outfit/outfit13.png" alt="Outfit 13" crossorigin="anonymous">
+                    </div>
                 </div>
-                <p>Eyes</p>
-                <div class="outfit-options faces owl-carousel owl-theme">
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes1.png" alt="Eyes 1"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes2.png" alt="Eyes 2"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes3.png" alt="Eyes 3"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes4.png" alt="Eyes 4"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes5.png" alt="Eyes 5"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes6.png" alt="Eyes 6"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes7.png" alt="Eyes 7"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes8.png" alt="Eyes 8"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes9.png" alt="Eyes 9"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes10.png" alt="Eyes 10"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes11.png" alt="Eyes 11"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes12.png" alt="Eyes 12"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes13.png" alt="Eyes 13"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes14.png" alt="Eyes 14"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes15.png" alt="Eyes 15"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes16.png" alt="Eyes 16"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes17.png" alt="Eyes 17"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes18.png" alt="Eyes 18"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes19.png" alt="Eyes 19"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes20.png" alt="Eyes 20"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes21.png" alt="Eyes 21"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes22.png" alt="Eyes 22"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes23.png" alt="Eyes 23"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes24.png" alt="Eyes 24"></div>
-                    <div class="item"><img class="outfit face" src="images/eyes/eyes25.png" alt="Eyes 25"></div>
+
+                <div class="trait-group">
+                    <div class="trait-header">
+                        <span class="trait-label">Mouth</span>
+                        <span class="trait-count">20 options</span>
+                    </div>
+                    <div class="trait-strip">
+                        <img class="outfit mouth-item" src="images/mouth/mouth1.png" alt="Mouth 1" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth2.png" alt="Mouth 2" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth3.png" alt="Mouth 3" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth4.png" alt="Mouth 4" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth5.png" alt="Mouth 5" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth6.png" alt="Mouth 6" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth7.png" alt="Mouth 7" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth8.png" alt="Mouth 8" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth9.png" alt="Mouth 9" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth10.png" alt="Mouth 10" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth11.png" alt="Mouth 11" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth12.png" alt="Mouth 12" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth13.png" alt="Mouth 13" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth14.png" alt="Mouth 14" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth15.png" alt="Mouth 15" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth16.png" alt="Mouth 16" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth17.png" alt="Mouth 17" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth18.png" alt="Mouth 18" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth19.png" alt="Mouth 19" crossorigin="anonymous">
+                        <img class="outfit mouth-item" src="images/mouth/mouth20.png" alt="Mouth 20" crossorigin="anonymous">
+                    </div>
                 </div>
-                <p>Head</p>
-                <div class="outfit-options head-options owl-carousel owl-theme">
-                    <div class="item"><img class="outfit head-item" src="images/head/head1.png" alt="Head 1"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head2.png" alt="Head 2"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head3.png" alt="Head 3"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head4.png" alt="Head 4"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head5.png" alt="Head 5"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head6.png" alt="Head 6"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head7.png" alt="Head 7"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head8.png" alt="Head 8"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head9.png" alt="Head 9"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head10.png" alt="Head 10"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head11.png" alt="Head 11"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head12.png" alt="Head 12"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head13.png" alt="Head 13"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head14.png" alt="Head 14"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head15.png" alt="Head 15"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head16.png" alt="Head 16"></div>
-                    <div class="item"><img class="outfit head-item" src="images/head/head17.png" alt="Head 17"></div>
+
+                <div class="trait-group">
+                    <div class="trait-header">
+                        <span class="trait-label">Eyes</span>
+                        <span class="trait-count">25 options</span>
+                    </div>
+                    <div class="trait-strip">
+                        <img class="outfit face" src="images/eyes/eyes1.png" alt="Eyes 1" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes2.png" alt="Eyes 2" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes3.png" alt="Eyes 3" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes4.png" alt="Eyes 4" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes5.png" alt="Eyes 5" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes6.png" alt="Eyes 6" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes7.png" alt="Eyes 7" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes8.png" alt="Eyes 8" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes9.png" alt="Eyes 9" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes10.png" alt="Eyes 10" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes11.png" alt="Eyes 11" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes12.png" alt="Eyes 12" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes13.png" alt="Eyes 13" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes14.png" alt="Eyes 14" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes15.png" alt="Eyes 15" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes16.png" alt="Eyes 16" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes17.png" alt="Eyes 17" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes18.png" alt="Eyes 18" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes19.png" alt="Eyes 19" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes20.png" alt="Eyes 20" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes21.png" alt="Eyes 21" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes22.png" alt="Eyes 22" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes23.png" alt="Eyes 23" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes24.png" alt="Eyes 24" crossorigin="anonymous">
+                        <img class="outfit face" src="images/eyes/eyes25.png" alt="Eyes 25" crossorigin="anonymous">
+                    </div>
                 </div>
+
+                <div class="trait-group">
+                    <div class="trait-header">
+                        <span class="trait-label">Head</span>
+                        <span class="trait-count">17 options</span>
+                    </div>
+                    <div class="trait-strip">
+                        <img class="outfit head-item" src="images/head/head1.png" alt="Head 1" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head2.png" alt="Head 2" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head3.png" alt="Head 3" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head4.png" alt="Head 4" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head5.png" alt="Head 5" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head6.png" alt="Head 6" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head7.png" alt="Head 7" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head8.png" alt="Head 8" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head9.png" alt="Head 9" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head10.png" alt="Head 10" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head11.png" alt="Head 11" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head12.png" alt="Head 12" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head13.png" alt="Head 13" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head14.png" alt="Head 14" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head15.png" alt="Head 15" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head16.png" alt="Head 16" crossorigin="anonymous">
+                        <img class="outfit head-item" src="images/head/head17.png" alt="Head 17" crossorigin="anonymous">
+                    </div>
+                </div>
+
             </div>
         </div>
-    </div>
+    </main>
 
-    
-    <canvas id="canvas" style="display: none;"></canvas>
-    <div id="item-preview"><img src="" alt="Preview"></div>
+    <!-- Hidden canvas for export -->
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <!-- Item hover preview -->
+    <div id="item-preview"><img src="" alt=""></div>
 
     <!-- Download / Share Modal -->
     <div id="pfp-modal" class="pfp-modal-overlay hidden">
@@ -210,12 +505,62 @@
         </div>
     </div>
 
-    <script src="js/jquery.min.js"></script>
+    <!-- Sidebar user widget -->
+    <script>
+    (function () {
+        var token    = localStorage.getItem('rr_token');
+        var username = localStorage.getItem('rr_username');
+        var avatar   = localStorage.getItem('rr_avatar');
+        var cachedRank = localStorage.getItem('rr_rank');
+        var widget   = document.getElementById('sidebar-user-widget');
+        if (!widget) return;
 
-    <script src="js/owl.carousel.min.js"></script>
-    
+        if (token && username) {
+            var safeUser = username.length > 16 ? username.slice(0, 16) + '…' : username;
+            widget.innerHTML =
+                '<div class="sidebar-user">' +
+                  '<div class="sidebar-avatar"><img src="' + (avatar || 'images/Default-Avatar.png') + '" onerror="this.src=\'images/Default-Avatar.png\'" alt=""></div>' +
+                  '<div style="flex:1;min-width:0;">' +
+                    '<div class="sidebar-username">' + safeUser + '</div>' +
+                    '<div class="sidebar-rank" id="sw-rank">' + (cachedRank ? 'Rank #' + cachedRank : '') + '</div>' +
+                  '</div>' +
+                '</div>' +
+                '<button class="btn-logout" onclick="(function(){' +
+                  'var t=localStorage.getItem(\'rr_token\');' +
+                  'localStorage.removeItem(\'rr_token\');localStorage.removeItem(\'rr_username\');localStorage.removeItem(\'rr_avatar\');localStorage.removeItem(\'rr_rank\');' +
+                  'if(t)fetch(\'api/auth.php?action=logout\',{method:\'POST\',headers:{\'Authorization\':\'Bearer \'+t}}).catch(function(){});' +
+                  'window.location.href=\'/\';' +
+                '})()">' +
+                  '<svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>' +
+                  'Log Out' +
+                '</button>';
+            fetch('api/me.php', { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (d) {
+                    var rankEl = document.getElementById('sw-rank');
+                    if (rankEl && d && d.rank_position) { localStorage.setItem('rr_rank', d.rank_position); rankEl.textContent = 'Rank #' + d.rank_position; }
+                })
+                .catch(function () {});
+        } else {
+            widget.innerHTML =
+                '<div class="sidebar-guest">' +
+                  '<div class="sidebar-guest-note">Not eligible for leaderboard rewards</div>' +
+                  '<a href="login" class="btn-sidebar-login">Login / Register</a>' +
+                '</div>';
+        }
+    })();
+
+    function toggleUtilities() {
+        var toggle = document.getElementById('utilities-toggle');
+        var sub    = document.getElementById('utilities-sub');
+        toggle.classList.toggle('open');
+        sub.classList.toggle('open');
+    }
+    </script>
+
+    <!-- jQuery (required by script1.js for $(document).ready wrapper) -->
+    <script src="js/jquery.min.js"></script>
+    <!-- script1.js handles all generator logic -->
     <script src="js/script1.js"></script>
-    <script src="js/header.js"></script>
-    <script src="js/footer.js"></script>
 </body>
 </html>

@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rat Republic — Docs</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <style>
+        @font-face { font-family: 'Inter'; src: url('fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype'); font-weight: 100 900; font-style: normal; }
+        @font-face { font-family: 'NftOpensea'; src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype'); }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #080808;
+            --sidebar-bg: #0a0a0a;
+            --surface: #111111;
+            --border: rgba(255,255,255,0.07);
+            --text: #ffffff;
+            --text-muted: rgba(255,255,255,0.5);
+            --text-dim: rgba(255,255,255,0.22);
+            --accent: #C8E030;
+            --accent-dim: rgba(200,224,48,0.1);
+            --accent-border: rgba(200,224,48,0.2);
+            --docs-nav-w: 256px;
+        }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+        html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; line-height: 1.6; }
+        body { overflow-x: hidden; }
+
+        /* ── Docs layout ── */
+        .docs-layout { display: flex; min-height: 100vh; max-width: 100%; overflow-x: hidden; }
+
+        /* ── Left nav ── */
+        /* ── Header (matches index.html) ── */
+        body { padding-top: 72px; }
+        .header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+            height: 72px;
+            background: rgba(8,8,8,0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center;
+            padding: 0 48px;
+        }
+        .header-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+        .header-brand img { width: 28px; height: 28px; object-fit: contain; }
+        .header-brand span { font-family: 'NftOpensea'; font-size: 0.9rem; letter-spacing: 0.12em; color: var(--text); }
+        .header-nav { flex: 1; display: flex; justify-content: center; }
+        .nav-pill { display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 24px; padding: 4px; }
+        .nav-pill a { font-size: 0.82rem; font-weight: 500; color: var(--text-muted); text-decoration: none; padding: 7px 18px; border-radius: 20px; transition: color 0.15s, background 0.15s; white-space: nowrap; }
+        .nav-pill a:hover { color: var(--text); background: rgba(255,255,255,0.07); }
+        .nav-pill a.active { background: rgba(255,255,255,0.12); color: var(--text); font-weight: 600; }
+        .header-actions { flex-shrink: 0; }
+        .btn-login { font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 500; color: var(--text-muted); background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 20px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 7px; text-decoration: none; }
+        .btn-login:hover { color: var(--text); border-color: rgba(255,255,255,0.35); }
+        .btn-login svg { width: 13px; height: 13px; opacity: 0.7; }
+        .btn-profile { display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 4px 12px 4px 4px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.12); transition: border-color 0.15s; }
+        .btn-profile:hover { border-color: rgba(255,255,255,0.3); }
+        .btn-profile-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #1a1a1a; }
+        .btn-profile-name { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); transition: color 0.15s; }
+        .btn-profile:hover .btn-profile-name { color: var(--text); }
+
+        /* ── Footer (matches index.html) ── */
+        .footer { background: var(--bg); border-top: 1px solid var(--border); padding: 22px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-left: var(--docs-nav-w); }
+        .footer-copy { font-size: 0.75rem; color: var(--text-dim); }
+        .footer-right { display: flex; align-items: center; gap: 16px; }
+        .footer-social { display: flex; align-items: center; gap: 10px; }
+        .footer-social a { color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+        .footer-social a:hover { color: var(--text-muted); }
+        .footer-social svg { width: 14px; height: 14px; fill: currentColor; display: block; }
+        .footer-fee { font-size: 0.72rem; color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+        .footer-fee:hover { color: var(--text-muted); }
+        .footer-divider { width: 1px; height: 14px; background: var(--border); }
+
+        .docs-nav {
+            position: fixed; top: 72px; left: 0; bottom: 0;
+            width: var(--docs-nav-w);
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            z-index: 50; overflow: hidden;
+        }
+
+        .docs-nav-scroll { flex: 1; padding: 14px 10px 20px; overflow-y: auto; }
+
+        .nav-group-label {
+            font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em;
+            text-transform: uppercase; color: var(--text-dim);
+            padding: 0 10px; margin: 16px 0 4px;
+        }
+        .nav-group-label:first-child { margin-top: 4px; }
+
+        .docs-nav a {
+            display: flex; align-items: center; gap: 9px;
+            padding: 7px 10px; border-radius: 7px;
+            text-decoration: none; font-size: 0.83rem; font-weight: 500;
+            color: var(--text-muted);
+            transition: background 0.12s, color 0.12s;
+        }
+        .docs-nav a:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+        .docs-nav a.active { background: var(--accent-dim); color: var(--accent); }
+        .docs-nav a .nav-dot {
+            width: 5px; height: 5px; border-radius: 50%;
+            background: currentColor; flex-shrink: 0; opacity: 0.4;
+        }
+        .docs-nav a.active .nav-dot { opacity: 1; }
+
+/* ── Main content ── */
+        .docs-main {
+            margin-left: var(--docs-nav-w);
+            flex: 1;
+            padding: 24px 56px 120px;
+        }
+
+        .docs-content { max-width: 740px; margin: 0 auto; }
+
+        /* ── Typography ── */
+        .docs-content h1 {
+            font-family: 'NftOpensea'; font-size: 2rem; letter-spacing: 0.06em;
+            color: var(--text); margin-bottom: 10px; line-height: 1.2;
+        }
+        .docs-content h2 {
+            font-family: 'NftOpensea'; font-size: 1.2rem; letter-spacing: 0.05em;
+            color: var(--text); margin-top: 44px; margin-bottom: 14px;
+            padding-bottom: 10px; border-bottom: 1px solid var(--border);
+        }
+        .docs-content h3 {
+            font-size: 0.92rem; font-weight: 700;
+            color: var(--text); margin-top: 24px; margin-bottom: 8px;
+        }
+        .docs-content p {
+            font-size: 0.9rem; color: rgba(255,255,255,0.72);
+            margin-bottom: 14px; line-height: 1.75;
+        }
+        .docs-content ul, .docs-content ol { padding-left: 20px; margin-bottom: 14px; }
+        .docs-content li {
+            font-size: 0.9rem; color: rgba(255,255,255,0.72);
+            margin-bottom: 6px; line-height: 1.7;
+        }
+        .docs-content strong { color: var(--text); font-weight: 600; }
+        .docs-content code {
+            font-family: 'Consolas', 'Monaco', monospace; font-size: 0.82rem;
+            background: rgba(255,255,255,0.08); border-radius: 4px;
+            padding: 2px 7px; color: var(--accent);
+        }
+        .docs-content a { color: var(--accent); text-decoration: none; }
+        .docs-content a:hover { text-decoration: underline; }
+
+        /* ── Section separator ── */
+        .docs-section { padding-bottom: 60px; border-bottom: 1px solid var(--border); margin-bottom: 60px; }
+        .docs-section:last-child { border-bottom: none; }
+
+        .docs-lead {
+            font-size: 1rem; color: rgba(255,255,255,0.5);
+            margin-bottom: 28px; line-height: 1.7;
+        }
+
+        /* ── Callouts ── */
+        .callout {
+            border-left: 3px solid var(--accent);
+            background: rgba(200,224,48,0.06);
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px; margin: 20px 0;
+        }
+        .callout p { margin: 0; font-size: 0.88rem; color: rgba(255,255,255,0.7); }
+        .callout strong { color: var(--accent); }
+
+        .callout-warn {
+            border-left-color: #FF8C00;
+            background: rgba(255,140,0,0.07);
+        }
+        .callout-warn strong { color: #FF8C00; }
+
+        .callout-danger {
+            border-left-color: #e04040;
+            background: rgba(224,64,64,0.07);
+        }
+        .callout-danger strong { color: #e04040; }
+
+        /* ── Fee table ── */
+        .fee-table {
+            width: 100%; border-collapse: collapse;
+            margin: 16px 0; font-size: 0.87rem;
+            background: var(--surface); border-radius: 10px; overflow: hidden;
+        }
+        .fee-table th {
+            text-align: left; padding: 10px 16px;
+            font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.07em;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+        }
+        .fee-table td {
+            padding: 12px 16px; color: rgba(255,255,255,0.7);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .fee-table tr:last-child td { border-bottom: none; }
+        .fee-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .fee-accent { color: var(--accent); font-weight: 600; }
+
+        /* ── Badge ── */
+        .badge {
+            display: inline-flex; align-items: center;
+            padding: 2px 10px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em;
+        }
+        .badge-green { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border); }
+        .badge-orange { background: rgba(255,140,0,0.1); color: #FF8C00; border: 1px solid rgba(255,140,0,0.2); }
+        .badge-red { background: rgba(224,64,64,0.1); color: #e04040; border: 1px solid rgba(224,64,64,0.2); }
+
+        /* ── Step list ── */
+        .steps { display: flex; flex-direction: column; gap: 14px; margin: 16px 0 24px; }
+        .step { display: flex; gap: 14px; align-items: flex-start; }
+        .step-num {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--accent-dim); border: 1px solid var(--accent-border);
+            color: var(--accent); font-size: 0.78rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-top: 1px;
+        }
+        .step-body { flex: 1; }
+        .step-title { font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+        .step-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* ── Tool card grid (overview) ── */
+        .tools-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px; margin: 20px 0;
+        }
+        .tool-link-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 16px 18px;
+            text-decoration: none; transition: border-color 0.15s;
+        }
+        .tool-link-card:hover { border-color: rgba(255,255,255,0.2); }
+        .tool-link-card-name {
+            font-family: 'NftOpensea'; font-size: 0.85rem; letter-spacing: 0.07em;
+            color: var(--text); margin-bottom: 4px;
+        }
+        .tool-link-card-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* ── Mobile ── */
+        .mobile-nav-toggle {
+            display: none;
+            width: 36px; height: 36px; border-radius: 8px;
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text-muted); align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0;
+        }
+        .mobile-nav-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+        @media (max-width: 800px) {
+            .mobile-nav-toggle { display: flex; margin-left: auto; }
+            .header-nav { display: none; }
+            .header-actions { display: none; }
+            .docs-nav { transform: translateX(-100%); transition: transform 0.22s ease; top: 72px; }
+            .docs-nav.open { transform: translateX(0); }
+            .docs-main { margin-left: 0; padding: 16px 20px 80px; width: 100%; min-width: 0; }
+            .footer { margin-left: 0; }
+            .docs-content h1 { font-size: 1.6rem; }
+            .docs-content h2 { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── Header ── -->
+    <header class="header">
+        <a href="/" class="header-brand">
+            <img src="images/branding/rat-republic-logo.svg" alt="">
+            <span>RAT REPUBLIC</span>
+        </a>
+        <nav class="header-nav">
+            <div class="nav-pill">
+                <a href="/">Home</a>
+                <a href="tools">Utilities</a>
+                <a href="leaderboard">Crowned Vermins</a>
+                <a href="docs" class="active">Documentation</a>
+            </div>
+        </nav>
+        <div class="header-actions" id="header-actions">
+            <a href="login" class="btn-login">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                Login
+            </a>
+        </div>
+        <button class="mobile-nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+            <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+    </header>
+
+<div class="docs-layout">
+
+    <!-- ── Left navigation sidebar ── -->
+    <nav class="docs-nav" id="docs-nav">
+        <div class="docs-nav-scroll">
+
+            <div class="nav-group-label">Getting Started</div>
+            <a href="#overview"><span class="nav-dot"></span>Overview</a>
+
+            <div class="nav-group-label">Tools</div>
+            <a href="#scavenger"><span class="nav-dot"></span>Scavenger</a>
+            <a href="#airdrop"><span class="nav-dot"></span>Airdrop</a>
+            <a href="#vanity"><span class="nav-dot"></span>Vanity Address</a>
+            <a href="#token-burn"><span class="nav-dot"></span>Token Burn</a>
+            <a href="#nft-burn"><span class="nav-dot"></span>NFT Burn</a>
+
+            <div class="nav-group-label">Community</div>
+            <a href="#leaderboard"><span class="nav-dot"></span>Crowned Vermins</a>
+            <a href="#profile"><span class="nav-dot"></span>Profile</a>
+            <a href="#referral"><span class="nav-dot"></span>Referral Program</a>
+
+            <div class="nav-group-label">Help</div>
+            <a href="#faq"><span class="nav-dot"></span>FAQ</a>
+
+            <div class="nav-group-label">Legal</div>
+            <a href="legal#terms"><span class="nav-dot"></span>Terms of Service</a>
+            <a href="legal#privacy"><span class="nav-dot"></span>Privacy Policy</a>
+
+        </div>
+
+    </nav>
+
+    <!-- ── Main content ── -->
+    <main class="docs-main">
+        <div class="docs-content">
+
+            <!-- ══════════════════════════════════════════
+                 OVERVIEW
+            ══════════════════════════════════════════ -->
+            <section class="docs-section" id="overview">
+                <h1>Rat Republic Docs</h1>
+                <p class="docs-lead">Everything you need to know about the Rat Republic Solana utility platform — tools, fees, safety, and how to get the most out of each feature.</p>
+
+                <h2>What Is Rat Republic?</h2>
+                <p>Rat Republic is a non-custodial suite of Solana tools built for the community. Every operation requires your direct signature through Phantom or Solflare — we never have custody of your assets.</p>
+                <p>Tools are designed to save time, recover locked SOL, and give you full control over your on-chain footprint. A small service fee per operation sustains the platform.</p>
+
+                <h2>Available Tools</h2>
+                <div class="tools-grid">
+                    <a class="tool-link-card" href="#scavenger">
+                        <div class="tool-link-card-name">Scavenger</div>
+                        <div class="tool-link-card-desc">Close empty token accounts, recover locked SOL rent</div>
+                    </a>
+                    <a class="tool-link-card" href="#airdrop">
+                        <div class="tool-link-card-name">Airdrop</div>
+                        <div class="tool-link-card-desc">Send SOL or tokens to hundreds of wallets at once</div>
+                    </a>
+                    <a class="tool-link-card" href="#vanity">
+                        <div class="tool-link-card-name">Vanity Address</div>
+                        <div class="tool-link-card-desc">Generate a custom Solana address that starts with your text</div>
+                    </a>
+                    <a class="tool-link-card" href="#token-burn">
+                        <div class="tool-link-card-name">Token Burn</div>
+                        <div class="tool-link-card-desc">Burn tokens with balance and reclaim their rent (Expert Mode)</div>
+                    </a>
+                    <a class="tool-link-card" href="#nft-burn">
+                        <div class="tool-link-card-name">NFT Burn</div>
+                        <div class="tool-link-card-desc">Burn unwanted NFTs, reclaim ~0.017 SOL per NFT (Expert Mode)</div>
+                    </a>
+                </div>
+
+                <h2>Connecting Your Wallet</h2>
+                <p>Rat Republic supports <strong>Phantom</strong> and <strong>Solflare</strong>. Click "Connect Wallet" on any tool page to get started. No account registration is required to use tools, but registering unlocks the leaderboard, referral program, and reduced fees.</p>
+
+                <h2>Fee Overview</h2>
+                <table class="fee-table">
+                    <thead>
+                        <tr><th>Tool</th><th>Fee</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Scavenger (referred user)</td><td class="fee-accent">1.8% of recovered SOL</td></tr>
+                        <tr><td>Scavenger (guest / not referred)</td><td class="fee-accent">2.0% of recovered SOL</td></tr>
+                        <tr><td>Token Burn (referred user)</td><td class="fee-accent">1.8% of recovered SOL</td></tr>
+                        <tr><td>Token Burn (guest / not referred)</td><td class="fee-accent">2.0% of recovered SOL</td></tr>
+                        <tr><td>NFT Burn (referred user)</td><td class="fee-accent">1.8% of recovered SOL</td></tr>
+                        <tr><td>NFT Burn (guest / not referred)</td><td class="fee-accent">2.0% of recovered SOL</td></tr>
+                        <tr><td>Airdrop</td><td class="fee-accent">0.008 SOL per batch (20 wallets)</td></tr>
+                        <tr><td>Vanity Address</td><td class="fee-accent"><span class="badge badge-green">FREE</span></td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 SCAVENGER
+            ══════════════════════════════════════════ -->
+            <section class="docs-section" id="scavenger">
+                <h1>Scavenger</h1>
+                <p class="docs-lead">Close abandoned zero-balance token accounts and reclaim their locked SOL rent (~0.00204 SOL per account).</p>
+
+                <h2>How It Works</h2>
+                <p>On Solana, every SPL token account requires a rent deposit of approximately <strong>0.00203928 SOL</strong> to exist. When you sell, transfer, or hold tokens that were rugged or abandoned, those empty accounts remain open — trapping your SOL indefinitely.</p>
+                <p>Scavenger identifies all zero-balance token accounts in your wallet and closes them in batches of up to 27 per transaction, returning the locked rent directly to you minus a small service fee.</p>
+
+                <h2>How to Use</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-body">
+                            <div class="step-title">Go to the Scavenger page</div>
+                            <div class="step-desc">Navigate to <a href="cleanup">ratrepublic.art/cleanup</a>. You'll land in NOOB mode by default.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-body">
+                            <div class="step-title">Connect your wallet</div>
+                            <div class="step-desc">Click "Connect Wallet". Select Phantom or Solflare from the modal.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-body">
+                            <div class="step-title">Let it scan</div>
+                            <div class="step-desc">Scavenger automatically scans all your token accounts and displays the ones that are safe to close with their estimated reclaim amount.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">4</div>
+                        <div class="step-body">
+                            <div class="step-title">Select and claim</div>
+                            <div class="step-desc">All eligible accounts are pre-selected. Deselect any you want to keep, then click "Claim SOL".</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">5</div>
+                        <div class="step-body">
+                            <div class="step-title">Approve and done</div>
+                            <div class="step-desc">Approve the transaction in your wallet. SOL arrives in seconds. A Solscan link appears for each batch.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Fee Structure</h2>
+                <table class="fee-table">
+                    <thead>
+                        <tr><th>User Type</th><th>Fee</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Referred user (10% discount)</td><td class="fee-accent">1.8% of recovered SOL</td></tr>
+                        <tr><td>Guest / registered (not referred)</td><td class="fee-accent">2.0% of recovered SOL</td></tr>
+                    </tbody>
+                </table>
+                <div class="callout">
+                    <p><strong>Save on fees:</strong> Register via a referral link to unlock the 1.8% rate — a 10% discount from the standard 2.0%. Registration alone (without being referred) does not reduce the fee.</p>
+                </div>
+
+                <h2>Expert Mode</h2>
+                <p>Toggle from <strong>NOOB</strong> to <strong>EXPERT</strong> mode using the button at the top of the Scavenger page. Expert mode unlocks additional tabs:</p>
+                <table class="fee-table">
+                    <thead>
+                        <tr><th>Tab</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>CLAIM</strong></td><td>The standard empty account closer (available in both modes)</td></tr>
+                        <tr><td><strong>SCANNER</strong></td><td>Preview your empty accounts without connecting a wallet</td></tr>
+                        <tr><td><strong>TOKENS</strong> <span class="badge badge-orange">Destructive</span></td><td>Burn tokens with remaining balance and reclaim rent</td></tr>
+                        <tr><td><strong>NFTs</strong> <span class="badge badge-red">Destructive</span></td><td>Burn unwanted NFTs and reclaim all associated rent</td></tr>
+                    </tbody>
+                </table>
+
+                <h2>Safety</h2>
+                <ul>
+                    <li><strong>Manual Approval</strong> — Every action requires your direct signature.</li>
+                    <li><strong>Zero-Balance Only</strong> — The CLAIM tab only closes accounts with a balance of exactly 0. Accounts with any remaining token balance are never touched.</li>
+                    <li><strong>Non-Custodial</strong> — No assets are transferred out of your control.</li>
+                    <li><strong>Airdrop Eligibility</strong> — Closing empty accounts does not affect your eligibility for future airdrops. Airdrops target your primary wallet address.</li>
+                </ul>
+                <div class="callout callout-warn">
+                    <p><strong>Note:</strong> Closing accounts is permanent. However, a new token account is automatically created when someone sends that token to you again (costs ~0.00204 SOL to reopen).</p>
+                </div>
+
+                <h2>Pro Tips</h2>
+                <ul>
+                    <li>Run Scavenger periodically after active trading to continuously recover rent.</li>
+                    <li>If an account holds even <code>0.000001</code> of a token it won't appear in CLAIM — use the TOKENS tab in Expert Mode to burn it.</li>
+                    <li>The SCANNER tab lets you check any wallet address without connecting — useful for helping friends or checking your cold wallet.</li>
+                </ul>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 AIRDROP
+            ══════════════════════════════════════════ -->
+            <section class="docs-section" id="airdrop">
+                <h1>Airdrop</h1>
+                <p class="docs-lead">Send SOL or SPL tokens to multiple wallets in seconds. Supports manual address lists, token holder snapshots, and three distribution modes.</p>
+
+                <h2>Tabs Overview</h2>
+                <table class="fee-table">
+                    <thead>
+                        <tr><th>Tab</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>SPECIFIC</strong></td><td>Send to a manually provided list of wallet addresses</td></tr>
+                        <tr><td><strong>SUPPLY BASED</strong></td><td>Send to all holders of a token, filtered by balance range</td></tr>
+                    </tbody>
+                </table>
+
+                <h2>SPECIFIC Tab</h2>
+                <p>Paste any number of Solana wallet addresses (one per line) and set an amount. The tool validates each address and batches transactions automatically — up to 20 recipients per on-chain transaction.</p>
+                <div class="callout">
+                    <p><strong>Use cases:</strong> Paying contest winners, compensating contributors, team payouts, NFT holder rewards, or any custom recipient list.</p>
+                </div>
+
+                <h2>SUPPLY BASED Tab</h2>
+                <p>Enter a token mint address to fetch a live holder snapshot. Filter by minimum and maximum holdings to target the exact tier of holders you want to reward.</p>
+
+                <h3>SOL vs Tokens</h3>
+                <ul>
+                    <li><strong>SOL sub-tab</strong> — Distribute native SOL to the filtered holder list</li>
+                    <li><strong>TOKENS sub-tab</strong> — Distribute SPL tokens from your wallet. The tool auto-creates Associated Token Accounts for recipients who don't have one yet (costs ~0.00204 SOL rent per new ATA)</li>
+                </ul>
+
+                <h3>Distribution Modes</h3>
+                <table class="fee-table">
+                    <thead>
+                        <tr><th>Mode</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Even Split</strong></td><td>Total amount divided equally among all qualifying wallets</td></tr>
+                        <tr><td><strong>Proportional</strong></td><td>Each wallet receives an amount proportional to their token holdings relative to the filtered group</td></tr>
+                        <tr><td><strong>Custom</strong></td><td>Fixed amount per wallet — total cost scales with recipient count</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Filtering Options</h3>
+                <ul>
+                    <li><strong>Min Holdings</strong> — Exclude wallets below this balance threshold</li>
+                    <li><strong>Max Holdings</strong> — Exclude wallets above this balance (useful to remove whales, LPs, or vesting contracts)</li>
+                    <li><strong>Blocklist</strong> — Manually add addresses to exclude (LP wallets, vesting contracts, etc.)</li>
+                    <li><strong>Self-Exclusion</strong> — Your connected wallet is automatically excluded from the recipient list</li>
+                </ul>
+
+                <h2>Fee Structure</h2>
+                <table class="fee-table">
+                    <thead>
+                        <tr><th>Operation</th><th>Fee</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Per batch (up to 20 recipients)</td><td class="fee-accent">0.008 SOL flat</td></tr>
+                    </tbody>
+                </table>
+                <p>The fee is charged once per transaction batch. Sending to 40 wallets = 2 batches = 0.016 SOL in fees, plus the transfer amounts.</p>
+
+                <div class="callout">
+                    <p><strong>Preview before sending:</strong> Click the Preview button to review the full recipient list, per-wallet amounts, and estimated total cost before signing anything.</p>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 VANITY ADDRESS
+            ══════════════════════════════════════════ -->
+            <section class="docs-section" id="vanity">
+                <h1>Vanity Address</h1>
+                <p class="docs-lead">Generate a custom Solana wallet address that starts or ends with any text of your choice — entirely in your browser, for free.</p>
+
+                <h2>What Is a Vanity Address?</h2>
+                <p>A vanity address is a standard Solana wallet where the public key begins or ends with a specific string you chose — for example, a wallet that starts with <code>RATxxx...</code>. The wallet is cryptographically identical to any other Solana wallet and fully functional.</p>
+                <p>The tool works by generating thousands of keypairs per second using a background Web Worker until one matches your pattern.</p>
+
+                <h2>How to Use</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-body">
+                            <div class="step-title">Enter your prefix or suffix</div>
+                            <div class="step-desc">Type the string you want your address to start or end with. Solana addresses are Base58 — no <code>0</code>, <code>O</code>, <code>I</code>, or <code>l</code> characters.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-body">
+                            <div class="step-title">Click Generate</div>
+                            <div class="step-desc">The generator runs entirely in your browser using a Web Worker thread. No data is sent to any server at any point.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-body">
+                            <div class="step-title">Copy and save your keypair</div>
+                            <div class="step-desc">When a match is found, copy both the public and private keys to a secure location. Import the private key into Phantom or any Solana wallet that accepts raw private keys.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Security</h2>
+                <div class="callout callout-danger">
+                    <p><strong>Your private key never leaves your device.</strong> All generation runs locally in a browser Web Worker. Rat Republic never sees your private key, seed phrase, or any generated keypair.</p>
+                </div>
+                <ul>
+                    <li>Zero network requests are made during key generation</li>
+                    <li>Store your private key in a password manager or hardware wallet immediately after generation</li>
+                    <li>Never share your private key with anyone or any website</li>
+                    <li>A vanity address has the same security properties as any other randomly generated Solana keypair</li>
+                </ul>
+
+                <h2>Performance</h2>
+                <p>Longer patterns take exponentially more time to find:</p>
+                <table class="fee-table">
+                    <thead>
+                        <tr><th>Pattern Length</th><th>Average Time</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1 character</td><td>Instant</td></tr>
+                        <tr><td>2 characters</td><td>A few seconds</td></tr>
+                        <tr><td>3 characters</td><td>Seconds to minutes</td></tr>
+                        <tr><td>4 characters</td><td>Minutes</td></tr>
+                        <tr><td>5+ characters</td><td>Hours or longer</td></tr>
+                    </tbody>
+                </table>
+                <p>Speed depends on your CPU. The generator displays your current generation rate in real time. Desktop computers are significantly faster than mobile devices.</p>
+
+                <h2>Fee</h2>
+                <p>Vanity Address generation is <span class="badge badge-green">FREE</span> — no wallet connection required.</p>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 TOKEN BURN
+            ══════════════════════════════════════════ -->
+            <section class="docs-section" id="token-burn">
+                <h1>Token Burn</h1>
+                <p class="docs-lead">Permanently destroy unwanted SPL tokens (including Token 2022) and reclaim the rent deposit locked in the token account (~0.00204 SOL).</p>
+
+                <div class="callout callout-warn">
+                    <p><strong>Expert Mode only.</strong> Token Burn is in the <strong>TOKENS</strong> tab of the Scavenger page. Enable Expert Mode at the top of the page to access it.</p>
+                </div>
+
+                <h2>Why Burn Instead of Sending to a Burn Address?</h2>
+                <p>Burning via a native Solana instruction is strictly better than sending tokens to a dead address like <code>1nc1nerator...</code>:</p>
+                <ul>
+                    <li><strong>You get your SOL back</strong> — burning closes the token account and returns ~0.00204 SOL rent to you. Sending to an incinerator leaves that SOL locked in the dead account forever.</li>
+                    <li><strong>Tokens are actually destroyed</strong> — the total supply decreases on-chain, visible on any explorer. Tokens at an incinerator address still technically exist and count toward supply.</li>
+                    <li><strong>Cleaner wallet</strong> — the token account is fully closed, not just emptied. Your wallet shows fewer clutter accounts.</li>
+                    <li><strong>Deflationary pressure</strong> — reducing circulating supply can positively affect a token's price and metrics.</li>
+                </ul>
+
+                <h2>Safety: Can Airdropped Tokens Drain You?</h2>
+                <p>Burning a token account uses a standard native Solana instruction (<code>BurnChecked</code> + <code>CloseAccount</code>). This cannot execute any custom program logic — it's handled entirely by the SPL Token Program, not any token creator's contract.</p>
+                <div class="callout callout-warn">
+                    <p><strong>What to watch for:</strong> Token drains happen through <em>approval-based</em> attacks — when you sign a transaction that grants a program delegation over your tokens. The Rat Republic Token Burn tool only uses native burn and close instructions and never requests any token delegation or approval.</p>
+                </div>
+
+                <h2>How to Use</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-body">
+                            <div class="step-title">Enable Expert Mode</div>
+                            <div class="step-desc">On the Scavenger page, click the EXPERT toggle at the top.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-body">
+                            <div class="step-title">Open the TOKENS tab</div>
+                            <div class="step-desc">The tab is highlighted orange as a warning indicator — these actions are permanent.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-body">
+                            <div class="step-title">Connect and scan</div>
+                            <div class="step-desc">Connect your wallet, then click "Scan for Burnable Tokens". The tool fetches all SPL and Token2022 accounts with a balance greater than zero, displaying names and images from Metaplex metadata.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">4</div>
+                        <div class="step-body">
+                            <div class="step-title">Select tokens and burn</div>
+                            <div class="step-desc">Check the tokens you want to burn. Click "Burn &amp; Reclaim SOL", confirm the warning modal, then approve in your wallet.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Fee Structure</h2>
+                <table class="fee-table">
+                    <thead>
+                        <tr><th>User Type</th><th>Fee</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Referred user (10% discount)</td><td class="fee-accent">1.8% of recovered SOL</td></tr>
+                        <tr><td>Guest / not referred</td><td class="fee-accent">2.0% of recovered SOL</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="callout callout-danger">
+                    <p><strong>Burning is permanent and irreversible.</strong> Once burned, tokens cannot be recovered. Always double-check your selection — the tool shows the token name, symbol, and image before you confirm.</p>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 NFT BURN
+            ══════════════════════════════════════════ -->
+            <section class="docs-section" id="nft-burn">
+                <h1>NFT Burn</h1>
+                <p class="docs-lead">Burn unwanted Metaplex NFTs and recover all associated rent — approximately <strong>0.017 SOL</strong> per NFT.</p>
+
+                <div class="callout callout-warn">
+                    <p><strong>Expert Mode only.</strong> NFT Burn is in the <strong>NFTs</strong> tab of the Scavenger page.</p>
+                </div>
+
+                <h2>How Much SOL Do You Recover?</h2>
+                <p>An NFT on Solana spans multiple on-chain accounts, each with its own rent deposit:</p>
+                <table class="fee-table">
+                    <thead>
+                        <tr><th>Account</th><th>Approximate Rent</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Token account (holds the NFT)</td><td class="fee-accent">~0.00204 SOL</td></tr>
+                        <tr><td>Metaplex metadata account</td><td class="fee-accent">~0.012 SOL</td></tr>
+                        <tr><td>Master Edition account</td><td class="fee-accent">~0.003 SOL</td></tr>
+                        <tr><td><strong>Total per NFT</strong></td><td><strong class="fee-accent">~0.017 SOL</strong></td></tr>
+                    </tbody>
+                </table>
+                <p>Burning closes all three accounts simultaneously using the Metaplex <code>BurnNft</code> instruction, returning the full amount to your wallet.</p>
+
+                <h2>How to Use</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-body">
+                            <div class="step-title">Enable Expert Mode</div>
+                            <div class="step-desc">Toggle to EXPERT mode at the top of the Scavenger page.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-body">
+                            <div class="step-title">Open the NFTs tab</div>
+                            <div class="step-desc">Highlighted orange — these actions are permanent.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-body">
+                            <div class="step-title">Connect and scan</div>
+                            <div class="step-desc">Connect your wallet and click "Scan for NFTs". The tool fetches all Metaplex NFTs with their artwork and estimated SOL recovery per NFT.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">4</div>
+                        <div class="step-body">
+                            <div class="step-title">Select and burn</div>
+                            <div class="step-desc">Select the NFTs you want to destroy, click "Burn NFTs &amp; Reclaim SOL", confirm the warning, then approve in your wallet.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Fee Structure</h2>
+                <table class="fee-table">
+                    <thead>
+                        <tr><th>User Type</th><th>Fee</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Referred user (10% discount)</td><td class="fee-accent">1.8% of recovered SOL</td></tr>
+                        <tr><td>Guest / not referred</td><td class="fee-accent">2.0% of recovered SOL</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="callout callout-danger">
+                    <p><strong>NFT burning is permanent.</strong> The NFT artwork, metadata, and all on-chain data are destroyed. This cannot be undone.</p>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 LEADERBOARD
+            ══════════════════════════════════════════ -->
+            <section class="docs-section" id="leaderboard">
+                <h1>Crowned Vermins</h1>
+                <p class="docs-lead">The Rat Republic leaderboard — a competitive ranking of the top SOL recoverers in the community.</p>
+
+                <h2>How Rankings Work</h2>
+                <p>Every registered user has a rank based on the cumulative SOL they've recovered using any Rat Republic tool. Rankings update in real time as transactions complete on-chain.</p>
+                <p>The top 5 users are featured on the Crowned Vermins leaderboard page with their username, avatar, and total SOL recovered.</p>
+
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>Top 5 leaderboard</strong> — Live rankings with avatars and SOL amounts</li>
+                    <li><strong>Archive</strong> — Historical snapshots of previous leaderboard periods</li>
+                    <li><strong>FLEX IT</strong> — Generate and share a personalized rank card on X (Twitter)</li>
+                    <li><strong>Your rank</strong> — Displayed in your Profile and the site header once you're registered</li>
+                </ul>
+
+                <h2>Why Compete?</h2>
+                <p>Top-ranked users in the Rat Republic ecosystem may be featured, spotlighted in community announcements, or have priority access to new tools and events as they are announced.</p>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 PROFILE
+            ══════════════════════════════════════════ -->
+            <section class="docs-section" id="profile">
+                <h1>Profile</h1>
+                <p class="docs-lead">Your personal Rat Republic hub — view your stats, manage your identity, and track referral earnings.</p>
+
+                <h2>Profile Features</h2>
+                <ul>
+                    <li><strong>Username</strong> — Unique handle shown on the leaderboard and across the platform</li>
+                    <li><strong>Custom Avatar</strong> — Upload a profile picture displayed on your profile and share cards</li>
+                    <li><strong>SOL Recovered</strong> — Your all-time total across all tools</li>
+                    <li><strong>Leaderboard Rank</strong> — Your current position among all registered users</li>
+                    <li><strong>Referral Earnings</strong> — Total SOL earned passively from your referral activity</li>
+                    <li><strong>Share Card</strong> — Generate a shareable image showing your stats for X or community chats</li>
+                </ul>
+
+                <h2>PFP Generator</h2>
+                <p>The built-in PFP Generator lets you create a custom Rat Republic avatar by layering traits (background, body, outfit, eyes, accessories). Download your creation and set it as your profile picture.</p>
+
+                <h2>Creating an Account</h2>
+                <p>Registration is free and only requires an email address and username. Once registered you get access to reduced fees, the leaderboard, referral tracking, and your profile page.</p>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 REFERRAL
+            ══════════════════════════════════════════ -->
+            <section class="docs-section" id="referral">
+                <h1>Referral Program</h1>
+                <p class="docs-lead">Earn passive SOL automatically every time a user you referred completes a transaction on Rat Republic.</p>
+
+                <h2>How It Works</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-body">
+                            <div class="step-title">Register and get your referral link</div>
+                            <div class="step-desc">Create a free account. Your unique referral link is displayed on your Profile page. It looks like <code>ratrepublic.art/r/yourname</code>.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-body">
+                            <div class="step-title">Share your link</div>
+                            <div class="step-desc">Post it in communities, DMs, on X, in Telegram groups — anywhere your audience might find value in the tools.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-body">
+                            <div class="step-title">Earn from their activity</div>
+                            <div class="step-desc">Every time someone who registered via your link completes a paid transaction, you automatically receive a share of the service fee — paid on-chain with no manual claiming required.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Fee Split</h2>
+                <table class="fee-table">
+                    <thead>
+                        <tr><th>Recipient</th><th>Amount</th><th>Source</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Treasury</td><td class="fee-accent">1.3%</td><td>Of recovered SOL</td></tr>
+                        <tr><td>Referrer (you)</td><td class="fee-accent">0.5%</td><td>Of recovered SOL</td></tr>
+                        <tr><td><strong>Referred user pays</strong></td><td><strong>1.8% total</strong></td><td>10% discount from the 2.0% standard rate</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="callout">
+                    <p><strong>Referred users save money:</strong> Users who register through your link pay <strong>1.8%</strong> instead of 2.0% — a 10% discount. Your 0.5% comes out of the treasury's share, so the referred user pays less <em>and</em> you earn a cut.</p>
+                </div>
+
+                <h2>Tracking Earnings</h2>
+                <p>Your cumulative referral SOL earned is shown on your Profile page under "Referral Earnings". Each payout is an on-chain transaction verifiable on Solscan.</p>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 FAQ
+            ══════════════════════════════════════════ -->
+            <section class="docs-section" id="faq">
+                <h1>FAQ</h1>
+                <p class="docs-lead">Answers to the most common questions.</p>
+
+                <h2>Scavenger</h2>
+
+                <h3>Does closing empty accounts affect my airdrop eligibility?</h3>
+                <p>No. Airdrops are distributed to your primary wallet address. Token sub-accounts are just storage containers — closing them has no effect on your eligibility for any project's airdrop.</p>
+
+                <h3>Why is my claimable balance showing zero?</h3>
+                <p>Scavenger's CLAIM tab only shows accounts with a balance of exactly 0. If an account holds even <code>0.000001</code> of a token it is considered active. Use the <strong>TOKENS</strong> tab in Expert Mode to burn those accounts.</p>
+
+                <h3>Can I undo a closed account?</h3>
+                <p>No, closing is permanent. However, if you need to receive that token again in the future, a new token account is automatically created when someone sends it to your wallet (at a cost of ~0.00204 SOL).</p>
+
+                <h3>Is it safe to close airdropped token accounts?</h3>
+                <p>The CLAIM tab only closes accounts with zero balance — it never touches tokens you hold. For token accounts with balance (including suspicious airdrops), the TOKENS tab lets you review and burn them with full confirmation. Native burn instructions cannot execute custom contract code.</p>
+
+                <h2>Vanity Address</h2>
+
+                <h3>Does Rat Republic store my generated private key?</h3>
+                <p>No. Generation runs entirely in your browser using a Web Worker. No keypair data is ever sent to a server.</p>
+
+                <h3>Is a vanity address as secure as a regular address?</h3>
+                <p>Yes. The cryptographic security of a Solana keypair is determined by the entropy used to generate it — not by what the public key looks like. A vanity address is as secure as any other properly generated keypair.</p>
+
+                <h3>What Base58 characters are valid?</h3>
+                <p>Valid characters: <code>123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz</code>. The four excluded characters are <code>0</code> (zero), <code>O</code> (capital o), <code>I</code> (capital i), and <code>l</code> (lowercase L) — they're removed to avoid visual confusion.</p>
+
+                <h3>Why is generation slow on my phone?</h3>
+                <p>Mobile CPUs are significantly slower than desktop CPUs for this type of computation. For anything longer than 3 characters, a desktop or laptop is recommended.</p>
+
+                <h2>PFP Generator</h2>
+
+                <h3>What is the PFP Generator?</h3>
+                <p>The PFP Generator lets you create a custom Rat Republic-themed avatar by mixing and matching trait layers. Download your creation and use it as your profile picture anywhere.</p>
+
+                <h3>Are generated images stored on Rat Republic servers?</h3>
+                <p>No. Images are composed and downloaded on your device. Nothing is uploaded to Rat Republic servers.</p>
+
+                <h2>Token &amp; NFT Burn</h2>
+
+                <h3>What happens to burned tokens on-chain?</h3>
+                <p>The token balance is permanently reduced to zero and the account is closed. The token mint's total supply decreases by the burned amount, visible on any Solana explorer. This is a native Solana instruction — there is no way to reverse it.</p>
+
+                <h3>Can I accidentally burn a valuable token?</h3>
+                <p>The tool displays the token name, symbol, balance, and image (from Metaplex metadata) before you select anything. A separate confirmation modal requires an explicit acknowledgment before the transaction is signed. Always review carefully.</p>
+
+                <h3>Why do NFTs recover significantly more SOL than regular tokens?</h3>
+                <p>NFTs have two additional on-chain accounts that regular tokens don't: a Metaplex <strong>metadata account</strong> (~0.012 SOL, stores name/symbol/URI/creators) and a <strong>Master Edition account</strong> (~0.003 SOL, stores edition and supply data). Burning an NFT closes all three accounts and returns the full ~0.017 SOL.</p>
+
+                <h3>Does burning an NFT remove it from marketplaces?</h3>
+                <p>Yes. Once burned, the NFT's on-chain data is destroyed. It will no longer appear in your wallet, on marketplaces, or in any explorer. Listings may need time to update, but the NFT itself is gone permanently.</p>
+            </section>
+
+        </div><!-- /docs-content -->
+    </main>
+
+</div><!-- /docs-layout -->
+
+<script>
+(function () {
+    // Mobile nav toggle
+    var navEl = document.getElementById('docs-nav');
+    var toggleBtn = document.getElementById('nav-toggle');
+    toggleBtn.addEventListener('click', function () {
+        navEl.classList.toggle('open');
+    });
+    // Close on link click (mobile)
+    navEl.querySelectorAll('a[href^="#"]').forEach(function (a) {
+        a.addEventListener('click', function () {
+            navEl.classList.remove('open');
+        });
+    });
+
+    // Active link tracking via IntersectionObserver
+    var sections = document.querySelectorAll('.docs-section[id]');
+    var navLinks = document.querySelectorAll('.docs-nav a[href^="#"]');
+
+    function setActive(id) {
+        navLinks.forEach(function (a) {
+            if (a.getAttribute('href').slice(1) === id) {
+                a.classList.add('active');
+            } else {
+                a.classList.remove('active');
+            }
+        });
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+            if (e.isIntersecting) setActive(e.target.id);
+        });
+    }, { rootMargin: '-15% 0px -75% 0px' });
+
+    sections.forEach(function (s) { observer.observe(s); });
+    if (sections.length) setActive(sections[0].id);
+
+    // Smooth scroll with header offset
+    navLinks.forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            e.preventDefault();
+            var target = document.getElementById(this.getAttribute('href').slice(1));
+            if (target) {
+                window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 74, behavior: 'smooth' });
+            }
+        });
+    });
+})();
+</script>
+
+    <!-- ── Footer ── -->
+    <footer class="footer">
+        <span class="footer-copy">© 2026 Rat Republic. All rights reserved.</span>
+        <div class="footer-right">
+            <div class="footer-social">
+                <a href="https://x.com/rat_republicsol" target="_blank" title="X">
+                    <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="https://github.com/RatRepublic" target="_blank" title="GitHub">
+                    <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+                <a href="docs" title="Documentation">
+                    <svg viewBox="0 0 24 24"><path d="M12.513 1.097c-.645 0-1.233.34-2.407 1.017L3.675 5.82A7.233 7.233 0 0 0 0 12.063v.236a7.233 7.233 0 0 0 3.667 6.238L7.69 20.86c2.354 1.36 3.531 2.042 4.824 2.042 1.292.001 2.47-.678 4.825-2.038l4.251-2.453c1.177-.68 1.764-1.02 2.087-1.579.323-.56.324-1.24.323-2.6v-2.63a1.04 1.04 0 0 0-1.558-.903l-8.728 5.024c-.587.337-.88.507-1.201.507-.323 0-.616-.168-1.204-.506l-5.904-3.393c-.297-.171-.446-.256-.565-.271a.603.603 0 0 0-.634.368c-.045.111-.045.282-.043.625.002.252 0 .378.025.494.053.259.189.493.387.667.089.077.198.14.416.266l6.315 3.65c.589.34.884.51 1.207.51.324 0 .617-.17 1.206-.509l7.74-4.469c.202-.116.302-.172.377-.13.075.044.075.16.075.392v1.193c0 .34.001.51-.08.649-.08.14-.227.224-.522.394l-6.382 3.685c-1.178.68-1.767 1.02-2.413 1.02-.646 0-1.236-.34-2.412-1.022l-5.97-3.452-.043-.025a4.106 4.106 0 0 1-2.031-3.52V11.7c0-.801.427-1.541 1.12-1.944a1.979 1.979 0 0 1 1.982-.001l4.946 2.858c1.174.679 1.762 1.019 2.407 1.02.645 0 1.233-.34 2.41-1.017l7.482-4.306a1.091 1.091 0 0 0 0-1.891L14.92 2.11c-1.175-.675-1.762-1.013-2.406-1.013Z"/></svg>
+                </a>
+            </div>
+            <div class="footer-divider"></div>
+            <a href="https://solscan.io/account/ratU71Bedbf7196sexgCyBoRxM2Zjb7vBxJ5MJeBYGb" target="_blank" class="footer-fee">Fee Wallet</a>
+        </div>
+    </footer>
+
+    <script>
+        (function () {
+            var token    = localStorage.getItem('rr_token');
+            var username = localStorage.getItem('rr_username');
+            if (!token || !username) return;
+            var el = document.getElementById('header-actions');
+            var safeName = username.length > 16 ? username.slice(0, 16) + '…' : username;
+            function renderBtn(avatarSrc) {
+                el.innerHTML =
+                    '<a href="profile" class="btn-profile">' +
+                      '<img class="btn-profile-avatar" src="' + avatarSrc + '" onerror="this.onerror=null;this.src=\'images/Default-Avatar.png\'" alt="">' +
+                      '<span class="btn-profile-name">' + safeName + '</span>' +
+                    '</a>';
+            }
+            var cached = localStorage.getItem('rr_avatar');
+            renderBtn(cached || 'images/Default-Avatar.png');
+            fetch('api/me.php', { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (d) {
+                    if (!d) return;
+                    var fresh = d.avatar || 'images/Default-Avatar.png';
+                    if (d.avatar) localStorage.setItem('rr_avatar', d.avatar);
+                    renderBtn(fresh);
+                }).catch(function () {});
+        })();
+    </script>
+
+</body>
+</html>

@@ -4,318 +4,488 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rat Republic — Roadmap</title>
-    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
     <style>
-        @font-face {
-            font-family: 'NftOpensea';
-            src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
+        @font-face { font-family: 'Inter'; src: url('fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype'); font-weight: 100 900; font-style: normal; }
+        @font-face { font-family: 'NftOpensea'; src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype'); }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #080808; --sidebar-bg: #0d0d0d; --surface: #111111; --surface-2: #161616;
+            --border: rgba(255,255,255,0.07); --border-hover: rgba(255,255,255,0.15);
+            --text: #ffffff; --text-muted: rgba(255,255,255,0.45); --text-dim: rgba(255,255,255,0.22);
+            --accent: #C8E030; --accent-dim: rgba(200,224,48,0.1);
+            --sidebar-w: 220px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
 
-        body {
-            background-color: #1a1f0f;
-            background-image: url('images/Background.png');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            color: #fff;
-            font-family: monospace, 'Courier New', sans-serif;
-            min-height: 100vh;
-            padding: 40px 20px 80px;
-        }
+        /* ── Sidebar ── */
+        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 100; }
+        .sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 20px 16px; text-decoration: none; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+        .sidebar-brand img { width: 26px; height: 26px; object-fit: contain; flex-shrink: 0; }
+        .sidebar-brand span { font-family: 'NftOpensea'; font-size: 0.85rem; letter-spacing: 0.12em; color: var(--text); }
+        .sidebar-nav { flex: 1; padding: 4px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; text-decoration: none; font-size: 0.84rem; font-weight: 500; color: var(--text-muted); transition: background 0.15s, color 0.15s; }
+        .sidebar-nav a:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+        .sidebar-nav a.active { background: rgba(255,255,255,0.07); color: var(--text); }
+        .sidebar-nav a svg, .nav-group-toggle svg.nav-icon { width: 15px; height: 15px; opacity: 0.6; flex-shrink: 0; }
+        .sidebar-nav a.active svg, .sidebar-nav a:hover svg { opacity: 1; }
+        .sidebar-divider { height: 1px; background: var(--border); margin: 8px 10px; }
+        .nav-group-toggle { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border-radius: 8px; background: none; border: none; font-family: 'Inter'; font-size: 0.84rem; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: background 0.15s, color 0.15s; text-align: left; }
+        .nav-group-toggle:hover, .nav-group-toggle.open { background: rgba(255,255,255,0.05); color: var(--text); }
+        .nav-group-toggle.open svg.nav-icon { opacity: 1; }
+        .nav-group-toggle .chevron { margin-left: auto; width: 13px; height: 13px; opacity: 0.4; transition: transform 0.2s; flex-shrink: 0; }
+        .nav-group-toggle.open .chevron { transform: rotate(180deg); opacity: 0.7; }
+        .nav-sub { display: none; flex-direction: column; gap: 1px; padding-left: 14px; margin-top: 1px; }
+        .nav-sub.open { display: flex; }
+        .nav-sub a { font-size: 0.8rem; padding: 7px 12px; gap: 8px; }
+        .nav-sub a::before { content: ''; width: 1px; height: 14px; background: rgba(255,255,255,0.12); flex-shrink: 0; border-radius: 1px; }
+        .sidebar-bottom { padding: 10px; border-top: 1px solid var(--border); }
+        .sidebar-socials { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; }
+        .sidebar-social-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.08); color: var(--text-dim); text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+        .sidebar-social-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text-muted); }
+        .sidebar-social-btn svg { width: 12px; height: 12px; fill: currentColor; }
+        .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; margin-bottom: 4px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); }
+        .sidebar-avatar { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: #1a1a1a; }
+        .sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .sidebar-username { font-size: 0.82rem; font-weight: 600; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sidebar-rank { font-size: 0.65rem; color: var(--accent); font-weight: 600; }
+        .btn-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border-radius: 8px; font-family: 'Inter'; font-size: 0.82rem; font-weight: 500; color: rgba(255,100,100,0.6); background: transparent; border: none; cursor: pointer; transition: background 0.15s, color 0.15s; }
+        .btn-logout:hover { background: rgba(255,80,80,0.07); color: rgba(255,120,120,0.9); }
+        .btn-logout svg { width: 14px; height: 14px; opacity: 0.7; }
+        .sidebar-guest { padding: 10px 12px; border-radius: 8px; margin-bottom: 4px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); }
+        .sidebar-guest-note { font-size: 0.7rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 8px; }
+        .btn-sidebar-login { display: flex; align-items: center; justify-content: center; width: 100%; padding: 7px 12px; border-radius: 7px; font-family: 'Inter'; font-size: 0.78rem; font-weight: 600; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(200,224,48,0.2); text-decoration: none; transition: background 0.15s; }
+        .btn-sidebar-login:hover { background: rgba(200,224,48,0.18); }
 
-        .container {
-            max-width: 760px;
-            margin: 0 auto;
-        }
+        /* ── Main ── */
+        .main { margin-left: var(--sidebar-w); min-height: 100vh; padding: 40px 36px 80px; }
+        .inner { max-width: 680px; }
 
-        .page-title {
-            font-family: 'NftOpensea', monospace;
-            font-size: 2.8rem;
-            color: #fff;
-            letter-spacing: 4px;
-            text-align: center;
-            text-shadow: 0 0 20px rgba(255,255,255,0.15);
-            margin-bottom: 8px;
-        }
+        /* ── Header ── */
+        .page-heading { margin-bottom: 40px; }
+        .page-heading h1 { font-family: 'NftOpensea'; font-size: 1.9rem; letter-spacing: 0.06em; color: var(--text); margin-bottom: 4px; }
+        .page-heading p { font-size: 0.85rem; color: var(--text-muted); }
 
-        .page-sub {
-            text-align: center;
-            color: rgba(255,255,255,0.35);
-            font-size: 0.78rem;
-            letter-spacing: 1.5px;
-            margin-bottom: 56px;
-        }
-
-        /* Timeline */
-        .timeline {
-            position: relative;
-            padding-left: 48px;
-        }
-
+        /* ── Timeline ── */
+        .timeline { position: relative; padding-left: 40px; }
         .timeline::before {
             content: '';
             position: absolute;
-            left: 15px;
-            top: 8px;
-            bottom: 8px;
+            left: 7px;
+            top: 12px;
+            bottom: 12px;
             width: 2px;
-            background: linear-gradient(to bottom, #C8E030 0%, #5A7A18 40%, rgba(90,122,24,0.2) 100%);
+            background: linear-gradient(to bottom, var(--accent) 0%, rgba(200,224,48,0.3) 40%, rgba(200,224,48,0.05) 100%);
         }
 
-        /* Phase block */
-        .phase {
-            position: relative;
-            margin-bottom: 36px;
-        }
+        /* ── Phase ── */
+        .phase { position: relative; margin-bottom: 20px; }
 
         .phase-dot {
             position: absolute;
-            left: -40px;
-            top: 18px;
-            width: 18px;
-            height: 18px;
+            left: -33px;
+            top: 20px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            border: 2px solid #5A7A18;
-            background: #1a1f0f;
+            border: 2px solid rgba(200,224,48,0.2);
+            background: var(--bg);
             z-index: 1;
         }
-
-        .phase.complete .phase-dot {
-            background: #C8E030;
-            border-color: #C8E030;
-            box-shadow: 0 0 10px rgba(200,224,48,0.5);
-        }
-
-        .phase.next .phase-dot {
-            background: #1a1f0f;
-            border-color: #C8E030;
-            box-shadow: 0 0 14px rgba(200,224,48,0.6);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 8px rgba(200,224,48,0.4); }
-            50%       { box-shadow: 0 0 18px rgba(200,224,48,0.8); }
-        }
+        .phase.complete .phase-dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 8px rgba(200,224,48,0.4); }
+        .phase.current .phase-dot { border-color: var(--accent); background: var(--bg); box-shadow: 0 0 0 3px rgba(200,224,48,0.15); animation: dotpulse 2s ease-in-out infinite; }
+        @keyframes dotpulse { 0%, 100% { box-shadow: 0 0 0 3px rgba(200,224,48,0.15); } 50% { box-shadow: 0 0 0 5px rgba(200,224,48,0.25); } }
 
         .phase-card {
-            background: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
+            background: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 14px;
-            padding: 22px 24px;
+            overflow: hidden;
             transition: border-color 0.2s;
         }
-
-        .phase.complete .phase-card { border-color: rgba(200,224,48,0.25); }
-        .phase.next .phase-card {
-            border-color: #C8E030;
-            box-shadow: 0 0 24px rgba(200,224,48,0.1);
+        .phase-card::before {
+            content: '';
+            display: block;
+            height: 2px;
         }
+        .phase.complete .phase-card { border-color: rgba(200,224,48,0.12); }
+        .phase.complete .phase-card::before { background: rgba(200,224,48,0.3); }
+        .phase.current .phase-card { border-color: rgba(200,224,48,0.3); box-shadow: 0 0 28px rgba(200,224,48,0.06); }
+        .phase.current .phase-card::before { background: var(--accent); }
+        .phase.upcoming .phase-card::before { background: rgba(255,255,255,0.06); }
 
-        .phase-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
+        .phase-inner { padding: 20px 24px 22px; }
 
-        .phase-number {
-            font-family: 'NftOpensea', monospace;
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            color: rgba(255,255,255,0.3);
-        }
-
-        .phase-name {
-            font-family: 'NftOpensea', monospace;
-            font-size: 1.05rem;
-            color: #fff;
-            letter-spacing: 2px;
-            flex: 1;
-        }
+        .phase-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+        .phase-label { font-family: 'NftOpensea'; font-size: 0.68rem; letter-spacing: 0.12em; color: var(--text-dim); }
+        .phase-divider { width: 1px; height: 12px; background: var(--border); flex-shrink: 0; }
+        .phase-name { font-family: 'NftOpensea'; font-size: 1rem; letter-spacing: 0.06em; color: var(--text); flex: 1; }
+        .phase.complete .phase-name { color: var(--text-muted); }
 
         .phase-badge {
-            font-size: 0.65rem;
-            letter-spacing: 1.5px;
+            font-family: 'NftOpensea';
+            font-size: 0.62rem;
+            letter-spacing: 0.1em;
             padding: 3px 10px;
-            border-radius: 20px;
-            font-weight: bold;
-            text-transform: uppercase;
+            border-radius: 6px;
             white-space: nowrap;
         }
+        .badge-complete { background: rgba(200,224,48,0.08); border: 1px solid rgba(200,224,48,0.2); color: rgba(200,224,48,0.6); }
+        .badge-current  { background: var(--accent-dim); border: 1px solid rgba(200,224,48,0.35); color: var(--accent); }
+        .badge-upcoming { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-dim); }
 
-        .badge-complete {
-            background: rgba(200,224,48,0.12);
-            border: 1px solid rgba(200,224,48,0.4);
-            color: #C8E030;
-        }
-
-        .badge-next {
-            background: rgba(200,224,48,0.15);
-            border: 1px solid #C8E030;
-            color: #C8E030;
-            box-shadow: 0 0 8px rgba(200,224,48,0.2);
-        }
-
-        .badge-upcoming {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.12);
-            color: rgba(255,255,255,0.35);
-        }
-
-        .phase-items {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 9px;
-        }
+        /* ── Items ── */
+        .phase-items { list-style: none; display: flex; flex-direction: column; gap: 0; }
 
         .phase-item {
             display: flex;
             align-items: flex-start;
-            gap: 10px;
-            font-size: 0.82rem;
-            color: rgba(255,255,255,0.75);
-            line-height: 1.4;
+            gap: 12px;
+            padding: 9px 0;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.83rem;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
+        .phase-items .phase-item:first-child { border-top: none; }
 
-        .phase-item .icon {
+        .item-icon {
             flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-top: 1px;
-            font-size: 0.75rem;
         }
+        .phase.complete .item-icon { background: rgba(200,224,48,0.12); }
+        .phase.complete .item-icon svg { stroke: var(--accent); }
+        .phase.current .item-icon { background: rgba(200,224,48,0.08); }
+        .phase.current .item-icon svg { stroke: var(--accent); }
+        .phase.upcoming .item-icon svg { stroke: var(--text-dim); }
+        .item-icon svg { width: 10px; height: 10px; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 
-        .phase.complete .phase-item { color: rgba(255,255,255,0.45); text-decoration: line-through; }
-        .phase-item.done { color: rgba(255,255,255,0.45); text-decoration: line-through; }
-        .phase.complete .phase-item .icon { color: #C8E030; }
+        .item-text { flex: 1; }
+        .item-sub { font-size: 0.74rem; color: var(--text-dim); margin-top: 2px; }
 
-        .phase.next .phase-item .icon { color: #C8E030; }
+        .phase.complete .phase-item { color: rgba(255,255,255,0.3); }
+        .phase.complete .item-text { text-decoration: line-through; text-decoration-color: rgba(255,255,255,0.15); }
 
-        .phase.upcoming .phase-item .icon { color: rgba(90,122,24,0.7); }
+        .phase-item.done .item-text { text-decoration: line-through; text-decoration-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.3); }
+        .phase-item.done .item-icon { background: rgba(200,224,48,0.08); }
+        .phase-item.done .item-icon svg { stroke: rgba(200,224,48,0.4); }
 
-        .item-tba {
-            color: rgba(255,255,255,0.25);
-            font-style: italic;
-            font-size: 0.75rem;
-        }
+        .item-tba { color: var(--text-dim); font-style: italic; }
 
-        .item-tba .icon { color: rgba(90,122,24,0.4) !important; }
-
-        /* divider between phase number and name */
-        .phase-divider {
-            width: 1px;
-            height: 14px;
-            background: rgba(255,255,255,0.15);
+        @media (max-width: 900px) {
+            .main { margin-left: 0; padding: 24px 16px 60px; }
+            .sidebar { transform: translateX(-100%); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="page-title">ROADMAP</div>
-        <div class="page-sub">WHAT WE'VE BUILT · WHAT'S NEXT · WHAT'S COMING</div>
 
-        <div class="timeline">
-
-            <!-- Phase 1 -->
-            <div class="phase complete">
-                <div class="phase-dot"></div>
-                <div class="phase-card">
-                    <div class="phase-header">
-                        <span class="phase-number">PHASE 1</span>
-                        <div class="phase-divider"></div>
-                        <span class="phase-name">CORE</span>
-                        <span class="phase-badge badge-complete">Complete</span>
-                    </div>
-                    <ul class="phase-items">
-                        <li class="phase-item"><span class="icon">✓</span> Token account closer</li>
-                        <li class="phase-item"><span class="icon">✓</span> Fee + referral system</li>
-                        <li class="phase-item"><span class="icon">✓</span> Referral dashboard on profile</li>
-                        <li class="phase-item"><span class="icon">✓</span> Leaderboard + weekly prizes</li>
-                        <li class="phase-item"><span class="icon">✓</span> User accounts + profiles</li>
-                    </ul>
-                </div>
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+        <a href="/" class="sidebar-brand">
+            <img src="images/branding/rat-republic-logo.svg" alt="">
+            <span>RAT REPUBLIC</span>
+        </a>
+        <nav class="sidebar-nav">
+            <a href="/">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Home
+            </a>
+            <button class="nav-group-toggle" id="utilities-toggle" onclick="toggleUtilities()">
+                <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
+                Utilities
+                <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="nav-sub" id="utilities-sub">
+                <a href="cleanup">Scavenger</a>
+                <a href="vanity">Vanity Addy</a>
+                <a href="airdrop">Airdrop</a>
+                <a href="generator">PFP Generator</a>
             </div>
-
-            <!-- Phase 2 -->
-            <div class="phase next">
-                <div class="phase-dot"></div>
-                <div class="phase-card">
-                    <div class="phase-header">
-                        <span class="phase-number">PHASE 2</span>
-                        <div class="phase-divider"></div>
-                        <span class="phase-name">TOKEN LAUNCH</span>
-                        <span class="phase-badge badge-next">Next</span>
-                    </div>
-                    <ul class="phase-items">
-                        <li class="phase-item"><span class="icon">→</span> Launch token on Pumpfun</li>
-                        <li class="phase-item"><span class="icon">→</span> Token CA displayed on site</li>
-                        <li class="phase-item"><span class="icon">→</span> Manual treasury buyback + burn</li>
-                    </ul>
-                </div>
+            <a href="leaderboard">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Crowned Vermins
+            </a>
+            <a href="roadmap" class="active">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                Roadmap
+            </a>
+            <div class="sidebar-divider"></div>
+            <a href="profile">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Profile
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <div class="sidebar-socials">
+                <a href="https://x.com/rat_republicsol" target="_blank" rel="noopener" class="sidebar-social-btn" title="X">
+                    <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="https://github.com/RatRepublic" target="_blank" rel="noopener" class="sidebar-social-btn" title="GitHub">
+                    <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+                <a href="docs" class="sidebar-social-btn" title="Documentation">
+                    <svg viewBox="0 0 24 24"><path d="M12.513 1.097c-.645 0-1.233.34-2.407 1.017L3.675 5.82A7.233 7.233 0 0 0 0 12.063v.236a7.233 7.233 0 0 0 3.667 6.238L7.69 20.86c2.354 1.36 3.531 2.042 4.824 2.042 1.292.001 2.47-.678 4.825-2.038l4.251-2.453c1.177-.68 1.764-1.02 2.087-1.579.323-.56.324-1.24.323-2.6v-2.63a1.04 1.04 0 0 0-1.558-.903l-8.728 5.024c-.587.337-.88.507-1.201.507-.323 0-.616-.168-1.204-.506l-5.904-3.393c-.297-.171-.446-.256-.565-.271a.603.603 0 0 0-.634.368c-.045.111-.045.282-.043.625.002.252 0 .378.025.494.053.259.189.493.387.667.089.077.198.14.416.266l6.315 3.65c.589.34.884.51 1.207.51.324 0 .617-.17 1.206-.509l7.74-4.469c.202-.116.302-.172.377-.13.075.044.075.16.075.392v1.193c0 .34.001.51-.08.649-.08.14-.227.224-.522.394l-6.382 3.685c-1.178.68-1.767 1.02-2.413 1.02-.646 0-1.236-.34-2.412-1.022l-5.97-3.452-.043-.025a4.106 4.106 0 0 1-2.031-3.52V11.7c0-.801.427-1.541 1.12-1.944a1.979 1.979 0 0 1 1.982-.001l4.946 2.858c1.174.679 1.762 1.019 2.407 1.02.645 0 1.233-.34 2.41-1.017l7.482-4.306a1.091 1.091 0 0 0 0-1.891L14.92 2.11c-1.175-.675-1.762-1.013-2.406-1.013Z"/></svg>
+                </a>
             </div>
-
-            <!-- Phase 3 -->
-            <div class="phase upcoming">
-                <div class="phase-dot"></div>
-                <div class="phase-card">
-                    <div class="phase-header">
-                        <span class="phase-number">PHASE 3</span>
-                        <div class="phase-divider"></div>
-                        <span class="phase-name">TOOL EXPANSION</span>
-                        <span class="phase-badge badge-upcoming">Upcoming</span>
-                    </div>
-                    <ul class="phase-items">
-                        <li class="phase-item done"><span class="icon">·</span> Pre-scan preview — estimate recoverable SOL before connecting</li>
-                        <li class="phase-item"><span class="icon">·</span> NFT account closer</li>
-                        <li class="phase-item"><span class="icon">·</span> Domain account closer (.sol domains)</li>
-                        <li class="phase-item"><span class="icon">·</span> cNFT closer (compressed NFTs)</li>
-                        <li class="phase-item"><span class="icon">·</span> LP token closer (empty liquidity pool positions)</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Phase 4 -->
-            <div class="phase upcoming">
-                <div class="phase-dot"></div>
-                <div class="phase-card">
-                    <div class="phase-header">
-                        <span class="phase-number">PHASE 4</span>
-                        <div class="phase-divider"></div>
-                        <span class="phase-name">GROWTH</span>
-                        <span class="phase-badge badge-upcoming">Upcoming</span>
-                    </div>
-                    <ul class="phase-items">
-                        <li class="phase-item"><span class="icon">·</span> X account linking on profile</li>
-                        <li class="phase-item"><span class="icon">·</span> Automated weekly prize payout from treasury</li>
-                        <li class="phase-item"><span class="icon">·</span> Reward top token holders — scales with tool volume</li>
-                        <li class="phase-item"><span class="icon">·</span> Partner referral program — other projects earn % of fees</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Phase 5 -->
-            <div class="phase upcoming">
-                <div class="phase-dot"></div>
-                <div class="phase-card">
-                    <div class="phase-header">
-                        <span class="phase-number">PHASE 5</span>
-                        <div class="phase-divider"></div>
-                        <span class="phase-name">ECOSYSTEM</span>
-                        <span class="phase-badge badge-upcoming">Upcoming</span>
-                    </div>
-                    <ul class="phase-items">
-                        <li class="phase-item"><span class="icon">·</span> Multi-wallet scanner — paste multiple addresses, see combined recoverable SOL</li>
-                        <li class="phase-item"><span class="icon">·</span> More wallet support — OKX, Jupiter, Ledger, and others</li>
-                        <li class="phase-item item-tba"><span class="icon">·</span> More TBA</li>
-                    </ul>
-                </div>
-            </div>
-
+            <div style="height:1px;background:var(--border);margin:2px 2px 8px;"></div>
+            <div id="sidebar-user-widget"></div>
         </div>
-    </div>
-    <script src="js/header.js"></script>
-    <script src="js/footer.js"></script>
+    </aside>
+
+    <!-- ── Main ── -->
+    <main class="main">
+        <div class="inner">
+
+            <div class="page-heading">
+                <h1>ROADMAP</h1>
+                <p>What we've built, what's next, and what's coming.</p>
+            </div>
+
+            <div class="timeline">
+
+                <!-- Phase 1 — Complete -->
+                <div class="phase complete">
+                    <div class="phase-dot"></div>
+                    <div class="phase-card">
+                        <div class="phase-inner">
+                            <div class="phase-header">
+                                <span class="phase-label">PHASE 1</span>
+                                <div class="phase-divider"></div>
+                                <span class="phase-name">CORE</span>
+                                <span class="phase-badge badge-complete">Complete</span>
+                            </div>
+                            <ul class="phase-items">
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                                    <div class="item-text">Token account closer</div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                                    <div class="item-text">Fee + referral system</div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                                    <div class="item-text">Referral dashboard on profile</div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                                    <div class="item-text">Leaderboard + weekly prizes</div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                                    <div class="item-text">User accounts + profiles</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 2 — Current -->
+                <div class="phase current">
+                    <div class="phase-dot"></div>
+                    <div class="phase-card">
+                        <div class="phase-inner">
+                            <div class="phase-header">
+                                <span class="phase-label">PHASE 2</span>
+                                <div class="phase-divider"></div>
+                                <span class="phase-name">TOKEN LAUNCH</span>
+                                <span class="phase-badge badge-current">Next</span>
+                            </div>
+                            <ul class="phase-items">
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><line x1="2" y1="6" x2="9" y2="6"/><polyline points="6,3 9,6 6,9"/></svg></div>
+                                    <div class="item-text">Launch token on Pumpfun</div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><line x1="2" y1="6" x2="9" y2="6"/><polyline points="6,3 9,6 6,9"/></svg></div>
+                                    <div class="item-text">Token CA displayed on site</div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><line x1="2" y1="6" x2="9" y2="6"/><polyline points="6,3 9,6 6,9"/></svg></div>
+                                    <div class="item-text">Manual treasury buyback + burn</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 3 — Upcoming -->
+                <div class="phase upcoming">
+                    <div class="phase-dot"></div>
+                    <div class="phase-card">
+                        <div class="phase-inner">
+                            <div class="phase-header">
+                                <span class="phase-label">PHASE 3</span>
+                                <div class="phase-divider"></div>
+                                <span class="phase-name">TOOL EXPANSION</span>
+                                <span class="phase-badge badge-upcoming">Upcoming</span>
+                            </div>
+                            <ul class="phase-items">
+                                <li class="phase-item done">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                                    <div class="item-text">Pre-scan preview
+                                        <div class="item-sub">Estimate recoverable SOL before connecting</div>
+                                    </div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="1.5"/></svg></div>
+                                    <div class="item-text">NFT account closer</div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="1.5"/></svg></div>
+                                    <div class="item-text">Domain account closer
+                                        <div class="item-sub">.sol domains</div>
+                                    </div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="1.5"/></svg></div>
+                                    <div class="item-text">cNFT closer
+                                        <div class="item-sub">Compressed NFTs</div>
+                                    </div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="1.5"/></svg></div>
+                                    <div class="item-text">LP token closer
+                                        <div class="item-sub">Empty liquidity pool positions</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 4 — Upcoming -->
+                <div class="phase upcoming">
+                    <div class="phase-dot"></div>
+                    <div class="phase-card">
+                        <div class="phase-inner">
+                            <div class="phase-header">
+                                <span class="phase-label">PHASE 4</span>
+                                <div class="phase-divider"></div>
+                                <span class="phase-name">GROWTH</span>
+                                <span class="phase-badge badge-upcoming">Upcoming</span>
+                            </div>
+                            <ul class="phase-items">
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="1.5"/></svg></div>
+                                    <div class="item-text">X account linking on profile</div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="1.5"/></svg></div>
+                                    <div class="item-text">Automated weekly prize payout from treasury</div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="1.5"/></svg></div>
+                                    <div class="item-text">Reward top token holders
+                                        <div class="item-sub">Scales with tool volume</div>
+                                    </div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="1.5"/></svg></div>
+                                    <div class="item-text">Partner referral program
+                                        <div class="item-sub">Other projects earn a % of fees</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 5 — Upcoming -->
+                <div class="phase upcoming">
+                    <div class="phase-dot"></div>
+                    <div class="phase-card">
+                        <div class="phase-inner">
+                            <div class="phase-header">
+                                <span class="phase-label">PHASE 5</span>
+                                <div class="phase-divider"></div>
+                                <span class="phase-name">ECOSYSTEM</span>
+                                <span class="phase-badge badge-upcoming">Upcoming</span>
+                            </div>
+                            <ul class="phase-items">
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="1.5"/></svg></div>
+                                    <div class="item-text">Multi-wallet scanner
+                                        <div class="item-sub">Paste multiple addresses, see combined recoverable SOL</div>
+                                    </div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="1.5"/></svg></div>
+                                    <div class="item-text">Expanded wallet support
+                                        <div class="item-sub">OKX, Jupiter, Ledger, and others</div>
+                                    </div>
+                                </li>
+                                <li class="phase-item">
+                                    <div class="item-icon"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="1.5"/></svg></div>
+                                    <div class="item-text item-tba">More TBA</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+    (function () {
+        var token    = localStorage.getItem('rr_token');
+        var username = localStorage.getItem('rr_username');
+        var avatar   = localStorage.getItem('rr_avatar');
+        var cachedRank = localStorage.getItem('rr_rank');
+        var widget   = document.getElementById('sidebar-user-widget');
+        if (!widget) return;
+        if (token && username) {
+            var safeUser = username.length > 16 ? username.slice(0, 16) + '…' : username;
+            widget.innerHTML =
+                '<div class="sidebar-user">' +
+                  '<div class="sidebar-avatar"><img src="' + (avatar || 'images/Default-Avatar.png') + '" onerror="this.src=\'images/Default-Avatar.png\'" alt=""></div>' +
+                  '<div style="flex:1;min-width:0;">' +
+                    '<div class="sidebar-username">' + safeUser + '</div>' +
+                    '<div class="sidebar-rank" id="sw-rank">' + (cachedRank ? 'Rank #' + cachedRank : '') + '</div>' +
+                  '</div>' +
+                '</div>' +
+                '<button class="btn-logout" onclick="(function(){' +
+                  'var t=localStorage.getItem(\'rr_token\');' +
+                  'localStorage.removeItem(\'rr_token\');localStorage.removeItem(\'rr_username\');localStorage.removeItem(\'rr_avatar\');localStorage.removeItem(\'rr_rank\');' +
+                  'if(t)fetch(\'api/auth.php?action=logout\',{method:\'POST\',headers:{\'Authorization\':\'Bearer \'+t}}).catch(function(){});' +
+                  'window.location.href=\'/\';' +
+                '})()">' +
+                  '<svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>' +
+                  'Log Out' +
+                '</button>';
+            fetch('api/me.php', { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(function(r) { return r.ok ? r.json() : null; })
+                .then(function(d) {
+                    var rankEl = document.getElementById('sw-rank');
+                    if (rankEl && d && d.rank_position) { localStorage.setItem('rr_rank', d.rank_position); rankEl.textContent = 'Rank #' + d.rank_position; }
+                }).catch(function() {});
+        } else {
+            widget.innerHTML =
+                '<div class="sidebar-guest">' +
+                  '<div class="sidebar-guest-note">Sign in to track your progress</div>' +
+                  '<a href="login" class="btn-sidebar-login">Login / Register</a>' +
+                '</div>';
+        }
+    })();
+
+    function toggleUtilities() {
+        var toggle = document.getElementById('utilities-toggle');
+        var sub    = document.getElementById('utilities-sub');
+        toggle.classList.toggle('open');
+        sub.classList.toggle('open');
+    }
+    </script>
 </body>
 </html>

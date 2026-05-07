@@ -3,972 +3,639 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rat Republic — Dust to SOL</title>
-    <link rel="icon" type="image/png" href="images/favicon.png">
+    <title>Rat Republic — Scavenger</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        @font-face { font-family: 'Inter'; src: url('fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype'); font-weight: 100 900; font-style: normal; }
+        @font-face { font-family: 'NftOpensea'; src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype'); }
 
-        body {
-            background-color: #1a1f0f;
-            background-image: url('images/Background.png');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            color: #fff;
-            font-family: monospace, 'Courier New', sans-serif;
-            min-height: 100vh;
-            padding: 30px 20px 60px;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #080808; --sidebar-bg: #0d0d0d; --surface: #111111; --surface-2: #161616;
+            --border: rgba(255,255,255,0.07); --border-hover: rgba(255,255,255,0.15);
+            --text: #ffffff; --text-muted: rgba(255,255,255,0.45); --text-dim: rgba(255,255,255,0.22);
+            --accent: #C8E030; --accent-dim: rgba(200,224,48,0.1); --sidebar-w: 220px;
         }
 
-        .container { max-width: 760px; margin: 0 auto; }
+        html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
 
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 24px;
-            background-color: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            color: #C8E030;
-            text-decoration: none;
-            font-weight: bold;
-            padding: 8px 20px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            font-size: 0.85rem;
-        }
-        .back-btn:hover { border-color: #C8E030; box-shadow: 0 0 10px rgba(200,224,48,0.3); }
+        /* ── Sidebar ── */
+        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 100; }
+        .sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 20px 16px; text-decoration: none; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+        .sidebar-brand img { width: 26px; height: 26px; object-fit: contain; flex-shrink: 0; }
+        .sidebar-brand span { font-family: 'NftOpensea'; font-size: 0.85rem; letter-spacing: 0.12em; color: var(--text); }
+        .sidebar-nav { flex: 1; padding: 4px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; text-decoration: none; font-size: 0.84rem; font-weight: 500; color: var(--text-muted); transition: background 0.15s, color 0.15s; }
+        .sidebar-nav a:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+        .sidebar-nav a.active { background: rgba(255,255,255,0.07); color: var(--text); }
+        .sidebar-nav a svg, .nav-group-toggle svg.nav-icon { width: 15px; height: 15px; opacity: 0.6; flex-shrink: 0; }
+        .sidebar-nav a.active svg, .sidebar-nav a:hover svg { opacity: 1; }
+        .sidebar-divider { height: 1px; background: var(--border); margin: 8px 10px; }
+        .nav-group-toggle { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border-radius: 8px; background: none; border: none; font-family: 'Inter'; font-size: 0.84rem; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: background 0.15s, color 0.15s; text-align: left; }
+        .nav-group-toggle:hover, .nav-group-toggle.open { background: rgba(255,255,255,0.05); color: var(--text); }
+        .nav-group-toggle.open svg.nav-icon { opacity: 1; }
+        .nav-group-toggle .chevron { margin-left: auto; width: 13px; height: 13px; opacity: 0.4; transition: transform 0.2s; flex-shrink: 0; }
+        .nav-group-toggle.open .chevron { transform: rotate(180deg); opacity: 0.7; }
+        .nav-sub { display: none; flex-direction: column; gap: 1px; padding-left: 14px; margin-top: 1px; }
+        .nav-sub.open { display: flex; }
+        .nav-sub a { font-size: 0.8rem; padding: 7px 12px; gap: 8px; }
+        .nav-sub a::before { content: ''; width: 1px; height: 14px; background: rgba(255,255,255,0.12); flex-shrink: 0; border-radius: 1px; }
+        .nav-sub a.active::before { background: var(--accent); }
+        .sidebar-bottom { padding: 10px; border-top: 1px solid var(--border); }
+        .sidebar-socials { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; }
+        .sidebar-social-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.08); color: var(--text-dim); text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+        .sidebar-social-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text-muted); }
+        .sidebar-social-btn svg { width: 12px; height: 12px; fill: currentColor; }
 
-        @font-face {
-            font-family: 'NftOpensea';
-            src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
-        }
+        /* Logged-in user widget */
+        .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; margin-bottom: 4px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); }
+        .sidebar-avatar { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: #1a1a1a; }
+        .sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .sidebar-username { font-size: 0.82rem; font-weight: 600; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sidebar-rank { font-size: 0.65rem; color: var(--accent); font-weight: 600; }
+        .btn-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border-radius: 8px; font-family: 'Inter'; font-size: 0.82rem; font-weight: 500; color: rgba(255,100,100,0.6); background: transparent; border: none; cursor: pointer; transition: background 0.15s, color 0.15s; }
+        .btn-logout:hover { background: rgba(255,80,80,0.07); color: rgba(255,120,120,0.9); }
+        .btn-logout svg { width: 14px; height: 14px; opacity: 0.7; }
 
-        .page-title {
-            text-align: center;
-            font-family: 'NftOpensea', monospace;
-            color: #ffffff;
-            font-size: 2rem;
-            letter-spacing: 3px;
-            text-shadow: 0 0 16px rgba(255,255,255,0.2);
-            margin-bottom: 28px;
-        }
+        /* Guest widget */
+        .sidebar-guest { padding: 10px 12px; border-radius: 8px; margin-bottom: 4px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); }
+        .sidebar-guest-note { font-size: 0.7rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 8px; }
+        .btn-sidebar-login { display: flex; align-items: center; justify-content: center; width: 100%; padding: 7px 12px; border-radius: 7px; font-family: 'Inter'; font-size: 0.78rem; font-weight: 600; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(200,224,48,0.2); text-decoration: none; transition: background 0.15s; }
+        .btn-sidebar-login:hover { background: rgba(200,224,48,0.18); }
 
-        /* Tabs */
-        .tabs {
-            display: flex;
-            border-bottom: 2px solid #5A7A18;
-            margin-bottom: 36px;
-        }
-        .tab-btn {
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.4);
-            font-family: monospace;
-            font-size: 0.78rem;
-            font-weight: bold;
-            letter-spacing: 1.5px;
-            padding: 10px 14px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
-            transition: all 0.2s;
-        }
-        .tab-btn:hover { color: rgba(255,255,255,0.7); }
-        .tab-btn.active {
-            color: #C8E030;
-            border-bottom-color: #C8E030;
-        }
+        /* ── Main ── */
+        .main { margin-left: var(--sidebar-w); min-height: 100vh; padding: 36px 32px 80px; }
 
-        /* Tab content */
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        /* ── Title row ── */
+        .title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .page-title { font-family: 'NftOpensea'; font-size: 1.9rem; letter-spacing: 0.06em; color: var(--text); }
+        .page-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; }
+        .btn-help { font-family: 'Inter'; font-size: 0.75rem; font-weight: 500; color: var(--text-muted); background: transparent; border: 1px solid var(--border-hover); border-radius: 8px; padding: 6px 14px; cursor: pointer; transition: all 0.15s; }
+        .btn-help:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
 
-        /* SOL display */
-        .sol-display {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        .sol-label {
-            font-size: 0.68rem;
-            color: rgba(255,255,255,0.4);
-            letter-spacing: 2.5px;
-            margin-bottom: 8px;
-        }
-        .sol-amount {
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: #C8E030;
-            text-shadow: 0 0 24px rgba(200,224,48,0.5);
-            letter-spacing: 1px;
-        }
+        /* ── Mode toggle ── */
+        .mode-toggle { display: flex; gap: 6px; margin-bottom: 20px; }
+        .mode-btn { font-family: 'NftOpensea'; font-size: 0.72rem; letter-spacing: 0.1em; padding: 6px 20px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+        .mode-btn.active { background: var(--accent-dim); border-color: rgba(200,224,48,0.3); color: var(--accent); }
+        #mode-expert-btn.active { background: rgba(255,140,0,0.08); border-color: rgba(255,140,0,0.35); color: #FF8C00; }
 
-        /* Image placeholder */
-        .tool-image-wrap {
-            text-align: center;
-            margin: 0 auto 28px;
-        }
-        .tool-image-wrap img {
-            width: 160px;
-            height: auto;
-            filter: drop-shadow(0 0 14px rgba(200,224,48,0.3));
-            animation: float 3s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        /* Mode toggle */
-        .mode-toggle {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 16px;
-        }
-        .mode-btn {
-            background: rgba(20,28,12,0.9);
-            border: 1.5px solid #5A7A18;
-            color: rgba(255,255,255,0.45);
-            font-family: 'NftOpensea', monospace;
-            font-size: 0.78rem;
-            padding: 6px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            letter-spacing: 2px;
-            transition: all 0.2s;
-        }
-        .mode-btn.active {
-            border-color: #C8E030;
-            color: #C8E030;
-            box-shadow: 0 0 10px rgba(200,224,48,0.25);
-        }
-        #mode-expert-btn.active {
-            border-color: #FF8C00;
-            color: #FF8C00;
-            box-shadow: 0 0 10px rgba(255,140,0,0.35);
-        }
-        .mode-btn:hover { border-color: #C8E030; color: #C8E030; }
-        #mode-expert-btn:hover { border-color: #FF8C00; color: #FF8C00; }
+        /* Expert mode visibility */
         .expert-only { display: none; }
         .expert-mode .expert-only { display: inline-flex; }
         .expert-content { display: none !important; }
         .expert-mode .noob-content { display: none !important; }
         .expert-mode .expert-content { display: flex !important; }
-        .expert-coming-soon {
-            text-align: center;
-            padding: 40px 20px;
-            color: rgba(255,255,255,0.3);
-            font-family: 'NftOpensea', monospace;
-            letter-spacing: 3px;
-            font-size: 0.9rem;
-        }
-        .expert-coming-soon span {
-            display: block;
-            font-size: 0.72rem;
-            margin-top: 8px;
-            color: rgba(255,255,255,0.2);
-            letter-spacing: 1px;
-            font-family: monospace;
-        }
 
-        /* Connect area */
+        /* ── Content grid ── */
+        .content-grid { display: grid; grid-template-columns: 1fr 152px; gap: 14px; align-items: start; }
+
+        /* ── Main card ── */
+        .main-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+
+        /* ── Tabs ── */
+        .tabs { display: flex; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); overflow-x: auto; }
+        .tab-btn { font-family: 'Inter'; font-size: 0.78rem; font-weight: 500; color: var(--text-muted); background: transparent; border: none; border-bottom: 2px solid transparent; padding: 13px 18px; cursor: pointer; letter-spacing: 0.02em; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+        .tab-btn:hover { color: var(--text); }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+        #tab-tokens-btn.active, #tab-nft-btn.active { color: #FF8C00; border-bottom-color: #FF8C00; }
+
+        /* ── Tab content ── */
+        .tab-content { display: none; padding: 24px 24px 28px; }
+        .tab-content.active { display: block; }
+
+        /* ── SOL display ── */
+        .sol-display { text-align: center; margin-bottom: 24px; }
+        .sol-label { font-size: 0.68rem; font-weight: 600; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+        .sol-amount { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 3rem; letter-spacing: -0.02em; color: var(--accent); line-height: 1; }
+
+        /* ── Tool image ── */
+        .tool-image-wrap { text-align: center; margin: 0 auto 24px; }
+        .tool-image-wrap img { width: 140px; height: auto; filter: drop-shadow(0 0 14px rgba(200,224,48,0.2)); animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+        /* ── Auth indicator ── */
+        #auth-indicator { text-align: center; margin-bottom: 12px; font-size: 0.72rem; color: var(--text-dim); }
+        #auth-indicator strong { color: var(--accent); }
+        #auth-indicator a { color: var(--accent); text-decoration: none; }
+
+        /* ── Connect area ── */
         .connect-area { text-align: center; }
-        .btn-connect {
-            background-color: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            color: #C8E030;
-            font-weight: bold;
-            font-family: monospace;
-            font-size: 0.95rem;
-            padding: 13px 40px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-shadow: 0 0 8px rgba(200,224,48,0.4);
-            letter-spacing: 1px;
-        }
-        .btn-connect:hover {
-            border-color: #C8E030;
-            box-shadow: 0 0 16px rgba(200,224,48,0.35);
-            background-color: rgba(40,60,15,0.98);
-        }
-        .connect-note {
-            color: rgba(255,255,255,0.25);
-            font-size: 0.7rem;
-            margin-top: 10px;
-        }
+        .btn-connect { font-family: 'Inter'; font-size: 0.9rem; font-weight: 700; color: #0a0a0a; background: var(--accent); border: none; border-radius: 10px; padding: 13px 40px; cursor: pointer; transition: opacity 0.15s; letter-spacing: 0.01em; }
+        .btn-connect:hover { opacity: 0.88; }
+        .connect-note { font-size: 0.7rem; color: var(--text-dim); margin-top: 10px; }
 
-        /* Wallet picker modal */
-        .wallet-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.72);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        .wallet-modal-card {
-            background: #1a1f0f;
-            border: 2px solid #5A7A18;
-            border-radius: 16px;
-            padding: 24px 20px 20px;
-            width: 320px;
-            max-width: 92vw;
-        }
-        .wallet-modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            margin-bottom: 18px;
-        }
-        .wallet-modal-title {
-            color: #fff;
-            font-weight: bold;
-            font-size: 0.95rem;
-            letter-spacing: 1px;
-        }
-        .wallet-modal-close {
-            position: absolute;
-            right: 0;
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.45);
-            font-size: 1.1rem;
-            cursor: pointer;
-            padding: 2px 6px;
-            transition: color 0.2s;
-            line-height: 1;
-        }
-        .wallet-modal-close:hover { color: #fff; }
-        .wallet-option {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background 0.2s;
-            border: 1px solid transparent;
-            margin-bottom: 4px;
-        }
-        .wallet-option:hover:not(.wallet-disabled) {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(90,122,24,0.5);
-        }
-        .wallet-option.wallet-disabled { opacity: 0.28; cursor: not-allowed; }
-        .wallet-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            flex-shrink: 0;
-        }
-        .wallet-name {
-            color: #fff;
-            font-size: 0.9rem;
-            font-weight: bold;
-            flex: 1;
-        }
-        .wallet-installed {
-            font-size: 0.62rem;
-            color: #C8E030;
-            border: 1px solid #5A7A18;
-            padding: 2px 8px;
-            border-radius: 4px;
-            background: rgba(200,224,48,0.08);
-            letter-spacing: 1px;
-        }
+        /* ── Wallet row ── */
+        .wallet-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding: 10px 14px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; flex-wrap: wrap; }
+        .wallet-addr-text { font-size: 0.78rem; color: var(--text-muted); flex: 1; }
+        .wallet-addr-text strong { color: var(--text); font-weight: 600; }
+        .btn-sm { font-family: 'Inter'; font-size: 0.72rem; font-weight: 500; color: var(--text-muted); background: transparent; border: 1px solid var(--border-hover); border-radius: 6px; padding: 5px 12px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+        .btn-sm:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
+        .btn-sm.btn-disconnect { border-color: rgba(255,80,80,0.25); color: rgba(255,120,120,0.55); }
+        .btn-sm.btn-disconnect:hover { border-color: rgba(255,80,80,0.6); color: rgba(255,120,120,0.9); }
 
-        /* Wallet row */
-        .wallet-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-        .wallet-addr-text { color: rgba(255,255,255,0.5); font-size: 0.76rem; }
-        .wallet-addr-text strong { color: #C8E030; }
-        .btn-sm {
-            background: rgba(20,28,12,0.9);
-            border: 1.5px solid #5A7A18;
-            color: rgba(255,255,255,0.65);
-            font-family: monospace;
-            font-size: 0.7rem;
-            font-weight: bold;
-            padding: 5px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-sm:hover { border-color: #C8E030; color: #C8E030; }
-        .btn-sm.btn-disconnect { border-color: rgba(255,80,80,0.4); color: rgba(255,120,120,0.65); }
-        .btn-sm.btn-disconnect:hover { border-color: rgba(255,80,80,0.8); color: #ff8080; }
+        /* ── Status ── */
+        .status-area { margin: 14px 0; padding: 11px 14px; border-radius: 8px; font-size: 0.82rem; display: none; text-align: center; }
+        .status-area.loading { display: block; background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-muted); }
+        .status-area.success { display: block; background: var(--accent-dim); border: 1px solid rgba(200,224,48,0.2); color: var(--accent); }
+        .status-area.error { display: block; background: rgba(255,80,80,0.06); border: 1px solid rgba(255,80,80,0.3); color: #ff8080; }
+        .status-area.info { display: block; background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-muted); }
+        .status-area a { color: var(--accent); }
 
-        /* Status */
-        .status-area {
-            margin: 16px 0;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            display: none;
-            text-align: center;
-        }
-        .status-area.loading {
-            display: block;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(90,122,24,0.5);
-            color: rgba(255,255,255,0.65);
-        }
-        .status-area.success {
-            display: block;
-            background: rgba(200,224,48,0.07);
-            border: 1px solid #5A7A18;
-            color: #C8E030;
-        }
-        .status-area.error {
-            display: block;
-            background: rgba(255,80,80,0.07);
-            border: 1px solid rgba(255,80,80,0.4);
-            color: #ff8080;
-        }
-        .status-area.info {
-            display: block;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(90,122,24,0.5);
-            color: rgba(255,255,255,0.65);
-        }
-        .status-area a { color: #C8E030; }
+        /* ── Results ── */
+        .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+        .select-all-label { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--text-muted); cursor: pointer; }
+        .select-all-label input { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+        .summary-text { font-size: 0.78rem; font-weight: 600; color: var(--accent); }
 
-        /* Results */
-        .results-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .select-all-label {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.76rem;
-            cursor: pointer;
-        }
-        .select-all-label input { accent-color: #C8E030; width: 14px; height: 14px; cursor: pointer; }
-        .summary-text { color: #C8E030; font-size: 0.76rem; font-weight: bold; }
+        .token-list { display: flex; flex-direction: column; gap: 5px; max-height: 260px; overflow-y: auto; margin-bottom: 14px; padding-right: 2px; }
+        .token-list::-webkit-scrollbar { width: 4px; }
+        .token-list::-webkit-scrollbar-track { background: transparent; }
+        .token-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .token-row { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; transition: border-color 0.15s; }
+        .token-row:hover { border-color: var(--border-hover); }
+        .token-row input[type="checkbox"] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
+        .token-mint { color: var(--text-muted); font-size: 0.74rem; font-family: monospace; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .token-sol { color: var(--accent); font-size: 0.74rem; font-weight: 700; white-space: nowrap; }
 
-        .token-list {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            margin-bottom: 14px;
-            max-height: 280px;
-            overflow-y: auto;
-        }
-        .token-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(90,122,24,0.35);
-            border-radius: 6px;
-            padding: 7px 12px;
-        }
-        .token-row input[type="checkbox"] { accent-color: #C8E030; width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
-        .token-mint { color: rgba(255,255,255,0.55); font-size: 0.74rem; flex: 1; }
-        .token-sol { color: #C8E030; font-size: 0.74rem; font-weight: bold; white-space: nowrap; }
-
-        .btn-reclaim {
-            width: 100%;
-            background-color: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            color: #C8E030;
-            font-weight: bold;
-            font-family: monospace;
-            font-size: 0.95rem;
-            padding: 13px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-shadow: 0 0 6px rgba(200,224,48,0.4);
-            letter-spacing: 1px;
-        }
-        .btn-reclaim:hover:not(:disabled) {
-            border-color: #C8E030;
-            box-shadow: 0 0 14px rgba(200,224,48,0.35);
-            background-color: rgba(40,60,15,0.98);
-        }
+        /* ── Reclaim button ── */
+        .btn-reclaim { width: 100%; font-family: 'Inter'; font-size: 0.9rem; font-weight: 700; color: #0a0a0a; background: var(--accent); border: none; border-radius: 10px; padding: 14px; cursor: pointer; transition: opacity 0.15s; }
+        .btn-reclaim:hover:not(:disabled) { opacity: 0.9; }
         .btn-reclaim:disabled { opacity: 0.35; cursor: not-allowed; }
 
-        /* HOW DOES IT WORK */
-        .faq-list { display: flex; flex-direction: column; gap: 20px; }
-        .section-heading {
-            color: #C8E030;
-            font-size: 0.72rem;
-            font-weight: bold;
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            opacity: 0.75;
-        }
-        .faq-q {
-            color: #C8E030;
-            font-size: 0.83rem;
-            font-weight: bold;
-            margin-bottom: 7px;
-            letter-spacing: 0.5px;
-        }
-        .faq-a {
-            color: rgba(255,255,255,0.58);
-            font-size: 0.79rem;
-            line-height: 1.7;
-        }
-        .faq-a strong { color: #C8E030; }
-        .faq-bullets {
-            margin: 8px 0 0 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            padding-left: 4px;
-        }
-        .faq-divider {
-            border: none;
-            border-top: 1px solid rgba(90,122,24,0.25);
-        }
+        /* ── Success screen ── */
+        .success-label { text-align: center; font-size: 0.68rem; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; margin-top: 8px; }
+        .success-amount { text-align: center; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 3rem; letter-spacing: -0.02em; color: var(--accent); margin-bottom: 24px; }
+        .success-image-wrap { text-align: center; margin-bottom: 28px; }
+        .success-image-wrap img { width: 180px; height: auto; filter: drop-shadow(0 0 14px rgba(200,224,48,0.2)); animation: float 3s ease-in-out infinite; }
+        .success-buttons { display: flex; gap: 10px; justify-content: center; }
+        .btn-success-action { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Inter'; font-size: 0.85rem; font-weight: 600; background: var(--surface-2); border: 1px solid var(--border-hover); color: var(--text-muted); border-radius: 10px; padding: 12px; cursor: pointer; text-decoration: none; text-align: center; transition: all 0.15s; }
+        .btn-success-action:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
 
-        /* Success screen */
-        .success-label {
-            text-align: center;
-            font-size: 0.68rem;
-            color: rgba(255,255,255,0.4);
-            letter-spacing: 2.5px;
-            margin-bottom: 8px;
-            margin-top: 8px;
-        }
-        .success-amount {
-            text-align: center;
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: #C8E030;
-            text-shadow: 0 0 24px rgba(200,224,48,0.5);
-            margin-bottom: 24px;
-            letter-spacing: 1px;
-        }
-        .success-image-wrap {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-        .success-image-wrap img {
-            width: 200px;
-            height: auto;
-            filter: drop-shadow(0 0 14px rgba(200,224,48,0.3));
-            animation: float 3s ease-in-out infinite;
-        }
-        .success-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        .btn-success-action {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(20,28,12,0.92);
-            border: 2px solid #5A7A18;
-            color: #C8E030;
-            font-family: 'NftOpensea', monospace;
-            font-size: 0.95rem;
-            padding: 13px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-            text-decoration: none;
-            text-align: center;
-            box-sizing: border-box;
-        }
-        .btn-success-action:hover {
-            border-color: #C8E030;
-            box-shadow: 0 0 14px rgba(200,224,48,0.35);
-            background: rgba(40,60,15,0.98);
-        }
-
-        .main-card {
-            background: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            border-radius: 16px;
-            padding: 28px 24px 32px;
-        }
-
-        /* Stats bar */
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 16px;
-        }
-        .stat-box {
-            background: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            border-radius: 12px;
-            padding: 16px 10px 14px;
-            text-align: center;
-            transition: border-color 0.2s;
-        }
-        .stat-box:hover { border-color: #C8E030; }
-        .stat-icon { margin-bottom: 8px; opacity: 0.55; line-height: 1; }
-        .stat-num {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: #C8E030;
-            text-shadow: 0 0 12px rgba(200,224,48,0.4);
-            margin-bottom: 5px;
-            letter-spacing: 0.5px;
-        }
-        .stat-label {
-            font-size: 0.58rem;
-            color: rgba(255,255,255,0.38);
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            line-height: 1.4;
-        }
-        @media (max-width: 500px) {
-            .stats-bar { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        .hidden { display: none !important; }
-
-        /* ── Login Reminder Popup ── */
-        .login-overlay {
-            position: fixed; inset: 0; z-index: 99999;
-            background: rgba(0,0,0,0.75);
-            display: flex; align-items: center; justify-content: center;
-            padding: 20px;
-        }
-        .login-overlay.hidden { display: none; }
-        .login-card {
-            background: rgba(14,20,7,0.97);
-            border: 2px solid #C8E030;
-            border-radius: 16px;
-            padding: 32px 28px 24px;
-            max-width: 360px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 0 40px rgba(200,224,48,0.15);
-        }
-        .login-card-title {
-            font-family: 'NftOpensea', monospace;
-            font-size: 1.5rem;
-            color: #fff;
-            letter-spacing: 3px;
-            line-height: 1.3;
-            margin-bottom: 10px;
-        }
-        .login-card-sub {
-            font-size: 0.78rem;
-            color: rgba(255,255,255,0.45);
-            margin-bottom: 24px;
-            line-height: 1.6;
-        }
-        .login-card-btns {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 18px;
-        }
-        .login-card-btns a, .login-card-btns button {
-            font-family: monospace;
-            font-size: 0.8rem;
-            font-weight: bold;
-            padding: 8px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-        }
-        .btn-login-go {
-            background: rgba(200,224,48,0.12);
-            border: 1.5px solid #C8E030;
-            color: #C8E030;
-        }
-        .btn-login-go:hover { background: rgba(200,224,48,0.22); box-shadow: 0 0 10px rgba(200,224,48,0.3); }
-        .btn-login-skip {
-            background: transparent;
-            border: 1.5px solid rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.3);
-        }
-        .btn-login-skip:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.5); }
-        .login-card-dsa {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.3);
-            cursor: pointer;
-            user-select: none;
-        }
-        .login-card-dsa input[type="checkbox"] {
-            accent-color: #C8E030;
-            width: 13px; height: 13px;
-            cursor: pointer;
-        }
-        .login-card-dsa:hover { color: rgba(255,255,255,0.5); }
-
-        /* ── Scanner Tab ── */
-        .scanner-intro { color: rgba(255,255,255,0.45); font-size: 0.82rem; text-align: center; margin-bottom: 20px; letter-spacing: 0.5px; }
-        .scanner-input-row { display: flex; gap: 8px; margin-bottom: 14px; }
-        .scanner-input { flex: 1; background: rgba(20,28,12,0.8); border: 1.5px solid #5A7A18; border-radius: 8px; color: #fff; font-family: monospace; font-size: 0.82rem; padding: 10px 12px; outline: none; }
-        .scanner-input:focus { border-color: #C8E030; }
-        .btn-scanner-scan { background: rgba(90,122,24,0.3); border: 1.5px solid #C8E030; color: #C8E030; font-family: 'NftOpensea', monospace; font-size: 0.82rem; padding: 10px 18px; border-radius: 8px; cursor: pointer; letter-spacing: 1px; white-space: nowrap; }
-        .btn-scanner-scan:hover { background: rgba(90,122,24,0.6); }
-        .scanner-status { font-size: 0.8rem; color: rgba(255,255,255,0.4); text-align: center; min-height: 20px; margin-bottom: 10px; }
+        /* ── Scanner tab ── */
+        .scanner-intro { font-size: 0.83rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
+        .scanner-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
+        .scanner-input { flex: 1; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: monospace; font-size: 0.82rem; padding: 10px 14px; outline: none; transition: border-color 0.15s; }
+        .scanner-input:focus { border-color: rgba(200,224,48,0.4); }
+        .btn-scanner-scan { font-family: 'Inter'; font-size: 0.82rem; font-weight: 600; padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(200,224,48,0.3); background: var(--accent-dim); color: var(--accent); cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+        .btn-scanner-scan:hover { background: rgba(200,224,48,0.18); }
+        .scanner-status { font-size: 0.8rem; color: var(--text-muted); text-align: center; min-height: 20px; margin-bottom: 10px; }
         .scanner-result { text-align: center; margin-top: 10px; }
-        .scanner-summary { font-size: 1.1rem; color: #C8E030; font-family: 'NftOpensea', monospace; letter-spacing: 2px; margin-bottom: 18px; }
-        .scanner-dot { color: rgba(255,255,255,0.3); margin: 0 8px; }
-        .btn-scanner-connect { background: rgba(90,122,24,0.3); border: 1.5px solid #C8E030; color: #C8E030; font-family: 'NftOpensea', monospace; font-size: 0.85rem; padding: 12px 24px; border-radius: 10px; cursor: pointer; letter-spacing: 1px; }
-        .btn-scanner-connect:hover { background: rgba(90,122,24,0.7); }
+        .scanner-summary { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1rem; color: var(--accent); margin-bottom: 18px; }
+        .scanner-dot { color: var(--text-dim); margin: 0 8px; }
+        .btn-scanner-connect { font-family: 'Inter'; font-size: 0.85rem; font-weight: 600; padding: 11px 24px; border-radius: 10px; border: 1px solid rgba(200,224,48,0.3); background: var(--accent-dim); color: var(--accent); cursor: pointer; transition: all 0.15s; }
+        .btn-scanner-connect:hover { background: rgba(200,224,48,0.18); }
+
+        /* ── Expert coming soon ── */
+        .expert-coming-soon { text-align: center; padding: 40px 20px; color: var(--text-dim); font-family: 'NftOpensea'; letter-spacing: 3px; font-size: 0.9rem; }
+        .expert-coming-soon span { display: block; font-size: 0.72rem; margin-top: 8px; color: var(--text-dim); letter-spacing: 1px; font-family: 'Inter'; }
+
+        /* ── FAQ / How it works ── */
+        .section-heading { font-size: 0.68rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+        .faq-list { display: flex; flex-direction: column; gap: 18px; }
+        .faq-q { font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+        .faq-a { font-size: 0.8rem; color: var(--text-muted); line-height: 1.7; }
+        .faq-a strong { color: var(--accent); font-weight: 600; }
+        .faq-bullets { margin: 8px 0 0 16px; display: flex; flex-direction: column; gap: 5px; padding-left: 4px; }
+        .faq-divider { border: none; border-top: 1px solid var(--border); }
+
+        /* ── Stats column ── */
+        .stats-col { display: flex; flex-direction: column; gap: 12px; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 10px; text-align: center; transition: border-color 0.15s; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .stat-card:hover { border-color: var(--border-hover); }
+        .stat-icon { margin-bottom: 8px; opacity: 0.4; }
+        .stat-icon svg { width: 18px; height: 18px; stroke: var(--accent); }
+        .stat-num { font-family: 'NftOpensea'; font-size: 1.25rem; color: var(--accent); letter-spacing: 0.02em; margin-bottom: 4px; line-height: 1.1; }
+        .stat-label { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; line-height: 1.4; }
+
+        /* ── Wallet picker modal ── */
+        .wallet-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .wallet-modal-card { background: var(--surface); border: 1px solid var(--border-hover); border-radius: 16px; padding: 22px 18px 18px; width: 300px; max-width: 92vw; }
+        .wallet-modal-header { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 16px; }
+        .wallet-modal-title { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+        .wallet-modal-close { position: absolute; right: 0; background: none; border: none; color: var(--text-muted); font-size: 1rem; cursor: pointer; padding: 2px 6px; transition: color 0.15s; line-height: 1; }
+        .wallet-modal-close:hover { color: var(--text); }
+        .wallet-option { display: flex; align-items: center; gap: 14px; padding: 11px 12px; border-radius: 10px; cursor: pointer; transition: background 0.15s; border: 1px solid transparent; margin-bottom: 4px; }
+        .wallet-option:hover:not(.wallet-disabled) { background: rgba(255,255,255,0.05); border-color: var(--border-hover); }
+        .wallet-option.wallet-disabled { opacity: 0.28; cursor: not-allowed; }
+        .wallet-icon { width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0; }
+        .wallet-name { color: var(--text); font-size: 0.88rem; font-weight: 600; flex: 1; }
+        .wallet-installed { font-size: 0.62rem; color: var(--accent); border: 1px solid rgba(200,224,48,0.25); padding: 2px 8px; border-radius: 4px; background: var(--accent-dim); letter-spacing: 0.05em; }
+
+        /* ── Help modal ── */
+        .help-overlay { position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .help-overlay.hidden { display: none; }
+        .help-modal { background: var(--surface); border: 1px solid var(--border-hover); border-radius: 16px; padding: 28px 24px 24px; max-width: 420px; width: 100%; position: relative; }
+        .help-modal-title { font-family: 'NftOpensea'; font-size: 1.1rem; color: var(--text); letter-spacing: 0.08em; text-align: center; margin-bottom: 22px; }
+        .help-close { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 1rem; cursor: pointer; padding: 4px 8px; transition: color 0.15s; }
+        .help-close:hover { color: var(--text); }
+        .help-steps { display: flex; flex-direction: column; gap: 14px; }
+        .help-step { display: flex; gap: 14px; align-items: flex-start; }
+        .step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--accent-dim); border: 1px solid rgba(200,224,48,0.25); color: var(--accent); font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .step-text { font-size: 0.8rem; color: var(--text-muted); line-height: 1.55; padding-top: 3px; }
+        .step-text strong { color: var(--accent); }
+
+        /* ── Login reminder popup ── */
+        .login-overlay { position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-overlay.hidden { display: none; }
+        .login-card { background: var(--surface); border: 1px solid rgba(200,224,48,0.2); border-radius: 16px; padding: 32px 28px 24px; max-width: 340px; width: 100%; text-align: center; }
+        .login-card-title { font-family: 'NftOpensea'; font-size: 1.3rem; color: var(--text); letter-spacing: 0.05em; line-height: 1.3; margin-bottom: 10px; }
+        .login-card-sub { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 22px; line-height: 1.6; }
+        .login-card-btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+        .btn-login-go { font-family: 'Inter'; font-size: 0.8rem; font-weight: 600; padding: 8px 20px; border-radius: 8px; cursor: pointer; text-decoration: none; background: var(--accent-dim); border: 1px solid rgba(200,224,48,0.3); color: var(--accent); transition: all 0.15s; }
+        .btn-login-go:hover { background: rgba(200,224,48,0.2); }
+        .btn-login-skip { font-family: 'Inter'; font-size: 0.8rem; font-weight: 500; padding: 8px 20px; border-radius: 8px; cursor: pointer; background: transparent; border: 1px solid var(--border-hover); color: var(--text-dim); transition: all 0.15s; }
+        .btn-login-skip:hover { border-color: rgba(255,255,255,0.2); color: var(--text-muted); }
+        .login-card-dsa { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 0.72rem; color: var(--text-dim); cursor: pointer; user-select: none; }
+        .login-card-dsa input[type="checkbox"] { accent-color: var(--accent); width: 13px; height: 13px; cursor: pointer; }
+
+        /* ── Burn tab ── */
+        .burn-intro { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
+        .burn-intro strong { color: rgba(255,100,100,0.8); }
+        .btn-burn { width: 100%; font-family: 'Inter'; font-size: 0.9rem; font-weight: 700; color: #fff; background: linear-gradient(135deg, #b83232, #e04040); border: none; border-radius: 10px; padding: 14px; cursor: pointer; transition: opacity 0.15s; }
+        .btn-burn:hover:not(:disabled) { opacity: 0.88; }
+        .btn-burn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        /* ── Misc ── */
+        .hidden { display: none !important; }
+        p[style*="font-style:italic"], p[style*="font-style: italic"] { font-size: 0.78rem; }
+
+        @media (max-width: 900px) {
+            .main { margin-left: 0; padding: 24px 16px 60px; }
+            .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+            .sidebar.open { transform: translateX(0); }
+            .content-grid { grid-template-columns: 1fr; }
+            .stats-col { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+            .stat-card { flex: 1 1 calc(50% - 5px); }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="tools" class="back-btn">← Back to Utilities</a>
 
-        <div class="main-card">
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+        <a href="/" class="sidebar-brand">
+            <img src="images/branding/rat-republic-logo.svg" alt="">
+            <span>RAT REPUBLIC</span>
+        </a>
+        <nav class="sidebar-nav">
+            <a href="/">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Home
+            </a>
+            <button class="nav-group-toggle open" id="utilities-toggle" onclick="toggleUtilities()">
+                <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
+                Utilities
+                <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="nav-sub open" id="utilities-sub">
+                <a href="cleanup" class="active">Scavenger</a>
+                <a href="vanity">Vanity Addy</a>
+                <a href="airdrop">Airdrop</a>
+                <a href="generator">PFP Generator</a>
+            </div>
+            <a href="leaderboard">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Crowned Vermins
+            </a>
+            <a href="roadmap">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                Roadmap
+            </a>
+            <div class="sidebar-divider"></div>
+            <a href="profile">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Profile
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <div class="sidebar-socials">
+                <a href="https://x.com/rat_republicsol" target="_blank" rel="noopener" class="sidebar-social-btn" title="X">
+                    <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="https://github.com/RatRepublic" target="_blank" rel="noopener" class="sidebar-social-btn" title="GitHub">
+                    <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+                <a href="docs" class="sidebar-social-btn" title="Documentation">
+                    <svg viewBox="0 0 24 24"><path d="M12.513 1.097c-.645 0-1.233.34-2.407 1.017L3.675 5.82A7.233 7.233 0 0 0 0 12.063v.236a7.233 7.233 0 0 0 3.667 6.238L7.69 20.86c2.354 1.36 3.531 2.042 4.824 2.042 1.292.001 2.47-.678 4.825-2.038l4.251-2.453c1.177-.68 1.764-1.02 2.087-1.579.323-.56.324-1.24.323-2.6v-2.63a1.04 1.04 0 0 0-1.558-.903l-8.728 5.024c-.587.337-.88.507-1.201.507-.323 0-.616-.168-1.204-.506l-5.904-3.393c-.297-.171-.446-.256-.565-.271a.603.603 0 0 0-.634.368c-.045.111-.045.282-.043.625.002.252 0 .378.025.494.053.259.189.493.387.667.089.077.198.14.416.266l6.315 3.65c.589.34.884.51 1.207.51.324 0 .617-.17 1.206-.509l7.74-4.469c.202-.116.302-.172.377-.13.075.044.075.16.075.392v1.193c0 .34.001.51-.08.649-.08.14-.227.224-.522.394l-6.382 3.685c-1.178.68-1.767 1.02-2.413 1.02-.646 0-1.236-.34-2.412-1.022l-5.97-3.452-.043-.025a4.106 4.106 0 0 1-2.031-3.52V11.7c0-.801.427-1.541 1.12-1.944a1.979 1.979 0 0 1 1.982-.001l4.946 2.858c1.174.679 1.762 1.019 2.407 1.02.645 0 1.233-.34 2.41-1.017l7.482-4.306a1.091 1.091 0 0 0 0-1.891L14.92 2.11c-1.175-.675-1.762-1.013-2.406-1.013Z"/></svg>
+                </a>
+            </div>
+            <div style="height:1px;background:var(--border);margin:2px 2px 8px;"></div>
 
-        <div class="page-title">SCAVENGER</div>
+            <!-- User widget — populated by inline script below -->
+            <div id="sidebar-user-widget"></div>
+        </div>
+    </aside>
+
+    <!-- ── Main ── -->
+    <main class="main">
+
+        <div class="title-row">
+            <div class="page-title">SCAVENGER</div>
+            <button class="btn-help" onclick="openHelp()">? Need Help</button>
+        </div>
+        <div class="page-sub">Reclaim locked SOL from empty token accounts.</div>
 
         <div class="mode-toggle">
             <button class="mode-btn active" id="mode-noob-btn" onclick="switchMode('noob')">NOOB</button>
             <button class="mode-btn" id="mode-expert-btn" onclick="switchMode('expert')">EXPERT</button>
         </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" id="tab-claim-btn" onclick="switchTab('claim')">CLAIM</button>
-            <button class="tab-btn" id="tab-scanner-btn" onclick="switchTab('scanner')">SCANNER</button>
-            <button class="tab-btn expert-only" id="tab-tokens-btn" onclick="switchTab('tokens')">TOKENS</button>
-            <button class="tab-btn expert-only" id="tab-nft-btn" onclick="switchTab('nft')">NFT</button>
-            <button class="tab-btn" id="tab-howto-btn" onclick="switchTab('howto')">HOW IT WORKS</button>
-            <button class="tab-btn" id="tab-disclaimer-btn" onclick="switchTab('disclaimer')">DISCLAIMER</button>
-        </div>
+        <div class="content-grid">
 
-        <!-- CLAIM TAB -->
-        <div class="tab-content active" id="tab-claim">
+            <!-- Main card -->
+            <div class="main-card">
+                <div class="tabs">
+                    <button class="tab-btn active" id="tab-claim-btn" onclick="switchTab('claim')">CLAIM</button>
+                    <button class="tab-btn" id="tab-scanner-btn" onclick="switchTab('scanner')">SCANNER</button>
+                    <button class="tab-btn expert-only" id="tab-tokens-btn" onclick="switchTab('tokens')">TOKENS</button>
+                    <button class="tab-btn expert-only" id="tab-nft-btn" onclick="switchTab('nft')">NFT</button>
+                    <button class="tab-btn" id="tab-howto-btn" onclick="switchTab('howto')">HOW IT WORKS</button>
+                    <button class="tab-btn" id="tab-disclaimer-btn" onclick="switchTab('disclaimer')">DISCLAIMER</button>
+                </div>
 
-            <div class="sol-display" id="sol-display">
-                <div class="sol-label">UNCLAIMED SOL</div>
-                <div class="sol-amount" id="unclaimed-sol-display">??? SOL</div>
-            </div>
+                <!-- CLAIM TAB -->
+                <div class="tab-content active" id="tab-claim">
 
-            <!-- Replace src with your PNG path once you have it -->
-            <div class="tool-image-wrap" id="tool-image-wrap">
-                <img src="images/dust-to-sol.png" alt="" id="tool-image">
-            </div>
+                    <div class="sol-display" id="sol-display">
+                        <div class="sol-label">UNCLAIMED SOL</div>
+                        <div class="sol-amount" id="unclaimed-sol-display">??? SOL</div>
+                    </div>
 
-            <!-- Auth indicator (shown when logged in) -->
-            <div id="auth-indicator" style="display:none;text-align:center;margin-bottom:10px;font-size:0.72rem;color:rgba(255,255,255,0.45);letter-spacing:1px;">
-                Logged in as <strong id="auth-username" style="color:#C8E030;"></strong>
-                &nbsp;·&nbsp;<a href="profile" style="color:#C8E030;text-decoration:none;">Profile</a>
-                &nbsp;·&nbsp;<a href="login" id="auth-logout-link" style="color:rgba(255,255,255,0.35);text-decoration:none;">Log out</a>
-            </div>
+                    <div class="tool-image-wrap" id="tool-image-wrap">
+                        <img src="images/dust-to-sol.png" alt="" id="tool-image">
+                    </div>
 
-            <!-- Connect section -->
-            <div class="connect-area" id="connect-section">
-                <button class="btn-connect" id="connect-btn">Connect Wallet</button>
-                <div class="connect-note">Make sure to register first to enjoy additional perks</div>
-            </div>
+                    <div id="auth-indicator" style="display:none;">
+                        Logged in as <strong id="auth-username"></strong>
+                        &nbsp;·&nbsp;<a href="profile">Profile</a>
+                        &nbsp;·&nbsp;<a href="login" id="auth-logout-link" style="color:var(--text-dim);">Log out</a>
+                    </div>
 
-            <!-- Scan section (shown after connect) -->
-            <div class="hidden" id="scan-section">
-                <div class="wallet-row">
-                    <span class="wallet-addr-text">Connected: <strong id="wallet-display"></strong></span>
-                    <button class="btn-sm" id="scan-btn">↻ Rescan</button>
-                    <button class="btn-sm btn-disconnect" id="disconnect-btn">Disconnect</button>
+                    <div class="connect-area" id="connect-section">
+                        <button class="btn-connect" id="connect-btn">Connect Wallet</button>
+                        <div class="connect-note">Make sure to register first to enjoy additional perks</div>
+                    </div>
+
+                    <div class="hidden" id="scan-section">
+                        <div class="wallet-row">
+                            <span class="wallet-addr-text">Connected: <strong id="wallet-display"></strong></span>
+                            <button class="btn-sm" id="scan-btn">↻ Rescan</button>
+                            <button class="btn-sm btn-disconnect" id="disconnect-btn">Disconnect</button>
+                        </div>
+                    </div>
+
+                    <div class="status-area" id="status-area"></div>
+
+                    <div class="hidden" id="results-section">
+                        <div class="results-header">
+                            <label class="select-all-label">
+                                <input type="checkbox" id="select-all" checked> Select All
+                            </label>
+                            <span class="summary-text" id="summary-text"></span>
+                        </div>
+                        <div class="token-list" id="token-list"></div>
+                        <button class="btn-reclaim" id="reclaim-btn">Reclaim SOL</button>
+                        <p style="margin-top:10px;font-size:0.7rem;color:var(--text-dim);text-align:center;font-style:italic;">
+                            ⚠ Caution: This process is irreversible, double check before continuing.
+                        </p>
+                    </div>
+
+                    <div class="hidden" id="success-section">
+                        <div class="success-label">SUCCESSFULLY CLAIMED</div>
+                        <div class="success-amount" id="success-amount-display">0.0000 SOL</div>
+                        <div class="success-image-wrap">
+                            <img src="images/claim-success.png" alt="" id="success-image">
+                        </div>
+                        <div class="success-buttons">
+                            <button class="btn-success-action" id="go-back-btn">Go Back</button>
+                            <a class="btn-success-action" id="see-tx-btn" href="#" target="_blank" rel="noopener">See TX</a>
+                            <button class="btn-success-action" id="tweet-btn">Tweet</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- SCANNER TAB -->
+                <div class="tab-content" id="tab-scanner">
+                    <div class="scanner-intro">Paste any Solana wallet address to see recoverable SOL — no connection needed.</div>
+                    <div class="scanner-input-row">
+                        <input id="scanner-address-input" class="scanner-input" type="text" maxlength="44" placeholder="Wallet address (base58)">
+                        <button id="scanner-scan-btn" class="btn-scanner-scan">Scan</button>
+                    </div>
+                    <div id="scanner-status" class="scanner-status"></div>
+                    <div id="scanner-result" class="scanner-result hidden">
+                        <div class="scanner-summary">
+                            <span id="scanner-count">—</span> empty accounts
+                            <span class="scanner-dot">·</span>
+                            ~<span id="scanner-sol">—</span> SOL recoverable
+                        </div>
+                        <button id="scanner-connect-btn" class="btn-scanner-connect">Connect Wallet to Reclaim →</button>
+                    </div>
+                </div>
+
+                <!-- TOKENS TAB (Expert) -->
+                <div class="tab-content" id="tab-tokens">
+
+                    <!-- Not connected -->
+                    <div class="connect-area" id="burn-no-wallet">
+                        <button class="btn-connect" onclick="document.getElementById('connect-btn').click()">Connect Wallet</button>
+                        <div class="connect-note">Connect your wallet to scan for burnable tokens</div>
+                    </div>
+
+                    <!-- Connected -->
+                    <div id="burn-wallet-section" class="hidden">
+                        <div class="wallet-row" style="margin-bottom:16px;">
+                            <span class="wallet-addr-text">Connected: <strong id="burn-wallet-addr"></strong></span>
+                            <button class="btn-sm btn-disconnect" onclick="document.getElementById('disconnect-btn').click()">Disconnect</button>
+                        </div>
+                        <p class="burn-intro">Burn tokens with remaining balance and reclaim their rent (~0.00204 SOL each). <strong>This action is permanent and cannot be undone.</strong></p>
+                        <button class="btn-reclaim" id="burn-scan-btn" style="margin-bottom:16px;">Scan for Burnable Tokens</button>
+                        <div class="status-area" id="burn-status"></div>
+                        <div id="burn-results" class="hidden">
+                            <div class="results-header">
+                                <label class="select-all-label">
+                                    <input type="checkbox" id="burn-select-all" checked> Select All
+                                </label>
+                                <span class="summary-text" id="burn-summary"></span>
+                            </div>
+                            <div class="token-list" id="burn-token-list"></div>
+                            <button class="btn-burn" id="burn-btn">Burn &amp; Reclaim SOL</button>
+                            <p style="margin-top:10px;font-size:0.7rem;color:rgba(255,100,100,0.6);text-align:center;">
+                                ⚠ Burning is permanent. Burned tokens cannot be recovered.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- NFT TAB (Expert) -->
+                <div class="tab-content" id="tab-nft">
+
+                    <!-- Not connected -->
+                    <div class="connect-area" id="nft-no-wallet">
+                        <button class="btn-connect" onclick="document.getElementById('connect-btn').click()">Connect Wallet</button>
+                        <div class="connect-note">Connect your wallet to scan for burnable NFTs</div>
+                    </div>
+
+                    <!-- Connected -->
+                    <div id="nft-wallet-section" class="hidden">
+                        <div class="wallet-row" style="margin-bottom:16px;">
+                            <span class="wallet-addr-text">Connected: <strong id="nft-wallet-addr"></strong></span>
+                            <button class="btn-sm btn-disconnect" onclick="document.getElementById('disconnect-btn').click()">Disconnect</button>
+                        </div>
+                        <p class="burn-intro">Burn unwanted NFTs and reclaim their rent (~0.017 SOL each including metadata &amp; edition accounts). <strong>This action is permanent and cannot be undone.</strong></p>
+                        <button class="btn-reclaim" id="nft-scan-btn" style="margin-bottom:16px;">Scan for NFTs</button>
+                        <div class="status-area" id="nft-status"></div>
+                        <div id="nft-results" class="hidden">
+                            <div class="results-header">
+                                <label class="select-all-label">
+                                    <input type="checkbox" id="nft-select-all" checked> Select All
+                                </label>
+                                <span class="summary-text" id="nft-summary"></span>
+                            </div>
+                            <div class="token-list" id="nft-token-list"></div>
+                            <button class="btn-burn" id="nft-burn-btn">Burn NFTs &amp; Reclaim SOL</button>
+                            <p style="margin-top:10px;font-size:0.7rem;color:rgba(255,100,100,0.6);text-align:center;">
+                                ⚠ Burning is permanent. NFTs cannot be recovered.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- HOW IT WORKS TAB -->
+                <div class="tab-content" id="tab-howto">
+
+                    <div class="faq-list mode-content noob-content">
+                        <div class="faq-item">
+                            <div class="section-heading">The Concept</div>
+                            <p class="faq-a">On the Solana blockchain, every individual token account requires a small "rent" deposit of approximately <strong>0.00203928 SOL</strong> to exist. If you've held tokens that were eventually sold, rugged, or migrated, those empty accounts are still holding your SOL hostage. This utility identifies those abandoned, zero-balance accounts and shuts them down, instantly returning the locked rent to your main wallet.</p>
+                        </div>
+                        <hr class="faq-divider">
+                        <div class="faq-item">
+                            <div class="section-heading">Security &amp; Trust</div>
+                            <p class="faq-a">Your assets remain under your control.</p>
+                            <ul class="faq-bullets">
+                                <li class="faq-a"><strong>Manual Approval:</strong> Every action requires your direct signature via your wallet provider (like Phantom).</li>
+                                <li class="faq-a"><strong>Zero-Balance Protection:</strong> The system only interacts with accounts that are completely empty.</li>
+                                <li class="faq-a"><strong>Non-Custodial:</strong> No tokens are ever transferred out of your possession.</li>
+                            </ul>
+                        </div>
+                        <hr class="faq-divider">
+                        <div class="faq-item">
+                            <div class="faq-q">Does this impact my eligibility for airdrops?</div>
+                            <p class="faq-a">Absolutely not. Airdrops are tied to your primary wallet address, not specific sub-accounts.</p>
+                        </div>
+                        <hr class="faq-divider">
+                        <div class="faq-item">
+                            <div class="faq-q">Why is my "claimable" balance showing as zero?</div>
+                            <p class="faq-a">The tool specifically filters for accounts with a balance of exactly 0. If an account holds even <strong>0.000001</strong> of a token, it is considered active and will not be displayed.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-list mode-content expert-content">
+                        <div class="faq-item">
+                            <div class="section-heading">Expert Mode — Full Toolkit</div>
+                            <p class="faq-a">Expert mode unlocks every cleanup tool available. Each tab targets a different type of on-chain clutter.</p>
+                        </div>
+                        <hr class="faq-divider">
+                        <div class="faq-item">
+                            <div class="faq-q">CLAIM — Empty Account Closer</div>
+                            <p class="faq-a">Scans your wallet for SPL token accounts with a balance of exactly <strong>0</strong> and closes them in batches. Each closed account returns <strong>~0.00203928 SOL</strong> minus the service fee.</p>
+                        </div>
+                        <hr class="faq-divider">
+                        <div class="faq-item">
+                            <div class="faq-q">SCANNER — No-Connect Preview</div>
+                            <p class="faq-a">Paste any Solana wallet address to instantly see how many empty accounts it holds — no wallet connection required.</p>
+                        </div>
+                        <hr class="faq-divider">
+                        <div class="faq-item">
+                            <div class="faq-q">TOKENS — Burn Fungible Tokens</div>
+                            <p class="faq-a">Lists every SPL token in your wallet that still carries a balance. Selecting a token burns its entire supply and closes the account, returning the <strong>~0.00203928 SOL</strong> rent. <strong>Use with care: the token balance is permanently destroyed.</strong></p>
+                        </div>
+                        <hr class="faq-divider">
+                        <div class="faq-item">
+                            <div class="faq-q">NFT — Burn NFTs &amp; pNFTs</div>
+                            <p class="faq-a">Displays every NFT and programmable NFT in your wallet. Burning destroys the NFT on-chain permanently and reclaims the locked SOL.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- DISCLAIMER TAB -->
+                <div class="tab-content" id="tab-disclaimer">
+
+                    <div class="faq-list mode-content noob-content">
+                        <div class="faq-item">
+                            <p class="faq-a" style="color:rgba(200,224,48,0.6);font-style:italic;">By proceeding, you acknowledge that you are solely responsible for verifying the accounts you choose to close.</p>
+                        </div>
+                        <hr class="faq-divider">
+                        <div class="faq-item">
+                            <div class="faq-q">Irreversible Action</div>
+                            <p class="faq-a">The process of reclaiming SOL by closing empty token accounts is permanent and non-reversible.</p>
+                        </div>
+                        <hr class="faq-divider">
+                        <div class="faq-item">
+                            <div class="faq-q">No Support Recovery</div>
+                            <p class="faq-a">Because this is a decentralized on-chain action, no developer, wallet provider, or protocol can reverse this transaction.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-list mode-content expert-content">
+                        <div class="faq-item">
+                            <p class="faq-a" style="color:#FF8C00;font-style:italic;">By using Expert mode, you confirm that you understand the irreversible nature of these actions and accept full responsibility for every transaction you sign.</p>
+                        </div>
+                        <hr class="faq-divider">
+                        <div class="faq-item">
+                            <div class="faq-q">TOKENS — Burning with Balance</div>
+                            <p class="faq-a">The TOKENS tab burns tokens that still hold a balance. This is <strong>not</strong> a transfer — the token supply is destroyed at the protocol level. No refund is possible.</p>
+                        </div>
+                        <hr class="faq-divider">
+                        <div class="faq-item">
+                            <div class="faq-q">NFT — Burning NFTs &amp; pNFTs</div>
+                            <p class="faq-a">Burning an NFT destroys the mint account, token account, and on-chain metadata permanently.</p>
+                        </div>
+                        <hr class="faq-divider">
+                        <div class="faq-item">
+                            <div class="faq-q">No Recovery — Ever</div>
+                            <p class="faq-a">Rat Republic has no custody over your assets and cannot intervene once a transaction is signed and submitted.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div><!-- /main-card -->
+
+            <!-- Stats column -->
+            <div class="stats-col" id="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-icon"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M2 21c0-4 3.134-7 7-7"/><circle cx="17" cy="10" r="3"/><path d="M14 21c0-3 1.343-5 3-5s3 2 3 5"/></svg></div>
+                    <div class="stat-num" id="stat-users">—</div>
+                    <div class="stat-label">Users Served</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/><circle cx="12" cy="16" r="1.5" fill="currentColor" stroke="none"/></svg></div>
+                    <div class="stat-num" id="stat-accounts">—</div>
+                    <div class="stat-label">Accounts Closed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5C9.5 8.12 10.62 7 12 7c1.38 0 2.5 1.12 2.5 2.5S13.38 12 12 12s-2.5 1.12-2.5 2.5S10.62 17 12 17c1.38 0 2.5-1.12 2.5-2.5"/></svg></div>
+                    <div class="stat-num" id="stat-sol">—</div>
+                    <div class="stat-label">SOL Recovered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/></svg></div>
+                    <div class="stat-num" id="stat-highest">—</div>
+                    <div class="stat-label">Most SOL, Single User</div>
                 </div>
             </div>
 
-            <div class="status-area" id="status-area"></div>
+        </div><!-- /content-grid -->
 
-            <!-- Results (shown after scan finds accounts) -->
-            <div class="hidden" id="results-section">
-                <div class="results-header">
-                    <label class="select-all-label">
-                        <input type="checkbox" id="select-all" checked> Select All
-                    </label>
-                    <span class="summary-text" id="summary-text"></span>
-                </div>
-                <div class="token-list" id="token-list"></div>
-                <button class="btn-reclaim" id="reclaim-btn">Reclaim SOL</button>
-                <p style="margin-top:10px;font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;font-style:italic;">
-                    ⚠ Caution: This process is irreversible, double check before continuing.
-                </p>
-            </div>
+    </main>
 
-            <!-- Success screen (shown after reclaim) -->
-            <div class="hidden" id="success-section">
-                <div class="success-label">SUCCESSFULLY CLAIMED</div>
-                <div class="success-amount" id="success-amount-display">0.0000 SOL</div>
-                <div class="success-image-wrap">
-                    <img src="images/claim-success.png" alt="" id="success-image">
-                </div>
-                <div class="success-buttons">
-                    <button class="btn-success-action" id="go-back-btn">Go Back</button>
-                    <a class="btn-success-action" id="see-tx-btn" href="#" target="_blank" rel="noopener">See TX</a>
-                    <button class="btn-success-action" id="tweet-btn">Tweet</button>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- SCANNER TAB -->
-        <div class="tab-content" id="tab-scanner">
-            <div class="scanner-intro">Paste any Solana wallet address to see recoverable SOL — no connection needed.</div>
-            <div class="scanner-input-row">
-                <input id="scanner-address-input" class="scanner-input" type="text" maxlength="44" placeholder="Wallet address (base58)">
-                <button id="scanner-scan-btn" class="btn-scanner-scan">Scan</button>
-            </div>
-            <div id="scanner-status" class="scanner-status"></div>
-            <div id="scanner-result" class="scanner-result hidden">
-                <div class="scanner-summary">
-                    <span id="scanner-count">—</span> empty accounts
-                    <span class="scanner-dot">·</span>
-                    ~<span id="scanner-sol">—</span> SOL recoverable
-                </div>
-                <button id="scanner-connect-btn" class="btn-scanner-connect">Connect Wallet to Reclaim →</button>
-            </div>
-        </div>
-
-        <!-- TOKENS TAB (Expert) -->
-        <div class="tab-content" id="tab-tokens">
-            <div class="expert-coming-soon">
-                COMING SOON
-                <span>Burn tokens with balance and reclaim rent</span>
-            </div>
-        </div>
-
-        <!-- NFT TAB (Expert) -->
-        <div class="tab-content" id="tab-nft">
-            <div class="expert-coming-soon">
-                COMING SOON
-                <span>Burn unwanted NFTs and reclaim rent</span>
-            </div>
-        </div>
-
-        <!-- HOW IT WORKS TAB -->
-        <div class="tab-content" id="tab-howto">
-
-            <!-- NOOB version -->
-            <div class="faq-list mode-content noob-content">
-
-                <div class="faq-item">
-                    <div class="section-heading">The Concept</div>
-                    <p class="faq-a">On the Solana blockchain, every individual token account requires a small "rent" deposit of approximately <strong>0.00203928 SOL</strong> to exist. If you've held tokens that were eventually sold, rugged, or migrated, those empty accounts are still holding your SOL hostage. This utility identifies those abandoned, zero-balance accounts and shuts them down, instantly returning the locked rent to your main wallet.</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="section-heading">Security &amp; Trust</div>
-                    <p class="faq-a">Your assets remain under your control.</p>
-                    <ul class="faq-bullets">
-                        <li class="faq-a"><strong>Manual Approval:</strong> Every action requires your direct signature via your wallet provider (like Phantom).</li>
-                        <li class="faq-a"><strong>Zero-Balance Protection:</strong> The system is programmed to only interact with accounts that are completely empty. If an account holds even a fraction of a token, it is ignored.</li>
-                        <li class="faq-a"><strong>Non-Custodial:</strong> No tokens are ever transferred out of your possession. The only cost is the negligible Solana network gas fee (approx. 0.000005 SOL).</li>
-                    </ul>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="section-heading">Frequently Asked Questions</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-q">Does this impact my eligibility for airdrops?</div>
-                    <p class="faq-a">Absolutely not. Airdrops are tied to your primary wallet address, not specific sub-accounts. If a project sends you tokens in the future, the network simply generates a fresh token account for you. Cleaning up old accounts has no bearing on your future rewards.</p>
-                </div>
-                <hr class="faq-divider">
-                <div class="faq-item">
-                    <div class="faq-q">Why is my "claimable" balance showing as zero?</div>
-                    <p class="faq-a">The tool specifically filters for accounts with a balance of exactly 0. Many rug pulls or failed projects leave behind "dust" (tiny fractions of a token). If an account holds even <strong>0.000001</strong> of a token, it is considered active and will not be displayed for closure to ensure your safety.</p>
-                </div>
-
-            </div>
-
-            <!-- EXPERT version -->
-            <div class="faq-list mode-content expert-content">
-
-                <div class="faq-item">
-                    <div class="section-heading">Expert Mode — Full Toolkit</div>
-                    <p class="faq-a">Expert mode unlocks every cleanup tool available on Rat Republic. Each tab targets a different type of on-chain clutter. Use them independently or in sequence to fully reclaim your wallet's locked SOL.</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="faq-q">CLAIM — Empty Account Closer</div>
-                    <p class="faq-a">The core tool. Scans your wallet for SPL token accounts with a balance of exactly <strong>0</strong> and closes them in batches of up to 22 per transaction. Each closed account returns <strong>~0.00203928 SOL</strong> minus the service fee. Safe by design — only zero-balance accounts are ever touched.</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="faq-q">SCANNER — No-Connect Preview</div>
-                    <p class="faq-a">Paste any Solana wallet address to instantly see how many empty accounts it holds and how much SOL is recoverable — no wallet connection required. Use it to check your own wallet first, or share it so others can see their potential before connecting.</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="faq-q">TOKENS — Burn Fungible Tokens</div>
-                    <p class="faq-a">For tokens you want completely gone. This tab lists every SPL token in your wallet that still carries a balance — rugs, dead memes, junk airdrops. Selecting a token burns its entire supply held by you and closes the account in the same transaction, returning the <strong>~0.00203928 SOL</strong> rent. The standard service fee applies. <strong>Use with care: the token balance is permanently destroyed, not transferred.</strong></p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="faq-q">NFT — Burn NFTs &amp; pNFTs</div>
-                    <p class="faq-a">Displays every regular NFT and programmable NFT (pNFT) in your wallet. You can burn individual pieces to reclaim the <strong>~0.01–0.02 SOL</strong> locked across the mint account, metadata account, and token account. Burning destroys the NFT on-chain permanently — metadata, image, and any associated utility or access rights are gone forever.</p>
-                </div>
-
-
-            </div>
-
-        </div>
-
-        <!-- DISCLAIMER TAB -->
-        <div class="tab-content" id="tab-disclaimer">
-
-            <!-- NOOB version -->
-            <div class="faq-list mode-content noob-content">
-
-                <div class="faq-item">
-                    <p class="faq-a" style="color: rgba(200,224,48,0.6); font-style: italic;">By proceeding, you acknowledge that you are solely responsible for verifying the accounts you choose to close and that you understand the finality of this action.</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="section-heading">SOL Account Reclamation</div>
-                    <p class="faq-a">Please read this carefully before proceeding.</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="faq-q">Irreversible Action</div>
-                    <p class="faq-a">The process of reclaiming SOL by closing empty token accounts or associated accounts is permanent and non-reversible. Once the transaction is confirmed on the blockchain, the account is burned and cannot be "un-closed."</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="faq-q">Loss of Access</div>
-                    <p class="faq-a">By reclaiming the rent deposit, you are permanently deleting the account entry for that specific token. If you receive that same token again in the future, a new account will need to be created (which will require a new rent deposit).</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="faq-q">Verify Before You Burn</div>
-                    <p class="faq-a">Ensure that the account you are closing is truly "dust" or empty. Closing an account that still contains active tokens or represents a necessary smart contract state may result in the total loss of those assets.</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="faq-q">No Support Recovery</div>
-                    <p class="faq-a">Because this is a decentralized on-chain action, no developer, wallet provider, or protocol can "undo" this transaction or recover SOL sent to a burn address.</p>
-                </div>
-
-            </div>
-
-            <!-- EXPERT version -->
-            <div class="faq-list mode-content expert-content">
-
-                <div class="faq-item">
-                    <p class="faq-a" style="color: #FF8C00; font-style: italic;">By using Expert mode, you confirm that you understand the irreversible nature of these actions and accept full responsibility for every transaction you sign.</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="section-heading">Expert Mode — Read Before Using</div>
-                    <p class="faq-a">Expert mode exposes tools that interact with tokens and NFTs that still carry value. Every action here is <strong>permanent and on-chain</strong>. There is no undo.</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="faq-q">CLAIM — Closing Empty Accounts</div>
-                    <p class="faq-a">Closing a token account permanently removes it from the blockchain. If you receive that token again in the future, a new account will be created at the cost of a new rent deposit (~0.00203928 SOL). This tool only touches zero-balance accounts — but confirm before signing.</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="faq-q">TOKENS — Burning with Balance</div>
-                    <p class="faq-a">The TOKENS tab burns tokens that still hold a balance. This is <strong>not</strong> a transfer — the token supply is destroyed at the protocol level. The market value of those tokens is forfeited entirely. Only use this for tokens you are certain are worthless. Double-check the token name and amount before signing. No refund is possible.</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="faq-q">NFT — Burning NFTs &amp; pNFTs</div>
-                    <p class="faq-a">Burning an NFT destroys the mint account, token account, and on-chain metadata permanently. The image may remain on IPFS or Arweave, but the on-chain ownership record is gone. Any utility, access, or whitelist tied to that NFT is permanently lost. Verify the NFT name and image carefully before confirming.</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="faq-q">No Recovery — Ever</div>
-                    <p class="faq-a">These are decentralized on-chain transactions. No developer, wallet provider, or support team can reverse a confirmed burn. Rat Republic has no custody over your assets and cannot intervene once a transaction is signed and submitted.</p>
-                </div>
-
-                <hr class="faq-divider">
-
-                <div class="faq-item">
-                    <div class="faq-q">You Are Responsible</div>
-                    <p class="faq-a">Expert mode is provided as-is for experienced users who understand Solana account mechanics. Rat Republic is not liable for any unintended asset loss resulting from use of these tools.</p>
-                </div>
-
-            </div>
-
-        </div>
-
-        </div><!-- /main-card -->
-
-        <div class="stats-bar" id="stats-bar">
-            <div class="stat-box">
-                <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="7" r="4" stroke="#C8E030" stroke-width="1.8"/><path d="M2 21c0-4 3.134-7 7-7" stroke="#C8E030" stroke-width="1.8" stroke-linecap="round"/><circle cx="17" cy="10" r="3" stroke="#C8E030" stroke-width="1.8"/><path d="M14 21c0-3 1.343-5 3-5s3 2 3 5" stroke="#C8E030" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-                <div class="stat-num" id="stat-users">—</div>
-                <div class="stat-label">Users Served</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="11" width="14" height="10" rx="2" stroke="#C8E030" stroke-width="1.8"/><path d="M8 11V7a4 4 0 018 0v4" stroke="#C8E030" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16" r="1.5" fill="#C8E030"/></svg></div>
-                <div class="stat-num" id="stat-accounts">—</div>
-                <div class="stat-label">Accounts Closed</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#C8E030" stroke-width="1.8"/><path d="M12 7v10M9.5 9.5C9.5 8.12 10.62 7 12 7c1.38 0 2.5 1.12 2.5 2.5S13.38 12 12 12s-2.5 1.12-2.5 2.5S10.62 17 12 17c1.38 0 2.5-1.12 2.5-2.5" stroke="#C8E030" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-                <div class="stat-num" id="stat-sol">—</div>
-                <div class="stat-label">SOL Recovered</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" stroke="#C8E030" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
-                <div class="stat-num" id="stat-highest">—</div>
-                <div class="stat-label">Most SOL (Single User)</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Wallet picker modal -->
+    <!-- ── Wallet picker modal ── -->
     <div class="wallet-modal-overlay hidden" id="wallet-modal">
         <div class="wallet-modal-card">
             <div class="wallet-modal-header">
@@ -976,20 +643,87 @@
                 <button class="wallet-modal-close" id="modal-close-btn">✕</button>
             </div>
             <div class="wallet-option" id="opt-phantom">
-                <div class="wallet-icon" id="icon-phantom" style="background: linear-gradient(135deg, #9945FF, #6B21F5);"></div>
+                <div class="wallet-icon" id="icon-phantom" style="background:linear-gradient(135deg,#9945FF,#6B21F5);"></div>
                 <span class="wallet-name">Phantom</span>
                 <span class="wallet-installed hidden" id="badge-phantom">INSTALLED</span>
             </div>
             <div class="wallet-option" id="opt-solflare">
-                <div class="wallet-icon" id="icon-solflare" style="background: linear-gradient(135deg, #FF8C00, #FF4500);"></div>
+                <div class="wallet-icon" id="icon-solflare" style="background:linear-gradient(135deg,#FF8C00,#FF4500);"></div>
                 <span class="wallet-name">Solflare</span>
                 <span class="wallet-installed hidden" id="badge-solflare">INSTALLED</span>
             </div>
         </div>
     </div>
 
+    <!-- ── Login reminder popup ── -->
+    <div class="login-overlay hidden" id="login-overlay">
+        <div class="login-card">
+            <div class="login-card-title">DONT FORGET TO LOGIN FOR THE LEADERBOARD</div>
+            <div class="login-card-sub">Track your reclaimed SOL, earn referral rewards, and climb the Crowned Vermins leaderboard.</div>
+            <div class="login-card-btns">
+                <a href="login" class="btn-login-go">Login</a>
+                <button class="btn-login-skip" id="login-skip-btn">Continue with Scavenger</button>
+            </div>
+            <label class="login-card-dsa">
+                <input type="checkbox" id="login-dsa-check">
+                Don't show this message again
+            </label>
+        </div>
+    </div>
+
+    <!-- ── Need Help modal ── -->
+    <div class="help-overlay hidden" id="help-overlay">
+        <div class="help-modal">
+            <div class="help-modal-title">HOW TO USE</div>
+            <button class="help-close" onclick="closeHelp()">✕</button>
+            <div class="help-steps">
+                <div class="help-step"><div class="step-num">1</div><div class="step-text">Click <strong>Connect Wallet</strong> and select Phantom or Solflare.</div></div>
+                <div class="help-step"><div class="step-num">2</div><div class="step-text">The tool automatically scans your wallet for <strong>empty token accounts</strong> that are locking up SOL rent.</div></div>
+                <div class="help-step"><div class="step-num">3</div><div class="step-text">Review the accounts found. All are selected by default — deselect any you want to keep.</div></div>
+                <div class="help-step"><div class="step-num">4</div><div class="step-text">Click <strong>Reclaim SOL</strong> and approve the transaction in your wallet.</div></div>
+                <div class="help-step"><div class="step-num">5</div><div class="step-text">SOL lands in your wallet instantly. A <strong>1.8% service fee</strong> is deducted from the recovered amount.</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Burn warning modal ── -->
+    <div class="help-overlay hidden" id="burn-warning-overlay">
+        <div class="help-modal" style="border-color:rgba(255,80,80,0.35);max-width:360px;">
+            <div class="help-modal-title" style="color:#ff7070;">⚠ CONFIRM BURN</div>
+            <button class="help-close" onclick="document.getElementById('burn-warning-overlay').classList.add('hidden')">✕</button>
+            <p style="font-size:0.83rem;color:var(--text-muted);text-align:center;margin-bottom:10px;line-height:1.55;">
+                You are about to permanently burn <strong id="burn-warn-count" style="color:#ff7070;font-size:1.05em;">0</strong> token(s) and close their accounts.
+            </p>
+            <p style="font-size:0.76rem;color:rgba(255,80,80,0.65);text-align:center;margin-bottom:22px;line-height:1.5;">
+                This action <strong style="color:rgba(255,80,80,0.85);">CANNOT be undone</strong>.<br>These tokens will be gone forever.
+            </p>
+            <div style="display:flex;gap:10px;">
+                <button class="btn-success-action" style="flex:1;" onclick="document.getElementById('burn-warning-overlay').classList.add('hidden')">Cancel</button>
+                <button class="btn-burn" style="flex:1;" id="burn-confirm-btn">I Understand, Burn</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── NFT burn warning modal ── -->
+    <div class="help-overlay hidden" id="nft-warning-overlay">
+        <div class="help-modal" style="border-color:rgba(255,80,80,0.35);max-width:360px;">
+            <div class="help-modal-title" style="color:#ff7070;">⚠ CONFIRM NFT BURN</div>
+            <button class="help-close" onclick="document.getElementById('nft-warning-overlay').classList.add('hidden')">✕</button>
+            <p style="font-size:0.83rem;color:var(--text-muted);text-align:center;margin-bottom:10px;line-height:1.55;">
+                You are about to permanently burn <strong id="nft-warn-count" style="color:#ff7070;font-size:1.05em;">0</strong> NFT(s) and close all associated accounts.
+            </p>
+            <p style="font-size:0.76rem;color:rgba(255,80,80,0.65);text-align:center;margin-bottom:22px;line-height:1.5;">
+                This action <strong style="color:rgba(255,80,80,0.85);">CANNOT be undone</strong>.<br>These NFTs will be gone forever.
+            </p>
+            <div style="display:flex;gap:10px;">
+                <button class="btn-success-action" style="flex:1;" onclick="document.getElementById('nft-warning-overlay').classList.add('hidden')">Cancel</button>
+                <button class="btn-burn" style="flex:1;" id="nft-confirm-btn">I Understand, Burn</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Buffer polyfill ── -->
     <script>
-    // Buffer polyfill required by @solana/web3.js SystemProgram
     if (typeof Buffer === 'undefined') {
         (function () {
             function mk(u8) {
@@ -1059,39 +793,93 @@
         })();
     }
     </script>
-    <!-- Login reminder popup — shown to guests only -->
-    <div class="login-overlay hidden" id="login-overlay">
-        <div class="login-card">
-            <div class="login-card-title">DONT FORGET TO LOGIN FOR THE LEADERBOARD</div>
-            <div class="login-card-sub">Track your reclaimed SOL, earn referral rewards, and climb the Crowned Vermins leaderboard.</div>
-            <div class="login-card-btns">
-                <a href="login" class="btn-login-go">Login</a>
-                <button class="btn-login-skip" id="login-skip-btn">Continue with Scavenger</button>
-            </div>
-            <label class="login-card-dsa">
-                <input type="checkbox" id="login-dsa-check">
-                Don't show this message again
-            </label>
-        </div>
-    </div>
 
+    <!-- ── Sidebar user widget ── -->
     <script>
-        (function () {
-            if (!localStorage.getItem('rr_token') && !localStorage.getItem('rr_skip_login_popup')) {
-                document.getElementById('login-overlay').classList.remove('hidden');
-            }
-            document.getElementById('login-skip-btn').addEventListener('click', function () {
-                if (document.getElementById('login-dsa-check').checked) {
-                    localStorage.setItem('rr_skip_login_popup', '1');
-                }
-                document.getElementById('login-overlay').classList.add('hidden');
+    (function () {
+        var token    = localStorage.getItem('rr_token');
+        var username = localStorage.getItem('rr_username');
+        var avatar   = localStorage.getItem('rr_avatar');
+        var cachedRank = localStorage.getItem('rr_rank');
+        var widget   = document.getElementById('sidebar-user-widget');
+
+        if (token && username) {
+            var avatarSrc = avatar || 'images/Default-Avatar.png';
+            widget.innerHTML =
+                '<div class="sidebar-user">' +
+                  '<div class="sidebar-avatar"><img src="' + avatarSrc + '" onerror="this.src=\'images/Default-Avatar.png\'" alt=""></div>' +
+                  '<div style="flex:1;overflow:hidden;">' +
+                    '<div class="sidebar-username">' + (username.length > 16 ? username.slice(0,16) + '…' : username) + '</div>' +
+                    '<div class="sidebar-rank" id="sidebar-rank-display">' + (cachedRank ? 'Rank #' + cachedRank : '') + '</div>' +
+                  '</div>' +
+                '</div>' +
+                '<button class="btn-logout" id="sidebar-logout-btn">' +
+                  '<svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>' +
+                  'Log Out' +
+                '</button>';
+
+            document.getElementById('sidebar-logout-btn').addEventListener('click', function () {
+                var t = localStorage.getItem('rr_token');
+                localStorage.removeItem('rr_token');
+                localStorage.removeItem('rr_username');
+                localStorage.removeItem('rr_avatar');
+                localStorage.removeItem('rr_rank');
+                if (t) fetch('api/auth.php?action=logout', { method:'POST', headers:{'Authorization':'Bearer '+t} }).catch(function(){});
+                window.location.href = '/';
             });
-        })();
+
+            // Fetch rank
+            fetch('api/me.php', { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(function(r) { return r.ok ? r.json() : null; })
+                .then(function(d) {
+                    if (d && d.rank_position) {
+                        localStorage.setItem('rr_rank', d.rank_position);
+                        var el = document.getElementById('sidebar-rank-display');
+                        if (el) el.textContent = 'Rank #' + d.rank_position;
+                    }
+                }).catch(function(){});
+        } else {
+            widget.innerHTML =
+                '<div class="sidebar-guest">' +
+                  '<div class="sidebar-guest-note">Not eligible for leaderboard rewards</div>' +
+                  '<a href="login" class="btn-sidebar-login">Login / Register</a>' +
+                '</div>';
+        }
+    })();
     </script>
+
+    <!-- ── Login overlay logic ── -->
+    <script>
+    (function () {
+        if (!localStorage.getItem('rr_token') && !localStorage.getItem('rr_skip_login_popup')) {
+            document.getElementById('login-overlay').classList.remove('hidden');
+        }
+        document.getElementById('login-skip-btn').addEventListener('click', function () {
+            if (document.getElementById('login-dsa-check').checked) {
+                localStorage.setItem('rr_skip_login_popup', '1');
+            }
+            document.getElementById('login-overlay').classList.add('hidden');
+        });
+    })();
+    </script>
+
+    <!-- ── Help modal logic ── -->
+    <script>
+        function openHelp()  { document.getElementById('help-overlay').classList.remove('hidden'); }
+        function closeHelp() { document.getElementById('help-overlay').classList.add('hidden'); }
+        document.getElementById('help-overlay').addEventListener('click', function(e) { if (e.target === this) closeHelp(); });
+    </script>
+
+    <!-- ── Sidebar accordion ── -->
+    <script>
+        function toggleUtilities() {
+            document.getElementById('utilities-toggle').classList.toggle('open');
+            document.getElementById('utilities-sub').classList.toggle('open');
+        }
+    </script>
+
     <script src="https://unpkg.com/@solana/web3.js@1.77.3/lib/index.iife.min.js" integrity="sha384-1h+8qk74Ovmn+r0huewEXrWzZZ4WNl8Ws0o7aP46Falb2DBgrxufJ4nBEZhaDIMQ" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@phantom/browser-sdk@2.0.2/dist/browser-sdk.umd.js" integrity="sha384-X2FDneBw6XI1NqE3gFKPlYZHFC0bsljNwiFOzC/+BGkp5iREQB1CXj5UDdnxuvgJ" crossorigin="anonymous"></script>
-    <script src="js/cleanup.js?v=24"></script>
-    <script src="js/header.js"></script>
-    <script src="js/footer.js"></script>
+    <script src="js/cleanup.js?v=27"></script>
 </body>
 </html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rat Republic — Legal</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <style>
+        @font-face { font-family: 'Inter'; src: url('fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype'); font-weight: 100 900; font-style: normal; }
+        @font-face { font-family: 'NftOpensea'; src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype'); }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:         #080808;
+            --surface:    #111111;
+            --border:     rgba(255,255,255,0.07);
+            --text:       #ffffff;
+            --text-muted: rgba(255,255,255,0.5);
+            --text-dim:   rgba(255,255,255,0.25);
+            --accent:     #C8E030;
+        }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; padding-top: 72px; }
+
+        /* ── Header ── */
+        .header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+            height: 72px;
+            background: rgba(8,8,8,0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center;
+            padding: 0 48px;
+        }
+        .header-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+        .header-brand img { width: 28px; height: 28px; object-fit: contain; }
+        .header-brand span { font-family: 'NftOpensea'; font-size: 0.9rem; letter-spacing: 0.12em; color: var(--text); }
+        .header-nav { flex: 1; display: flex; justify-content: center; }
+        .nav-pill { display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 24px; padding: 4px; }
+        .nav-pill a { font-size: 0.82rem; font-weight: 500; color: var(--text-muted); text-decoration: none; padding: 7px 18px; border-radius: 20px; transition: color 0.15s, background 0.15s; white-space: nowrap; }
+        .nav-pill a:hover { color: var(--text); background: rgba(255,255,255,0.07); }
+        .nav-pill a.active { background: rgba(255,255,255,0.12); color: var(--text); font-weight: 600; }
+        .header-actions { flex-shrink: 0; }
+        .btn-login { font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 500; color: var(--text-muted); background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 20px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 7px; text-decoration: none; }
+        .btn-login:hover { color: var(--text); border-color: rgba(255,255,255,0.35); }
+        .btn-login svg { width: 13px; height: 13px; opacity: 0.7; }
+        .btn-profile { display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 4px 12px 4px 4px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.12); transition: border-color 0.15s; }
+        .btn-profile:hover { border-color: rgba(255,255,255,0.3); }
+        .btn-profile-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #1a1a1a; }
+        .btn-profile-name { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); transition: color 0.15s; }
+        .btn-profile:hover .btn-profile-name { color: var(--text); }
+
+        /* ── Page tabs ── */
+        .page-tabs {
+            display: flex; gap: 0;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            position: sticky; top: 72px; z-index: 100;
+        }
+        .page-tab {
+            font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 500;
+            color: var(--text-muted); background: transparent;
+            border: none; border-bottom: 2px solid transparent;
+            padding: 14px 28px; cursor: pointer;
+            text-decoration: none; display: block;
+            transition: color 0.15s, border-color 0.15s;
+        }
+        .page-tab:hover { color: var(--text); }
+        .page-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+        /* ── Content ── */
+        .legal-wrap { max-width: 760px; margin: 0 auto; padding: 56px 32px 100px; }
+
+        .legal-section { display: none; }
+        .legal-section.active { display: block; }
+
+        .legal-header { margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+        .legal-title { font-family: 'NftOpensea'; font-size: 1.8rem; letter-spacing: 0.08em; color: var(--text); margin-bottom: 8px; }
+        .legal-date { font-size: 0.78rem; color: var(--text-dim); }
+
+        .legal-body h2 { font-size: 1rem; font-weight: 700; color: var(--text); margin: 36px 0 12px; letter-spacing: 0.02em; }
+        .legal-body h2:first-child { margin-top: 0; }
+        .legal-body p { font-size: 0.875rem; color: var(--text-muted); line-height: 1.75; margin-bottom: 12px; }
+        .legal-body ul { margin: 8px 0 12px 20px; }
+        .legal-body ul li { font-size: 0.875rem; color: var(--text-muted); line-height: 1.75; margin-bottom: 4px; }
+        .legal-body a { color: var(--accent); text-decoration: none; }
+        .legal-body a:hover { text-decoration: underline; }
+        .legal-body strong { color: var(--text); font-weight: 600; }
+
+        .notice-box {
+            background: rgba(200,224,48,0.06);
+            border: 1px solid rgba(200,224,48,0.2);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 32px;
+        }
+        .notice-box p { color: var(--text-muted); font-size: 0.84rem; line-height: 1.65; margin: 0; }
+        .notice-box strong { color: var(--accent); }
+
+        /* ── Footer ── */
+        .footer {
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            padding: 22px 48px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .footer-left { display: flex; align-items: center; gap: 16px; }
+        .footer-copy { font-size: 0.75rem; color: var(--text-dim); }
+        .footer-legal-links { display: flex; gap: 12px; }
+        .footer-legal-links a { font-size: 0.72rem; color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+        .footer-legal-links a:hover { color: var(--text-muted); }
+        .footer-right { display: flex; align-items: center; gap: 16px; }
+        .footer-social { display: flex; align-items: center; gap: 10px; }
+        .footer-social a { color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+        .footer-social a:hover { color: var(--text-muted); }
+        .footer-social svg { width: 14px; height: 14px; fill: currentColor; display: block; }
+        .footer-fee { font-size: 0.72rem; color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+        .footer-fee:hover { color: var(--text-muted); }
+        .footer-divider { width: 1px; height: 14px; background: var(--border); }
+
+        @media (max-width: 640px) {
+            .header { padding: 0 20px; }
+            .header-nav { display: none; }
+            .legal-wrap { padding: 40px 20px 80px; }
+            .footer { padding: 20px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── Header ── -->
+    <header class="header">
+        <a href="/" class="header-brand">
+            <img src="images/branding/rat-republic-logo.svg" alt="">
+            <span>RAT REPUBLIC</span>
+        </a>
+        <nav class="header-nav">
+            <div class="nav-pill">
+                <a href="/">Home</a>
+                <a href="/#utilities">Utilities</a>
+                <a href="leaderboard">Crowned Vermins</a>
+                <a href="docs">Documentation</a>
+            </div>
+        </nav>
+        <div class="header-actions" id="header-actions">
+            <a href="profile" class="btn-login">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                Login
+            </a>
+        </div>
+    </header>
+
+    <!-- ── Tabs ── -->
+    <div class="page-tabs">
+        <a href="#terms" class="page-tab active" id="tab-terms" onclick="showSection('terms')">Terms of Service</a>
+        <a href="#privacy" class="page-tab" id="tab-privacy" onclick="showSection('privacy')">Privacy Policy</a>
+    </div>
+
+    <div class="legal-wrap">
+
+        <!-- TERMS OF SERVICE -->
+        <section class="legal-section active" id="section-terms">
+            <div class="legal-header">
+                <h1 class="legal-title">TERMS OF SERVICE</h1>
+                <p class="legal-date">Effective date: May 6, 2026</p>
+            </div>
+
+            <div class="notice-box">
+                <p><strong>Important:</strong> All on-chain transactions — including rent reclaims, token burns, NFT burns, and airdrops — are <strong>permanent and irreversible</strong>. By using Rat Republic tools you accept full responsibility for every transaction you sign.</p>
+            </div>
+
+            <div class="legal-body">
+                <h2>1. Acceptance of Terms</h2>
+                <p>By accessing or using the Rat Republic website and tools ("Service"), you agree to be bound by these Terms of Service. If you do not agree, do not use the Service.</p>
+
+                <h2>2. Description of Service</h2>
+                <p>Rat Republic provides Solana-based utilities including:</p>
+                <ul>
+                    <li>Rent reclaim — closes empty token accounts to recover SOL</li>
+                    <li>Token burn — permanently destroys SPL tokens and reclaims account rent</li>
+                    <li>NFT burn — permanently destroys standard NFTs and reclaims rent</li>
+                    <li>Airdrop tool — sends SOL or tokens to multiple wallets in batch</li>
+                    <li>Vanity address generator — brute-forces custom Solana keypairs</li>
+                    <li>Leaderboard and referral reward system</li>
+                    <li>PFP generator — mix and match traits to build a custom profile picture</li>
+                </ul>
+                <p>The Service operates on the Solana blockchain. All transactions are executed by your connected wallet — Rat Republic never takes custody of your funds or private keys.</p>
+
+                <h2>3. Fees</h2>
+                <p>Rat Republic charges a service fee on certain transactions (rent reclaim, token burns, airdrops). Fees are deducted as part of the on-chain transaction and are clearly displayed before you sign. <strong>All fees are non-refundable once a transaction has been signed and broadcast.</strong></p>
+                <p>Fee rates may change at any time. The current rates are always shown in the app before confirmation.</p>
+
+                <h2>4. Irreversibility of On-Chain Actions</h2>
+                <p>Blockchain transactions are final. Rat Republic has no ability to reverse, undo, or refund any transaction that has been confirmed on-chain. This includes:</p>
+                <ul>
+                    <li>Burned tokens or NFTs (cannot be recovered)</li>
+                    <li>Closed token accounts</li>
+                    <li>SOL or tokens sent via the airdrop tool</li>
+                    <li>Service fees paid to the treasury</li>
+                </ul>
+                <p>You are solely responsible for verifying all transaction details before signing.</p>
+
+                <h2>5. Wallet Security</h2>
+                <p>Rat Republic never requests, stores, or transmits your private keys, seed phrases, or passwords. You are solely responsible for the security of your wallet. We strongly recommend using a hardware wallet or a dedicated browser wallet for any significant holdings.</p>
+
+                <h2>6. No Financial Advice</h2>
+                <p>Nothing on Rat Republic constitutes financial, investment, or tax advice. The Service is a set of utility tools. Any decisions you make regarding your assets are yours alone.</p>
+
+                <h2>7. User Accounts</h2>
+                <p>You may register an account to access the leaderboard and referral rewards. You are responsible for maintaining the confidentiality of your credentials. We reserve the right to suspend or terminate accounts that violate these terms, engage in spam or abuse, or attempt to exploit the reward system.</p>
+
+                <h2>8. Prohibited Conduct</h2>
+                <p>You agree not to:</p>
+                <ul>
+                    <li>Attempt to manipulate or exploit the leaderboard or referral system</li>
+                    <li>Use the Service for any unlawful purpose</li>
+                    <li>Interfere with or disrupt the Service's infrastructure</li>
+                    <li>Impersonate other users or Rat Republic team members</li>
+                </ul>
+
+                <h2>9. Disclaimer of Warranties</h2>
+                <p>The Service is provided <strong>"as is"</strong> without warranties of any kind. We do not guarantee that the Service will be uninterrupted, error-free, or that any particular transaction will succeed. Network congestion, RPC failures, and other on-chain conditions are outside our control.</p>
+
+                <h2>10. Limitation of Liability</h2>
+                <p>To the fullest extent permitted by law, Rat Republic and its team members shall not be liable for any loss of funds, lost profits, or indirect damages arising from your use of the Service, including but not limited to failed transactions, incorrect addresses, or user error.</p>
+
+                <h2>11. Changes to Terms</h2>
+                <p>We may update these Terms at any time. Continued use of the Service after changes are posted constitutes your acceptance of the revised Terms. The effective date at the top of this page will reflect the latest update.</p>
+
+                <h2>12. Contact</h2>
+                <p>Questions about these Terms? Reach us on <a href="https://x.com/rat_republicsol" target="_blank" rel="noopener">X (@rat_republicsol)</a>.</p>
+            </div>
+        </section>
+
+        <!-- PRIVACY POLICY -->
+        <section class="legal-section" id="section-privacy">
+            <div class="legal-header">
+                <h1 class="legal-title">PRIVACY POLICY</h1>
+                <p class="legal-date">Effective date: May 6, 2026</p>
+            </div>
+
+            <div class="notice-box">
+                <p><strong>Short version:</strong> We collect only what's necessary to run the leaderboard and referral system. We never touch your private keys and we never sell your data.</p>
+            </div>
+
+            <div class="legal-body">
+                <h2>1. What We Collect</h2>
+                <p>When you register an account, we collect:</p>
+                <ul>
+                    <li><strong>Email address</strong> — for account verification and recovery</li>
+                    <li><strong>Username</strong> — displayed on the leaderboard</li>
+                    <li><strong>Solana wallet address</strong> — to attribute on-chain activity, leaderboard rankings, and referral rewards</li>
+                    <li><strong>Referral data</strong> — which referral link you signed up through, if any</li>
+                    <li><strong>Profile avatar</strong> — an image you upload voluntarily</li>
+                </ul>
+                <p>When you use our tools without an account, we do not collect or store any personal information. Wallet connections and transactions happen entirely client-side through your browser wallet extension.</p>
+
+                <h2>2. What We Never Collect</h2>
+                <ul>
+                    <li>Private keys or seed phrases — we have no access to these at any time</li>
+                    <li>Passwords in plain text — passwords are hashed before storage</li>
+                    <li>Payment card or banking information</li>
+                </ul>
+
+                <h2>3. How We Use Your Data</h2>
+                <p>The data we collect is used exclusively to:</p>
+                <ul>
+                    <li>Display your rank on the Crowned Vermins leaderboard</li>
+                    <li>Track and distribute referral rewards</li>
+                    <li>Apply fee discounts tied to your referral status</li>
+                    <li>Let you log in and manage your profile</li>
+                    <li>Verify email ownership during registration</li>
+                </ul>
+                <p>We do not use your data for advertising, profiling, or any purpose beyond operating the Service.</p>
+
+                <h2>4. LocalStorage</h2>
+                <p>Our site uses browser <code>localStorage</code> to store:</p>
+                <ul>
+                    <li>Authentication token (session key, not a password)</li>
+                    <li>Your username and cached avatar for fast page loads</li>
+                    <li>UI preferences (e.g., NOOB/EXPERT mode setting)</li>
+                </ul>
+                <p>This data lives only in your browser and is cleared when you log out.</p>
+
+                <h2>5. On-Chain Data</h2>
+                <p>Solana is a public blockchain. Any transaction you sign through Rat Republic is permanently visible on-chain, including your wallet address, transaction amounts, and token activity. This is inherent to how blockchains work and is beyond our control.</p>
+
+                <h2>6. Data Sharing</h2>
+                <p>We do not sell, rent, or share your personal data with third parties. Your wallet address and username are visible on the public leaderboard if you choose to register — this is intentional and opt-in.</p>
+
+                <h2>7. Data Retention</h2>
+                <p>We retain account data for as long as your account is active. You may request deletion of your account and associated data by contacting us on X. On-chain transaction records cannot be deleted as they are part of the public blockchain.</p>
+
+                <h2>8. Security</h2>
+                <p>We use industry-standard practices to protect stored data, including hashed passwords and token-based authentication. However, no system is 100% secure. Use a strong, unique password and enable two-factor authentication on your email account.</p>
+
+                <h2>9. Children's Privacy</h2>
+                <p>Rat Republic is not directed at children under 13. We do not knowingly collect data from anyone under 13 years of age.</p>
+
+                <h2>10. Changes to This Policy</h2>
+                <p>We may update this Privacy Policy from time to time. The effective date at the top will reflect the latest revision. Continued use of the Service constitutes acceptance of any changes.</p>
+
+                <h2>11. Contact</h2>
+                <p>Questions or data requests? Reach us on <a href="https://x.com/rat_republicsol" target="_blank" rel="noopener">X (@rat_republicsol)</a>.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ── Footer ── -->
+    <footer class="footer">
+        <div class="footer-left">
+            <span class="footer-copy">© 2026 Rat Republic. All rights reserved.</span>
+            <div class="footer-legal-links">
+                <a href="legal#terms">Terms</a>
+                <a href="legal#privacy">Privacy</a>
+            </div>
+        </div>
+        <div class="footer-right">
+            <div class="footer-social">
+                <a href="https://x.com/rat_republicsol" target="_blank" rel="noopener" title="X">
+                    <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="https://github.com/RatRepublic" target="_blank" rel="noopener" title="GitHub">
+                    <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+                <a href="docs" title="Documentation">
+                    <svg viewBox="0 0 24 24"><path d="M12.513 1.097c-.645 0-1.233.34-2.407 1.017L3.675 5.82A7.233 7.233 0 0 0 0 12.063v.236a7.233 7.233 0 0 0 3.667 6.238L7.69 20.86c2.354 1.36 3.531 2.042 4.824 2.042 1.292.001 2.47-.678 4.825-2.038l4.251-2.453c1.177-.68 1.764-1.02 2.087-1.579.323-.56.324-1.24.323-2.6v-2.63a1.04 1.04 0 0 0-1.558-.903l-8.728 5.024c-.587.337-.88.507-1.201.507-.323 0-.616-.168-1.204-.506l-5.904-3.393c-.297-.171-.446-.256-.565-.271a.603.603 0 0 0-.634.368c-.045.111-.045.282-.043.625.002.252 0 .378.025.494.053.259.189.493.387.667.089.077.198.14.416.266l6.315 3.65c.589.34.884.51 1.207.51.324 0 .617-.17 1.206-.509l7.74-4.469c.202-.116.302-.172.377-.13.075.044.075.16.075.392v1.193c0 .34.001.51-.08.649-.08.14-.227.224-.522.394l-6.382 3.685c-1.178.68-1.767 1.02-2.413 1.02-.646 0-1.236-.34-2.412-1.022l-5.97-3.452-.043-.025a4.106 4.106 0 0 1-2.031-3.52V11.7c0-.801.427-1.541 1.12-1.944a1.979 1.979 0 0 1 1.982-.001l4.946 2.858c1.174.679 1.762 1.019 2.407 1.02.645 0 1.233-.34 2.41-1.017l7.482-4.306a1.091 1.091 0 0 0 0-1.891L14.92 2.11c-1.175-.675-1.762-1.013-2.406-1.013Z"/></svg>
+                </a>
+            </div>
+            <div class="footer-divider"></div>
+            <a href="https://solscan.io/account/ratU71Bedbf7196sexgCyBoRxM2Zjb7vBxJ5MJeBYGb" target="_blank" class="footer-fee">Fee Wallet</a>
+        </div>
+    </footer>
+
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('.legal-section').forEach(function(s) { s.classList.remove('active'); });
+            document.querySelectorAll('.page-tab').forEach(function(t) { t.classList.remove('active'); });
+            document.getElementById('section-' + id).classList.add('active');
+            document.getElementById('tab-' + id).classList.add('active');
+            history.replaceState(null, '', '#' + id);
+        }
+
+        // Activate tab from URL hash on load
+        (function() {
+            var hash = window.location.hash.replace('#', '');
+            if (hash === 'privacy') showSection('privacy');
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var token    = localStorage.getItem('rr_token');
+            var username = localStorage.getItem('rr_username');
+            if (!token || !username) return;
+            var el = document.getElementById('header-actions');
+            var safeName = username.length > 16 ? username.slice(0, 16) + '…' : username;
+            function renderBtn(src) {
+                el.innerHTML =
+                    '<a href="profile" class="btn-profile">' +
+                      '<img class="btn-profile-avatar" src="' + src + '" onerror="this.onerror=null;this.src=\'images/Default-Avatar.png\'" alt="">' +
+                      '<span class="btn-profile-name">' + safeName + '</span>' +
+                    '</a>';
+            }
+            var cached = localStorage.getItem('rr_avatar');
+            renderBtn(cached || 'images/Default-Avatar.png');
+            fetch('api/me.php', { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(function(r) { return r.ok ? r.json() : null; })
+                .then(function(d) {
+                    if (!d) return;
+                    if (d.avatar) { localStorage.setItem('rr_avatar', d.avatar); renderBtn(d.avatar); }
+                }).catch(function() {});
+        })();
+    </script>
+</body>
+</html>

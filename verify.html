@@ -4,117 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rat Republic — Verify Email</title>
-    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: #1a1f0f;
-            background-image: url('images/Background.png');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            color: #fff;
-            font-family: monospace, 'Courier New', sans-serif;
-            min-height: 100vh;
-            padding: 30px 20px 60px;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
+        @font-face { font-family: 'Inter'; src: url('fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype'); font-weight: 100 900; font-style: normal; }
+        @font-face { font-family: 'NftOpensea'; src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype'); }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #080808; --surface: #111111; --surface-2: #161616;
+            --border: rgba(255,255,255,0.07); --border-hover: rgba(255,255,255,0.15);
+            --text: #ffffff; --text-muted: rgba(255,255,255,0.45); --text-dim: rgba(255,255,255,0.22);
+            --accent: #C8E030; --accent-dim: rgba(200,224,48,0.1);
         }
-        .container { width: 100%; max-width: 420px; }
-        @font-face {
-            font-family: 'NftOpensea';
-            src: url('fonts/NftOpenseaRegular-jEJvR.ttf') format('truetype');
-        }
-        .main-card {
-            background: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            border-radius: 16px;
-            padding: 40px 28px;
-            text-align: center;
-        }
+        html, body { min-height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+        body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 20px 60px; min-height: 100vh; }
+
+        .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 32px; }
+        .brand img { width: 28px; height: 28px; object-fit: contain; }
+        .brand span { font-family: 'NftOpensea'; font-size: 0.88rem; letter-spacing: 0.12em; color: var(--text); }
+
+        .auth-card { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px 32px; text-align: center; }
+
         .state-icon { font-size: 3rem; margin-bottom: 16px; }
-        .state-title {
-            font-family: 'NftOpensea', monospace;
-            font-size: 1.5rem;
-            letter-spacing: 3px;
-            margin-bottom: 10px;
-        }
-        .state-title.success { color: #C8E030; }
+        .state-title { font-family: 'NftOpensea'; font-size: 1.3rem; letter-spacing: 0.08em; margin-bottom: 10px; }
+        .state-title.success { color: var(--accent); }
         .state-title.error   { color: #ff8080; }
-        .state-title.loading { color: rgba(255,255,255,0.5); }
-        .state-body {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.8rem;
-            line-height: 1.7;
-            margin-bottom: 24px;
-        }
-        .btn {
-            display: inline-block;
-            background-color: rgba(20, 28, 12, 0.92);
-            border: 2px solid #5A7A18;
-            color: #C8E030;
-            text-decoration: none;
-            font-weight: bold;
-            font-family: 'NftOpensea', monospace;
-            font-size: 0.9rem;
-            padding: 11px 28px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-        }
-        .btn:hover { border-color: #C8E030; box-shadow: 0 0 14px rgba(200,224,48,0.35); }
-        .countdown {
-            margin-top: 12px;
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.25);
-        }
+        .state-title.loading { color: var(--text-dim); }
+        .state-body { color: var(--text-muted); font-size: 0.8rem; line-height: 1.7; margin-bottom: 24px; }
+
+        .btn { display: inline-block; font-family: 'NftOpensea'; font-size: 0.85rem; letter-spacing: 0.08em; color: #0a0a0a; background: var(--accent); border: none; border-radius: 10px; padding: 12px 28px; cursor: pointer; text-decoration: none; transition: opacity 0.15s; }
+        .btn:hover { opacity: 0.9; }
+        .countdown { margin-top: 12px; font-size: 0.7rem; color: var(--text-dim); }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="main-card" id="card">
-            <!-- Loading -->
-            <div id="state-loading">
-                <div class="state-icon">⏳</div>
-                <div class="state-title loading">VERIFYING...</div>
-                <div class="state-body">Checking your verification link.</div>
-            </div>
+    <a href="/" class="brand">
+        <img src="images/branding/rat-republic-logo.svg" alt="">
+        <span>RAT REPUBLIC</span>
+    </a>
 
-            <!-- Success -->
-            <div id="state-success" style="display:none;">
-                <div class="state-icon">✅</div>
-                <div class="state-title success">EMAIL VERIFIED</div>
-                <div class="state-body">
-                    Your account is now active.<br>
-                    Taking you to your profile…
-                </div>
-                <a href="profile" class="btn">Go to Profile →</a>
-                <div class="countdown" id="countdown"></div>
-            </div>
+    <div class="auth-card" id="card">
+        <div id="state-loading">
+            <div class="state-icon">⏳</div>
+            <div class="state-title loading">VERIFYING...</div>
+            <div class="state-body">Checking your verification link.</div>
+        </div>
 
-            <!-- Expired -->
-            <div id="state-expired" style="display:none;">
-                <div class="state-icon">⌛</div>
-                <div class="state-title error">LINK EXPIRED</div>
-                <div class="state-body">
-                    This verification link has expired.<br>
-                    Register again to get a new one.
-                </div>
-                <a href="register" class="btn">Back to Register →</a>
-            </div>
+        <div id="state-success" style="display:none;">
+            <div class="state-icon">✅</div>
+            <div class="state-title success">EMAIL VERIFIED</div>
+            <div class="state-body">Your account is now active.<br>Taking you to your profile…</div>
+            <a href="profile" class="btn">Go to Profile →</a>
+            <div class="countdown" id="countdown"></div>
+        </div>
 
-            <!-- Error -->
-            <div id="state-error" style="display:none;">
-                <div class="state-icon">❌</div>
-                <div class="state-title error">INVALID LINK</div>
-                <div class="state-body" id="error-body">
-                    This verification link is invalid or has already been used.<br>
-                    Try logging in, or register again.
-                </div>
-                <a href="login" class="btn">Go to Login →</a>
-            </div>
+        <div id="state-expired" style="display:none;">
+            <div class="state-icon">⌛</div>
+            <div class="state-title error">LINK EXPIRED</div>
+            <div class="state-body">This verification link has expired.<br>Register again to get a new one.</div>
+            <a href="register" class="btn">Back to Register →</a>
+        </div>
+
+        <div id="state-error" style="display:none;">
+            <div class="state-icon">❌</div>
+            <div class="state-title error">INVALID LINK</div>
+            <div class="state-body" id="error-body">This verification link is invalid or has already been used.<br>Try logging in, or register again.</div>
+            <a href="login" class="btn">Go to Login →</a>
         </div>
     </div>
 
@@ -142,7 +96,6 @@
                     localStorage.setItem('rr_username', r.d.username);
                     show('state-success');
 
-                    // Countdown redirect
                     var secs = 4;
                     var cd = document.getElementById('countdown');
                     cd.textContent = 'Redirecting in ' + secs + 's…';
@@ -159,9 +112,7 @@
                     show('state-expired');
                 } else {
                     show('state-error');
-                    if (r.d.error) {
-                        document.getElementById('error-body').textContent = r.d.error;
-                    }
+                    if (r.d.error) document.getElementById('error-body').textContent = r.d.error;
                 }
             })
             .catch(function () {
@@ -170,7 +121,5 @@
             });
         }
     </script>
-    <script src="js/header.js"></script>
-    <script src="js/footer.js"></script>
 </body>
 </html>
