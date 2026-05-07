@@ -216,7 +216,7 @@
                 document.getElementById('stat-users').textContent    = Number(s.users_served).toLocaleString();
                 document.getElementById('stat-accounts').textContent = Number(s.accounts_closed).toLocaleString();
                 document.getElementById('stat-sol').textContent      = Number(s.sol_recovered).toFixed(2);
-                document.getElementById('stat-highest').textContent  = Number(s.top_user_sol).toFixed(4);
+                document.getElementById('stat-highest').textContent  = s.top_user_sol != null ? Number(s.top_user_sol).toFixed(4) : '—';
             })
             .catch(function () {});
     }

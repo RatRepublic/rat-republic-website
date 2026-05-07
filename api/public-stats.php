@@ -14,6 +14,7 @@ if (file_exists($statsFile) && (time() - filemtime($statsFile)) < $cacheTtl) {
             'users_served'    => (int)$cached['users_served'],
             'accounts_closed' => (int)$cached['accounts_closed'],
             'sol_recovered'   => round((float)$cached['sol_recovered'], 2),
+            'top_user_sol'    => isset($cached['top_user_sol']) ? round((float)$cached['top_user_sol'], 4) : null,
         ]);
         exit;
     }
@@ -27,7 +28,8 @@ try {
     $row = $db->query(
         'SELECT COUNT(DISTINCT wallet_address) AS users_served,
                 COALESCE(SUM(accounts_closed), 0) AS accounts_closed,
-                COALESCE(SUM(sol_amount), 0)      AS sol_recovered
+                COALESCE(SUM(sol_amount), 0)      AS sol_recovered,
+                COALESCE(MAX(sol_amount), 0)      AS top_user_sol
          FROM reclaim_history'
     )->fetch(PDO::FETCH_ASSOC);
 
@@ -35,6 +37,7 @@ try {
         'users_served'    => (int)$row['users_served'],
         'accounts_closed' => (int)$row['accounts_closed'],
         'sol_recovered'   => round((float)$row['sol_recovered'], 9),
+        'top_user_sol'    => round((float)$row['top_user_sol'], 4),
     ];
 
     // Write cache
@@ -44,6 +47,7 @@ try {
         'users_served'    => $stats['users_served'],
         'accounts_closed' => $stats['accounts_closed'],
         'sol_recovered'   => round($stats['sol_recovered'], 2),
+        'top_user_sol'    => $stats['top_user_sol'],
     ]);
 } catch (Exception $e) {
     // Fall back to whatever is on disk
