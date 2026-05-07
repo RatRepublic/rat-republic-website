@@ -502,8 +502,17 @@
         let totalAccounts    = 0;
         const signatures     = [];
 
+        // Pre-simulate before signing so Phantom's own simulation is less likely to fail
+        async function simulateTx(txToSim, conn) {
+            try {
+                const sim = await conn.simulateTransaction(txToSim);
+                return !(sim && sim.value && sim.value.err);
+            } catch (e) { return true; } // if simulate itself errors, proceed anyway
+        }
+
         // Sign with wallet, send through our own connection so we control skipPreflight
         async function sendTx(txToSend) {
+            await simulateTx(txToSend, connection);
             const signed = await wallet.signTransaction(txToSend);
             try {
                 return await connection.sendRawTransaction(signed.serialize(), {
@@ -959,6 +968,7 @@
                     tx.add(makeSolTransfer(walletPubkey, referrerPubkey, referrerLamports));
                 }
 
+                await simulateTx(tx, connection);
                 var signed = await wallet.signTransaction(tx);
                 var sig;
                 try {
@@ -1365,6 +1375,7 @@
                     tx.add(makeSolTransfer(walletPubkey, referrerPubkey, referrerLamports));
                 }
 
+                await simulateTx(tx, connection);
                 var signed = await wallet.signTransaction(tx);
                 var sig;
                 try {
