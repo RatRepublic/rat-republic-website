@@ -226,7 +226,7 @@ if ($action === 'login') {
         }
 
         $token = createSession($db, $user['id']);
-        echo json_encode(['token' => $token, 'username' => $user['username'] ?: $email]);
+        echo json_encode(['token' => $token, 'username' => $user['username'] ?: $login]);
     } catch (PDOException $e) {
         http_response_code(500);
         echo json_encode(['error' => 'Login failed']);
@@ -444,10 +444,56 @@ function createSession($db, $userId) {
     return $token;
 }
 
+function smtpSend($toEmail, $subject, $htmlBody, $plainBody) {
+    $socket = @fsockopen('ssl://smtp.hostinger.com', 465, $errno, $errstr, 15);
+    if (!$socket) return false;
+
+    $read = function() use ($socket) {
+        $buf = '';
+        while (!feof($socket)) {
+            $line = fgets($socket, 512);
+            if ($line === false) break;
+            $buf .= $line;
+            if (isset($line[3]) && $line[3] === ' ') break;
+        }
+        return $buf;
+    };
+
+    $read(); // 220 greeting
+    fputs($socket, "EHLO ratrepublic.art\r\n");
+    $read();
+    fputs($socket, "AUTH LOGIN\r\n");
+    $read();
+    fputs($socket, base64_encode(MAIL_FROM) . "\r\n");
+    $read();
+    fputs($socket, base64_encode(SMTP_PASS) . "\r\n");
+    $authResp = $read();
+    if (strpos($authResp, '235') === false) { fclose($socket); return false; }
+
+    fputs($socket, "MAIL FROM:<" . MAIL_FROM . ">\r\n"); $read();
+    fputs($socket, "RCPT TO:<{$toEmail}>\r\n"); $read();
+    fputs($socket, "DATA\r\n"); $read();
+
+    $b   = md5(uniqid('', true));
+    $msg = "From: " . MAIL_FROM_NAME . " <" . MAIL_FROM . ">\r\n"
+         . "To: {$toEmail}\r\n"
+         . "Subject: {$subject}\r\n"
+         . "MIME-Version: 1.0\r\n"
+         . "Content-Type: multipart/alternative; boundary=\"{$b}\"\r\n\r\n"
+         . "--{$b}\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n{$plainBody}\r\n"
+         . "--{$b}\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n{$htmlBody}\r\n"
+         . "--{$b}--\r\n.\r\n";
+
+    fputs($socket, $msg);
+    $resp = $read();
+    fputs($socket, "QUIT\r\n");
+    fclose($socket);
+    return strpos($resp, '250') !== false;
+}
+
 function sendVerificationEmail($toEmail, $toName, $token) {
     $link    = SITE_URL . '/verify.html?token=' . $token;
     $subject = 'Verify your Rat Republic account';
-    $from    = MAIL_FROM_NAME . ' <' . MAIL_FROM . '>';
 
     $html = '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#1a1f0f;font-family:monospace,Courier New,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#1a1f0f;padding:40px 20px;">
@@ -479,32 +525,14 @@ function sendVerificationEmail($toEmail, $toName, $token) {
 </table>
 </body></html>';
 
-    $plain = "Hey " . $toName . ",\n\nVerify your Rat Republic account by visiting this link:\n\n" . $link . "\n\nThis link expires in 24 hours.\n\nIf you did not create an account, ignore this email.";
+    $plain = "Hey {$toName},\n\nVerify your Rat Republic account:\n\n{$link}\n\nExpires in 24 hours. If you didn't create an account, ignore this.";
 
-    $boundary = md5(uniqid());
-    $headers  = implode("\r\n", [
-        'From: ' . $from,
-        'Reply-To: ' . MAIL_FROM,
-        'MIME-Version: 1.0',
-        'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
-        'X-Mailer: PHP/' . PHP_VERSION,
-    ]);
-
-    $body = "--{$boundary}\r\n"
-          . "Content-Type: text/plain; charset=UTF-8\r\n\r\n"
-          . $plain . "\r\n"
-          . "--{$boundary}\r\n"
-          . "Content-Type: text/html; charset=UTF-8\r\n\r\n"
-          . $html . "\r\n"
-          . "--{$boundary}--";
-
-    mail($toEmail, $subject, $body, $headers);
+    smtpSend($toEmail, $subject, $html, $plain);
 }
 
 function sendPasswordResetEmail($toEmail, $toName, $token) {
     $link    = SITE_URL . '/reset-password.html?token=' . $token;
     $subject = 'Reset your Rat Republic password';
-    $from    = MAIL_FROM_NAME . ' <' . MAIL_FROM . '>';
 
     $html = '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#1a1f0f;font-family:monospace,Courier New,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#1a1f0f;padding:40px 20px;">
@@ -536,24 +564,7 @@ function sendPasswordResetEmail($toEmail, $toName, $token) {
 </table>
 </body></html>';
 
-    $plain = "Hey " . $toName . ",\n\nReset your Rat Republic password by visiting this link:\n\n" . $link . "\n\nThis link expires in 1 hour.\n\nIf you did not request this, ignore this email.";
+    $plain = "Hey {$toName},\n\nReset your Rat Republic password:\n\n{$link}\n\nExpires in 1 hour. If you didn't request this, ignore it.";
 
-    $boundary = md5(uniqid());
-    $headers  = implode("\r\n", [
-        'From: ' . $from,
-        'Reply-To: ' . MAIL_FROM,
-        'MIME-Version: 1.0',
-        'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
-        'X-Mailer: PHP/' . PHP_VERSION,
-    ]);
-
-    $body = "--{$boundary}\r\n"
-          . "Content-Type: text/plain; charset=UTF-8\r\n\r\n"
-          . $plain . "\r\n"
-          . "--{$boundary}\r\n"
-          . "Content-Type: text/html; charset=UTF-8\r\n\r\n"
-          . $html . "\r\n"
-          . "--{$boundary}--";
-
-    mail($toEmail, $subject, $body, $headers);
+    smtpSend($toEmail, $subject, $html, $plain);
 }
