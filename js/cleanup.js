@@ -20,6 +20,13 @@
     const METADATA_PROG_ID = new solanaWeb3.PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
     const BURN_MAX_PER_TX  = 10; // burn + close = 2 instructions per token
 
+    async function simulateTx(txToSim, conn) {
+        try {
+            const sim = await conn.simulateTransaction(txToSim, { sigVerify: false });
+            return !(sim && sim.value && sim.value.err);
+        } catch (e) { return true; }
+    }
+
     let wallet = null;
     let walletPublicKey = null;
     let closableAccounts = [];
@@ -467,6 +474,7 @@
         const selected = getSelected();
         if (selected.length === 0) return;
 
+
         reclaimBtn.disabled = true;
         scanBtn.disabled = true;
 
@@ -501,14 +509,6 @@
         let totalNetLamports = 0;
         let totalAccounts    = 0;
         const signatures     = [];
-
-        // Pre-simulate before signing so Phantom's own simulation is less likely to fail
-        async function simulateTx(txToSim, conn) {
-            try {
-                const sim = await conn.simulateTransaction(txToSim);
-                return !(sim && sim.value && sim.value.err);
-            } catch (e) { return true; } // if simulate itself errors, proceed anyway
-        }
 
         // Sign with wallet, send through our own connection so we control skipPreflight
         async function sendTx(txToSend) {
