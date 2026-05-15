@@ -16,7 +16,7 @@
     const TREASURY = 'ratU71Bedbf7196sexgCyBoRxM2Zjb7vBxJ5MJeBYGb';
     const RENT_PER_ACCOUNT = 0.00203928;
     const RENT_LAMPORTS    = 2039280; // RENT_PER_ACCOUNT * 1e9, exact integer
-    const MAX_PER_TX = 22; // reduced from 25 to leave room for fee transfer instructions
+    const MAX_PER_TX = 18;
     const METADATA_PROG_ID = new solanaWeb3.PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
     const BURN_MAX_PER_TX  = 10; // burn + close = 2 instructions per token
 
@@ -510,29 +510,18 @@
         let totalAccounts    = 0;
         const signatures     = [];
 
-        // Sign with wallet, send through our own connection so we control skipPreflight
         async function sendTx(txToSend) {
-            await simulateTx(txToSend, connection);
+            const ok = await simulateTx(txToSend, connection);
+            if (!ok) throw new Error('Transaction simulation failed — please try again.');
             const signed = await wallet.signTransaction(txToSend);
-            try {
-                return await connection.sendRawTransaction(signed.serialize(), {
-                    skipPreflight: false,
-                    preflightCommitment: 'confirmed'
-                });
-            } catch (sendErr) {
-                const sendMsg = sendErr.message || String(sendErr);
-                if (sendMsg.toLowerCase().includes('simulation') || sendMsg.toLowerCase().includes('preflight')) {
-                    return await connection.sendRawTransaction(signed.serialize(), { skipPreflight: true });
-                }
-                throw sendErr;
-            }
+            return await connection.sendRawTransaction(signed.serialize(), { skipPreflight: true });
         }
 
         try {
             for (let ci = 0; ci < chunks.length; ci++) {
                 setStatus('Sending transaction ' + (ci + 1) + ' of ' + chunks.length + '...', 'loading');
 
-                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+                const { blockhash } = await connection.getLatestBlockhash('finalized');
                 const tx = new solanaWeb3.Transaction();
                 tx.recentBlockhash = blockhash;
                 tx.feePayer = walletPubkey;
@@ -568,19 +557,12 @@
                 const sig = await sendTx(tx);
                 signatures.push(sig);
 
-                // Transaction sent — record and count immediately, confirm in background
                 totalNetLamports += netLamports;
                 totalAccounts    += chunks[ci].length;
 
                 const chunkNetSol = (netLamports / 1e9).toFixed(4);
                 const chunkRefSol = referrerLamports > 0 ? referrerLamports / 1e9 : null;
                 recordReclaim(walletPublicKey, chunks[ci].length, chunkNetSol, sig, fi.referrer_wallet, chunkRefSol);
-
-                // Confirm in background — don't block the UI
-                connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, 'confirmed')
-                    .catch(function () {
-                        connection.getSignatureStatus(sig, { searchTransactionHistory: true }).catch(function () {});
-                    });
             }
 
             const totalNetSol = (totalNetLamports / 1e9).toFixed(4);
@@ -968,29 +950,13 @@
                     tx.add(makeSolTransfer(walletPubkey, referrerPubkey, referrerLamports));
                 }
 
-                await simulateTx(tx, connection);
+                var simOk = await simulateTx(tx, connection);
+                if (!simOk) throw new Error('Transaction simulation failed — please try again.');
                 var signed = await wallet.signTransaction(tx);
-                var sig;
-                try {
-                    sig = await connection.sendRawTransaction(signed.serialize(), {
-                        skipPreflight: false,
-                        preflightCommitment: 'confirmed'
-                    });
-                } catch(sendErr) {
-                    var sendMsg = sendErr.message || String(sendErr);
-                    if (sendMsg.toLowerCase().includes('simulation') || sendMsg.toLowerCase().includes('preflight')) {
-                        sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: true });
-                    } else { throw sendErr; }
-                }
+                var sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: true });
 
                 signatures.push(sig);
                 totalNetLamports += netLamports;
-
-                connection.confirmTransaction({
-                    signature: sig,
-                    blockhash: latestBlockhash.blockhash,
-                    lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
-                }, 'confirmed').catch(function(){});
             }
 
             var totalNetSol = (totalNetLamports / 1e9).toFixed(4);
@@ -1375,29 +1341,13 @@
                     tx.add(makeSolTransfer(walletPubkey, referrerPubkey, referrerLamports));
                 }
 
-                await simulateTx(tx, connection);
+                var simOk = await simulateTx(tx, connection);
+                if (!simOk) throw new Error('Transaction simulation failed — please try again.');
                 var signed = await wallet.signTransaction(tx);
-                var sig;
-                try {
-                    sig = await connection.sendRawTransaction(signed.serialize(), {
-                        skipPreflight: false,
-                        preflightCommitment: 'confirmed'
-                    });
-                } catch(sendErr) {
-                    var sendMsg = sendErr.message || String(sendErr);
-                    if (sendMsg.toLowerCase().includes('simulation') || sendMsg.toLowerCase().includes('preflight')) {
-                        sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: true });
-                    } else { throw sendErr; }
-                }
+                var sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: true });
 
                 signatures.push(sig);
                 totalNetLamports += netLamports;
-
-                connection.confirmTransaction({
-                    signature: sig,
-                    blockhash: latestBlockhash.blockhash,
-                    lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
-                }, 'confirmed').catch(function(){});
             }
 
             var totalNetSol = (totalNetLamports / 1e9).toFixed(4);
